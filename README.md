@@ -236,7 +236,7 @@ $aMessage = $oFolder->search()->text('hello world')->since('15.03.2018')->get();
 $aMessage = $oFolder->messages()->text('hello world')->since('15.03.2018')->get();
 
 ```
-All available query / search methods can be found here: [Query::class](src/IMAP/WhereQuery.php)
+All available query / search methods can be found here: [Query::class](src/Query/WhereQuery.php)
 
 Available search criteria:
 - `ALL` &mdash; return all messages matching the rest of the criteria
@@ -444,7 +444,7 @@ if you're just wishing a feature ;)
 >Off topic, rude or abusive issues will be deleted without any notice.
 
 ## Documentation
-### [Client::class](src/IMAP/Client.php)
+### [Client::class](src/Client.php)
 | Method              | Arguments                                                                       | Return            | Description                                                                                                                   |
 | ------------------- | ------------------------------------------------------------------------------- | :---------------: | ----------------------------------------------------------------------------------------------------------------------------  |
 | setConfig           | array $config                                                                   | self              | Set the Client configuration. Take a look at `config/imap.php` for more inspiration.                                          |
@@ -474,7 +474,7 @@ if you're just wishing a feature ;)
 | expunge             |                                                                                 | bool              | Delete all messages marked for deletion                                                                                       |
 | checkCurrentMailbox |                                                                                 | object            | Check current mailbox                                                                                                         |
 
-### [Message::class](src/IMAP/Message.php)
+### [Message::class](src/Message.php)
 | Method          | Arguments                     | Return               | Description                            |
 | --------------- | ----------------------------- | :------------------: | -------------------------------------- |
 | parseBody       |                               | Message              | Parse the Message body                 |
@@ -516,7 +516,7 @@ if you're just wishing a feature ;)
 | getFlags        |                               | FlagCollection       | Get the current message flags          |
 | is              |                               | boolean              | Does this message match another one?   |
 
-### [Folder::class](src/IMAP/Folder.php)
+### [Folder::class](src/Folder.php)
 | Method            | Arguments                                                                           | Return            | Description                                    |
 | ----------------- | ----------------------------------------------------------------------------------- | :---------------: | ---------------------------------------------- |
 | hasChildren       |                                                                                     | bool              | Determine if folder has children.              |
@@ -534,7 +534,7 @@ if you're just wishing a feature ;)
 | messages          | string $charset = 'UTF-8'                                                           | WhereQuery        | Alias for Folder::query()                      |
 | search            | string $charset = 'UTF-8'                                                           | WhereQuery        | Alias for Folder::query()                      |
       
-### [Query::class](src/IMAP/WhereQuery.php)
+### [Query::class](src/Query/WhereQuery.php)
 | Method             | Arguments                         | Return            | Description                                    |
 | ------------------ | --------------------------------- | :---------------: | ---------------------------------------------- |
 | where              | mixed $criteria, $value = null    | WhereQuery        | Add new criteria to the current query |
@@ -574,7 +574,7 @@ if you're just wishing a feature ;)
 | leaveUnread        |                                   | WhereQuery        | Don't mark all messages as "read" while fetching:  |
 | markAsRead         |                                   | WhereQuery        | Mark all messages as "read" while fetching |
            
-### [Attachment::class](src/IMAP/Attachment.php)
+### [Attachment::class](src/Attachment.php)
 | Method         | Arguments                      | Return         | Description                                            |
 | -------------- | ------------------------------ | :------------: | ------------------------------------------------------ |
 | getContent     |                                | string or null | Get attachment content                                 |     
@@ -587,28 +587,28 @@ if you're just wishing a feature ;)
 | getImgSrc      |                                | string or null | Get attachment image source as base64 encoded data url |      
 | save           | string $path, string $filename | boolean        | Save the attachment content to your filesystem         |      
 
-### [MessageCollection::class](src/IMAP/Support/MessageCollection.php)
+### [MessageCollection::class](src/Support/MessageCollection.php)
 Extends [Illuminate\Support\Collection::class](https://laravel.com/api/5.4/Illuminate/Support/Collection.html)
 
 | Method   | Arguments                                           | Return               | Description                      |
 | -------- | --------------------------------------------------- | :------------------: | -------------------------------- |
 | paginate | int $perPage = 15, $page = null, $pageName = 'page' | LengthAwarePaginator | Paginate the current collection. |
 
-### [FlagCollection::class](src/IMAP/Support/FlagCollection.php)
+### [FlagCollection::class](src/Support/FlagCollection.php)
 Extends [Illuminate\Support\Collection::class](https://laravel.com/api/5.4/Illuminate/Support/Collection.html)
 
 | Method   | Arguments                                           | Return               | Description                      |
 | -------- | --------------------------------------------------- | :------------------: | -------------------------------- |
 | paginate | int $perPage = 15, $page = null, $pageName = 'page' | LengthAwarePaginator | Paginate the current collection. |
 
-### [AttachmentCollection::class](src/IMAP/Support/AttachmentCollection.php)
+### [AttachmentCollection::class](src/Support/AttachmentCollection.php)
 Extends [Illuminate\Support\Collection::class](https://laravel.com/api/5.4/Illuminate/Support/Collection.html)
 
 | Method   | Arguments                                           | Return               | Description                      |
 | -------- | --------------------------------------------------- | :------------------: | -------------------------------- |
 | paginate | int $perPage = 15, $page = null, $pageName = 'page' | LengthAwarePaginator | Paginate the current collection. |
 
-### [FolderCollection::class](src/IMAP/Support/FolderCollection.php)
+### [FolderCollection::class](src/Support/FolderCollection.php)
 Extends [Illuminate\Support\Collection::class](https://laravel.com/api/5.4/Illuminate/Support/Collection.html)
 
 | Method   | Arguments                                           | Return               | Description                      |
