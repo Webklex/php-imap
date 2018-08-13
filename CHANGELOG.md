@@ -14,6 +14,6 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Affected Classes
 - NaN
 
-## 0.0.1 - 2017-03-04
+## 0.0.1 - 2018-08-13
 ### Added
 - new php-imap package (fork from [webklex/laravel-imap](https://github.com/Webklex/laravel-imap))
