@@ -111,17 +111,17 @@ class Folder {
      *
      * @param \Webklex\PHPIMAP\Client $client
      *
-     * @param object $folder
+     * @param object structure
      */
-    public function __construct(Client $client, $folder) {
+    public function __construct(Client $client, $structure) {
         $this->client = $client;
 
-        $this->delimiter = $folder->delimiter;
-        $this->path      = $folder->name;
-        $this->fullName  = $this->decodeName($folder->name);
+        $this->setDelimiter($structure->delimiter);
+        $this->path      = $structure->name;
+        $this->fullName  = $this->decodeName($structure->name);
         $this->name      = $this->getSimpleName($this->delimiter, $this->fullName);
 
-        $this->parseAttributes($folder->attributes);
+        $this->parseAttributes($structure->attributes);
     }
 
     /**
@@ -187,6 +187,7 @@ class Folder {
      * @param boolean      $fetch_flags
      *
      * @return Message|null
+     * @throws Exceptions\ConnectionFailedException
      */
     public function getMessage($uid, $msglist = null, $fetch_options = null, $fetch_body = false, $fetch_attachment = false, $fetch_flags = true) {
         if (imap_msgno($this->getClient()->getConnection(), $uid) > 0) {
@@ -210,8 +211,8 @@ class Folder {
      *
      * @return MessageCollection
      * @throws Exceptions\ConnectionFailedException
+     * @throws Exceptions\InvalidWhereQueryCriteriaException
      * @throws GetMessagesFailedException
-     * @throws MessageSearchValidationException
      */
     public function getMessages($criteria = 'ALL', $fetch_options = null, $fetch_body = true, $fetch_attachment = true, $fetch_flags = true, $limit = null, $page = 1, $charset = "UTF-8") {
 
@@ -234,8 +235,8 @@ class Folder {
      *
      * @return MessageCollection
      * @throws Exceptions\ConnectionFailedException
+     * @throws Exceptions\InvalidWhereQueryCriteriaException
      * @throws GetMessagesFailedException
-     * @throws MessageSearchValidationException
      *
      * @deprecated 1.0.5:2.0.0 No longer needed. Use Folder::getMessages('UNSEEN') instead
      * @see Folder::getMessages()
@@ -270,8 +271,8 @@ class Folder {
      * @return MessageCollection
      *
      * @throws Exceptions\ConnectionFailedException
+     * @throws Exceptions\InvalidWhereQueryCriteriaException
      * @throws GetMessagesFailedException
-     * @throws MessageSearchValidationException
      *
      * @doc http://php.net/manual/en/function.imap-search.php
      *      imap_search() only supports IMAP2 search criterias, because the function mail_criteria() (from c-client lib)
@@ -404,6 +405,7 @@ class Folder {
      *                  SA_ALL          - set all of the above
      *
      * @return object
+     * @throws Exceptions\ConnectionFailedException
      */
     public function getStatus($options) {
         return imap_status($this->client->getConnection(), $this->path, $options);
@@ -417,6 +419,7 @@ class Folder {
      * @param string $internal_date
      *
      * @return bool
+     * @throws Exceptions\ConnectionFailedException
      */
     public function appendMessage($message, $options = null, $internal_date = null) {
         return imap_append($this->client->getConnection(), $this->path, $message, $options, $internal_date);
@@ -429,5 +432,17 @@ class Folder {
      */
     public function getClient() {
         return $this->client;
+    }
+
+
+    /**
+     * @param $delimiter
+     */
+    public function setDelimiter($delimiter){
+        if(in_array($delimiter, [null, '', ' ', false]) === true) {
+            $delimiter = ClientManager::$config['options']['delimiter'];
+        }
+
+        $this->delimiter = $delimiter;
     }
 }

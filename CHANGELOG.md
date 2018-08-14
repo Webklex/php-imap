@@ -6,13 +6,13 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
+- Folder delimiter check added #137
 
 ### Added
 - NaN
 
 ### Affected Classes
-- NaN
+- [Folder::class](src/IMAP/Folder.php)
 
 ## 0.0.1 - 2018-08-13
 ### Added

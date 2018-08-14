@@ -383,8 +383,8 @@ class Client {
      *
      * @return MessageCollection
      * @throws ConnectionFailedException
+     * @throws Exceptions\InvalidWhereQueryCriteriaException
      * @throws GetMessagesFailedException
-     * @throws MessageSearchValidationException
      *
      * @deprecated 1.0.5.2:2.0.0 No longer needed. Use Folder::getMessages() instead
      * @see Folder::getMessages()
@@ -404,8 +404,8 @@ class Client {
      *
      * @return MessageCollection
      * @throws ConnectionFailedException
+     * @throws Exceptions\InvalidWhereQueryCriteriaException
      * @throws GetMessagesFailedException
-     * @throws MessageSearchValidationException
      *
      * @deprecated 1.0.5:2.0.0 No longer needed. Use Folder::getMessages('UNSEEN') instead
      * @see Folder::getMessages()
@@ -426,8 +426,8 @@ class Client {
      *
      * @return MessageCollection
      * @throws ConnectionFailedException
+     * @throws Exceptions\InvalidWhereQueryCriteriaException
      * @throws GetMessagesFailedException
-     * @throws MessageSearchValidationException
      *
      * @deprecated 1.0.5:2.0.0 No longer needed. Use Folder::searchMessages() instead
      * @see Folder::searchMessages()
