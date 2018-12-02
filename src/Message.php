@@ -119,6 +119,7 @@ class Message {
     public $in_reply_to = '';
     public $sender = [];
     public $priority = 0;
+    public $encoding = 'utf-8';
 
     /**
      * Message body components
@@ -343,8 +344,10 @@ class Message {
             } catch (\Exception $e) {
                 switch (true) {
                     case preg_match('/([A-Z]{2,3}\,\ [0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ [\-|\+][0-9]{4}\ \(.*)\)+$/i', $date) > 0:
+                    case preg_match('/([A-Z]{2,3}\, \ [0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ [\-|\+][0-9]{4}\ \(.*)\)+$/i', $date) > 0:
                     case preg_match('/([0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{2,4}\ [0-9]{2}\:[0-9]{2}\:[0-9]{2}\ [A-Z]{2}\ \-[0-9]{2}\:[0-9]{2}\ \([A-Z]{2,3}\ \-[0-9]{2}:[0-9]{2}\))+$/i', $date) > 0:
-                    $array = explode('(', $date);
+                        $date = str_replace('  ', ' ', $date);
+                        $array = explode('(', $date);
                         $array = array_reverse($array);
                         $date = trim(array_pop($array));
                         break;
@@ -518,7 +521,8 @@ class Message {
                     $partNumber = 1;
                 }
 
-                $encoding = $this->getEncoding($structure);
+                $encoding = $this->checkEncoding($structure);
+                $this->setEncoding($encoding);
 
                 $content = imap_fetchbody($this->client->getConnection(), $this->uid, $partNumber, $this->fetch_options | FT_UID);
                 $content = $this->decodeString($content, $structure->encoding);
@@ -537,7 +541,8 @@ class Message {
                     $partNumber = 1;
                 }
 
-                $encoding = $this->getEncoding($structure);
+                $encoding = $this->checkEncoding($structure);
+                $this->setEncoding($encoding);
 
                 $content = imap_fetchbody($this->client->getConnection(), $this->uid, $partNumber, $this->fetch_options | FT_UID);
                 $content = $this->decodeString($content, $structure->encoding);
@@ -709,13 +714,13 @@ class Message {
     }
 
     /**
-     * Get the encoding of a given abject
+     * Get the encoding of a given object
      *
      * @param object|string $structure
      *
      * @return string
      */
-    public function getEncoding($structure) {
+    public function checkEncoding($structure) {
         if (property_exists($structure, 'parameters')) {
             foreach ($structure->parameters as $parameter) {
                 if (strtolower($parameter->attribute) == "charset") {
@@ -727,6 +732,26 @@ class Message {
         }
 
         return 'UTF-8';
+    }
+
+    /**
+     * Get the encoding
+     *
+     * @return string
+     */
+    public function getEncoding() {
+        return $this->encoding;
+    }
+
+    /**
+     * Set the encoding
+     * @param $encoding
+     * 
+     * @return $this
+     */
+    public function setEncoding($encoding) {
+        $this->encoding = $encoding;
+        return $this;
     }
 
     /**
