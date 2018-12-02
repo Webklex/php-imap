@@ -140,6 +140,8 @@ class Client {
     * @return self
     */
     public function setConfig(array $config) {
+        if(empty(ClientManager::$config)) new ClientManager($config);
+
         $default_account = ClientManager::$config['default'];
         $defaultConfig  = ClientManager::$config['accounts'][$default_account];
 
