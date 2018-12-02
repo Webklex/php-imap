@@ -44,14 +44,6 @@
     "extra": {
         "branch-alias": {
             "dev-master": "1.0-dev"
-        },
-        "laravel": {
-            "providers": [
-                "Webklex\\IMAP\\Providers\\LaravelServiceProvider"
-            ],
-            "aliases": {
-                "Client": "Webklex\\IMAP\\Facades\\Client"
-            }
         }
     },
     "minimum-stability": "dev",
