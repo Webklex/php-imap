@@ -6,13 +6,23 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- Folder delimiter check added #137
+- NaN
 
 ### Added
 - NaN
 
 ### Affected Classes
-- [Folder::class](src/IMAP/Folder.php)
+- NaN
+
+## 0.0.3 - 2018-12-02
+### Fixed
+- Folder delimiter check added #137
+- Config setting not getting loaded
+- Date parsing updated
+
+### Affected Classes
+- [Folder::class](src/IMAP/Client.php)
+- [Folder::class](src/IMAP/Message.php)
 
 ## 0.0.1 - 2018-08-13
 ### Added
