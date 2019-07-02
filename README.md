@@ -344,32 +344,32 @@ $paginator = $oFolder->search()
 ``` html
 <table>
     <thead>
-        <tr>
-            <th>UID</th>
-            <th>Subject</th>
-            <th>From</th>
-            <th>Attachments</th>
-        </tr>
+    <tr>
+        <th>UID</th>
+        <th>Subject</th>
+        <th>From</th>
+        <th>Attachments</th>
+    </tr>
     </thead>
     <tbody>
         <?php if($paginator->count() > 0): ?>
             <?php foreach($paginator as $oMessage): ?>
-                <tr>
-                    <td><?php echo $oMessage->getUid(); ?></td>
-                    <td><?php echo $oMessage->getSubject(); ?></td>
-                    <td><?php echo $oMessage->getFrom()[0]->mail; ?></td>
-                    <td><?php echo $oMessage->getAttachments()->count() > 0 ? 'yes' : 'no'; ?></td>
-                </tr>
-            <?php endforeach: ?>
+            <tr>
+                <td><?php echo $oMessage->getUid(); ?></td>
+                <td><?php echo $oMessage->getSubject(); ?></td>
+                <td><?php echo $oMessage->getFrom()[0]->mail; ?></td>
+                <td><?php echo $oMessage->getAttachments()->count() > 0 ? 'yes' : 'no'; ?></td>
+            </tr>
+            <?php endforeach; ?>
         <?php else: ?>
             <tr>
                 <td colspan="4">No messages found</td>
             </tr>
-        <?php endif: ?>
+        <?php endif; ?>
     </tbody>
 </table>
 
-{{$paginator->links()}}
+<?php echo $paginator->links(); ?>
 ```
 > You can also paginate a Folder-, Attachment- or FlagCollection instance.
 

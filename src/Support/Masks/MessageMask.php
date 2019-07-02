@@ -79,33 +79,4 @@ class MessageMask extends Mask {
             return $body;
         });
     }
-
-    /**
-     * Get the Message html body with embedded image urls
-     * the resulting $body.
-     *
-     * @param string $route_name
-     * @param array $params
-     *
-     * @return null|string
-     */
-    public function getHTMLBodyWithEmbeddedUrlImages($route_name, $params = []) {
-        return $this->getCustomHTMLBody(function($body, $oAttachment) use($route_name, $params){
-            /** @var \Webklex\PHPIMAP\Attachment $oAttachment */
-            if ($oAttachment->id && $oAttachment->getImgSrc() != null) {
-                $oMessage = $oAttachment->getMessage();
-
-                $image_url = route($route_name, array_merge([
-                    'muid' => urlencode($oMessage->uid),
-                    'mid' => urlencode($oMessage->message_id),
-                    'mti' => urlencode($oMessage->date->timestamp),
-                    'aid' => urlencode($oAttachment->id)
-                ], $params));
-
-                $body = str_replace('cid:'.$oAttachment->id, $image_url, $body);
-            }
-
-            return $body;
-        });
-    }
 }
