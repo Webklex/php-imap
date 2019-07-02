@@ -24,12 +24,15 @@ and move them into a new repository.
     - [Basic usage example](#basic-usage-example)
     - [Folder / Mailbox](#folder--mailbox)
     - [Search](#search-for-messages)
+    - [Counting messages](#counting-messages)
     - [Result limiting](#result-limiting)
     - [Pagination](#pagination)
+    - [View examples](#view-examples)
     - [Fetch a specific message](#fetch-a-specific-message)
     - [Message flags](#message-flags)
     - [Attachments](#attachments)
     - [Advanced fetching](#advanced-fetching)
+    - [Masking](#masking)
     - [Specials](#specials)
 - [Support](#support)
 - [Documentation](#documentation)
@@ -38,11 +41,15 @@ and move them into a new repository.
   - [Folder::class](#folderclass)
   - [Query::class](#queryclass)
   - [Attachment::class](#attachmentclass) 
+  - [Mask::class](#maskclass) 
+    - [MessageMask::class](#messagemaskclass) 
+    - [AttachmentMask::class](#attachmentmaskclass) 
   - [MessageCollection::class](#messagecollectionclass) 
   - [AttachmentCollection::class](#attachmentcollectionclass) 
   - [FolderCollection::class](#foldercollectionclass) 
   - [FlagCollection::class](#flagcollectionclass) 
 - [Known issues](#known-issues)
+- [Milestones & upcoming features](#milestones--upcoming-features)
 - [Security](#security)
 - [Credits](#credits)
 - [License](#license)
@@ -76,6 +83,8 @@ The following encryption methods are supported:
 - `false` &mdash; Disable encryption 
 - `ssl` &mdash; Use SSL
 - `tls` &mdash; Use TLS
+- `starttls` &mdash; Use STARTTLS (alias TLS)
+- `notls` &mdash; Use NoTLS
 
 Detailed [config/imap.php](src/config/imap.php) configuration:
  - `default` &mdash; used default account. It will be used as default for any missing account parameters. If however the default account is missing a parameter the package default will be used. Set to `false` to disable this functionality.
@@ -87,9 +96,10 @@ Detailed [config/imap.php](src/config/imap.php) configuration:
      - `validate_cert` &mdash; decide weather you want to verify the certificate or not
      - `username` &mdash; imap account username
      - `password` &mdash; imap account password
+ - `date_format` &mdash; The default date format is used to convert any given Carbon::class object into a valid date string. (`d-M-Y`, `d-M-y`, `d M y`)
  - `options` &mdash; additional fetch options
    - `delimiter` &mdash; you can use any supported char such as ".", "/", etc
-   - `fetch` &mdash; `FT_UID` (message marked as read by fetching the message) or `FT_PEEK` (fetch the message without setting the "read" flag)
+   - `fetch` &mdash; `IMAP::FT_UID` (message marked as read by fetching the message) or `IMAP::FT_PEEK` (fetch the message without setting the "read" flag)
    - `fetch_body` &mdash; If set to `false` all messages will be fetched without the body and any potential attachments
    - `fetch_attachment` &mdash;  If set to `false` all messages will be fetched without any attachments
    - `fetch_flags` &mdash;  If set to `false` all messages will be fetched without any flags
@@ -97,6 +107,10 @@ Detailed [config/imap.php](src/config/imap.php) configuration:
    - `fetch_order` &mdash; Message fetch order
    - `open` &mdash; special configuration for imap_open()
      - `DISABLE_AUTHENTICATOR` &mdash; Disable authentication properties.
+   - `decoder` &mdash; Currently only the message subject and attachment name decoder can be set
+   - `masks` &mdash; Default [masking](#masking) config
+     - `message` &mdash; Default message mask
+     - `attachment` &mdash; Default attachment mask
 
 ## Usage
 #### Basic usage example
@@ -183,60 +197,67 @@ $aFolder = $oClient->getFolders();
 #### Search for messages
 Search for specific emails:
 ``` php
-/** @var \Webklex\PHPIMAP\Folder $oFolder */
+/** @var \Webklex\IMAP\Folder $oFolder */
 
 //Get all messages
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->all()->get();
 
 //Get all messages from example@domain.com
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->from('example@domain.com')->get();
 
 //Get all messages since march 15 2018
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->since('15.03.2018')->get();
 
 //Get all messages within the last 5 days
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->since(now()->subDays(5))->get();
 //Or for older laravel versions..
 $aMessage = $oFolder->query()->since(\Carbon::now()->subDays(5))->get();
 
 //Get all messages containing "hello world"
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->text('hello world')->get();
 
 //Get all unseen messages containing "hello world"
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->unseen()->text('hello world')->get();
 
 //Extended custom search query for all messages containing "hello world" 
 //and have been received since march 15 2018
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->text('hello world')->since('15.03.2018')->get();
 $aMessage = $oFolder->query()->Text('hello world')->Since('15.03.2018')->get();
 $aMessage = $oFolder->query()->whereText('hello world')->whereSince('15.03.2018')->get();
 
 // Build a custom search query
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()
 ->where([['TEXT', 'Hello world'], ['SINCE', \Carbon::parse('15.03.2018')]])
 ->get();
+
+//!EXPERIMENTAL!
+//Get all messages NOT containing "hello world"
+/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
+$aMessage = $oFolder->query()->notText('hello world')->get();
+$aMessage = $oFolder->query()->not_text('hello world')->get();
+$aMessage = $oFolder->query()->not()->text('hello world')->get();
 ```
 
 Available search aliases for a better code reading:
 ``` php
 // Folder::search() is just an alias for Folder::query()
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->search()->text('hello world')->since('15.03.2018')->get();
 
 // Folder::messages() is just an alias for Folder::query()
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->messages()->text('hello world')->since('15.03.2018')->get();
 
 ```
-All available query / search methods can be found here: [Query::class](src/Query/WhereQuery.php)
+All available query / search methods can be found here: [Query::class](src/IMAP/Query/WhereQuery.php)
 
 Available search criteria:
 - `ALL` &mdash; return all messages matching the rest of the criteria
@@ -250,6 +271,7 @@ Available search criteria:
 - `FROM` "string" &mdash; match messages with "string" in the From: field
 - `KEYWORD` "string" &mdash; match messages with "string" as a keyword
 - `NEW` &mdash; match new messages
+- `NOT` &mdash; not matching
 - `OLD` &mdash; match old messages
 - `ON` "date" &mdash; match messages with Date: matching "date"
 - `RECENT` &mdash; match messages with the \\RECENT flag set
@@ -269,18 +291,39 @@ Further information:
 - https://tools.ietf.org/html/rfc1176
 - https://tools.ietf.org/html/rfc1064
 - https://tools.ietf.org/html/rfc822
+- https://gist.github.com/martinrusev/6121028
 
 #### Result limiting
 Limiting the request emails:
 ``` php
-/** @var \Webklex\PHPIMAP\Folder $oFolder */
+/** @var \Webklex\IMAP\Folder $oFolder */
 
 //Get all messages for page 2 since march 15 2018 where each apge contains 10 messages
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->since('15.03.2018')->limit(10, 2)->get();
 ```
 
+#### Counting messages
+Count all available messages matching the current search criteria:
+``` php
+/** @var \Webklex\IMAP\Folder $oFolder */
+
+//Count all messages
+/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
+$count = $oFolder->query()->all()->count();
+
+//Count all messages since march 15 2018
+$count = $oFolder->query()->since('15.03.2018')->count();
+```
+
 #### Pagination
+Paginate a query:
+``` php
+/** @var \Webklex\IMAP\Folder $oFolder */
+
+/** @var \Illuminate\Pagination\LengthAwarePaginator $paginator */
+$paginator = $oFolder->query()->since('15.03.2018')->paginate();
+```
 Paginate a message collection:
 ``` php
 /** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
@@ -288,7 +331,6 @@ Paginate a message collection:
 /** @var \Illuminate\Pagination\LengthAwarePaginator $paginator */
 $paginator = $aMessage->paginate();
 ```
-
 View example for a paginated list:
 ``` php
 /** @var \Webklex\IMAP\Folder $oFolder */
@@ -332,47 +374,50 @@ $paginator = $oFolder->search()
 > You can also paginate a Folder-, Attachment- or FlagCollection instance.
 
 
+#### View examples
+You can find a few blade examples under [/examples](https://github.com/Webklex/laravel-imap/tree/master/examples).
+
 #### Fetch a specific message
 Get a specific message by uid (Please note that the uid is not unique and can change):
 ``` php
-/** @var \Webklex\PHPIMAP\Folder $oFolder */
+/** @var \Webklex\IMAP\Folder $oFolder */
 
-/** @var \Webklex\PHPIMAP\Message $oMessage */
+/** @var \Webklex\IMAP\Message $oMessage */
 $oMessage = $oFolder->getMessage($uid = 1);
 ```
 
 #### Message flags
 Flag or "unflag" a message:
 ``` php
-/** @var \Webklex\PHPIMAP\Message $oMessage */
+/** @var \Webklex\IMAP\Message $oMessage */
 $oMessage->setFlag(['Seen', 'Spam']);
 $oMessage->unsetFlag('Spam');
 ```
 
 Mark all messages as "read" while fetching:
 ``` php
-/** @var \Webklex\PHPIMAP\Folder $oFolder */
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\IMAP\Folder $oFolder */
+/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->text('Hello world')->markAsRead()->get();
 ```
 
 Don't mark all messages as "read" while fetching:
 ``` php
-/** @var \Webklex\PHPIMAP\Folder $oFolder */
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\IMAP\Folder $oFolder */
+/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->text('Hello world')->leaveUnread()->get();
 ```
 
 #### Attachments
 Save message attachments:
 ``` php
-/** @var \Webklex\PHPIMAP\Message $oMessage */
+/** @var \Webklex\IMAP\Message $oMessage */
 
-/** @var \Webklex\PHPIMAP\Support\AttachmentCollection $aAttachment */
+/** @var \Webklex\IMAP\Support\AttachmentCollection $aAttachment */
 $aAttachment = $oMessage->getAttachments();
 
 $aAttachment->each(function ($oAttachment) {
-    /** @var \Webklex\PHPIMAP\Attachment $oAttachment */
+    /** @var \Webklex\IMAP\Attachment $oAttachment */
     $oAttachment->save();
 });
 ```
@@ -380,33 +425,96 @@ $aAttachment->each(function ($oAttachment) {
 #### Advanced fetching
 Fetch messages without body fetching (decrease load):
 ``` php
-/** @var \Webklex\PHPIMAP\Folder $oFolder */
+/** @var \Webklex\IMAP\Folder $oFolder */
 
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->whereText('Hello world')->setFetchBody(false)->get();
 
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->whereAll()->setFetchBody(false)->setFetchAttachment();
 ```
 
 Fetch messages without body, flag and attachment fetching (decrease load):
 ``` php
-/** @var \Webklex\PHPIMAP\Folder $oFolder */
+/** @var \Webklex\IMAP\Folder $oFolder */
 
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->whereText('Hello world')
 ->setFetchFlags(false)
 ->setFetchBody(false)
 ->setFetchAttachment(false)
 ->get();
 
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->whereAll()
 ->setFetchFlags(false)
 ->setFetchBody(false)
 ->setFetchAttachment(false)
 ->get();
 ```
+
+#### Masking
+Laravel-IMAP already comes with two default masks [MessageMask::class](#messagemaskclass) and [AttachmentMask::class](#attachmentmaskclass).
+
+The masked instance has to be called manually and is designed to add custom functionality.
+
+You can call the default mask by calling the mask method without any arguments.
+``` php
+/** @var \Webklex\IMAP\Message $oMessage */
+$mask = $oMessage->mask();
+```
+
+There are several methods available to set the default mask:
+``` php
+/** @var \Webklex\IMAP\Client $oClient */
+/** @var \Webklex\IMAP\Message $oMessage */
+
+$message_mask = \Webklex\IMAP\Support\Masks\MessageMask::class;
+
+$oClient->setDefaultMessageMask($message_mask);
+$oMessage->setMask($message_mask);
+$mask = $oMessage->mask($message_mask);
+```
+The last one wont set the mask but generate a masked instance using the provided mask.
+
+You could also set the default masks inside your `config/imap.php` file under `masks`.
+
+You can also apply a mask on [attachments](#attachmentclass):
+``` php
+/** @var \Webklex\IMAP\Client $oClient */
+/** @var \Webklex\IMAP\Attachment $oAttachment */
+$attachment_mask = \Webklex\IMAP\Support\Masks\AttachmentMask::class;
+
+$oClient->setDefaultAttachmentMask($attachment_mask);
+$oAttachment->setMask($attachment_mask);
+$mask = $oAttachment->mask($attachment_mask);
+```
+
+If you want to implement your own mask just extend [MessageMask::class](#messagemaskclass), [AttachmentMask::class](#attachmentmaskclass)
+or [Mask::class](#maskclass) and implement your desired logic:
+
+``` php
+/** @var \Webklex\IMAP\Message $oMessage */
+class CustomMessageMask extends \Webklex\IMAP\Support\Masks\MessageMask {
+
+    /**
+     * New custom method which can be called through a mask
+     * @return string
+     */
+    public function token(){
+        return implode('-', [$this->message_id, $this->uid, $this->message_no]);
+    }
+}
+
+$mask = $oMessage->mask(CustomMessageMask::class);
+
+echo $mask->token().'@'.$mask->uid;
+```
+
+Additional examples can be found here:
+- [Custom message mask](https://github.com/Webklex/laravel-imap/blob/master/examples/custom_message_mask.php)
+- [Custom attachment mask](https://github.com/Webklex/laravel-imap/blob/master/examples/custom_attachment_mask.php)
+
 
 #### Specials
 Find the folder containing a message:
@@ -445,45 +553,54 @@ if you're just wishing a feature ;)
 
 ## Documentation
 ### [Client::class](src/Client.php)
-| Method              | Arguments                                                                       | Return            | Description                                                                                                                   |
-| ------------------- | ------------------------------------------------------------------------------- | :---------------: | ----------------------------------------------------------------------------------------------------------------------------  |
-| setConfig           | array $config                                                                   | self              | Set the Client configuration. Take a look at `config/imap.php` for more inspiration.                                          |
-| getConnection       | resource $connection                                                            | resource          | Get the current imap resource                                                                                                 |
-| setReadOnly         | bool $readOnly                                                                  | self              | Set read only property and reconnect if it's necessary.                                                                       |
-| isReadOnly          |                                                                                 | bool              | Determine if connection is in read only mode.                                                                                 |
-| isConnected         |                                                                                 | bool              | Determine if connection was established.                                                                                      |
-| checkConnection     |                                                                                 |                   | Determine if connection was established and connect if not.                                                                   |
-| connect             | int $attempts                                                                   |                   | Connect to server.                                                                                                            |
-| disconnect          |                                                                                 |                   | Disconnect from server.                                                                                                       |
-| getFolder           | string $folder_name, int $attributes = 32, int or null $delimiter               | Folder            | Get a Folder instance by name                                                                                                 |
-| getFolders          | bool $hierarchical, string or null $parent_folder                               | FolderCollection  | Get folders list. If hierarchical order is set to true, it will make a tree of folders, otherwise it will return flat array.  |
-| openFolder          | Folder $folder, integer $attempts                                               |                   | Open a given folder.                                                                                                          |
-| createFolder        | string $name                                                                    | boolean           | Create a new folder.                                                                                                          |
-| renameFolder        | string $old_name, string $new_name                                              | boolean           | Rename a folder. |
-| deleteFolder        | string $name                                                                    | boolean           | Delete a folder. |
-| getMessages         | Folder $folder, string $criteria, bool $fetch_body, bool $fetch_attachment, bool $fetch_flags      | MessageCollection | Get messages from folder.                                                                                                     |
-| getUnseenMessages   | Folder $folder, string $criteria, bool $fetch_body, bool $fetch_attachment, bool $fetch_flags      | MessageCollection | Get Unseen messages from folder.                                                                                              |
-| searchMessages      | array $where, Folder $folder, $fetch_options, bool $fetch_body, string $charset, bool $fetch_attachment, bool $fetch_flags | MessageCollection | Get specific messages from a given folder.                                                                                    |
-| getQuota            |                                                                                 | array             | Retrieve the quota level settings, and usage statics per mailbox                                                              |
-| getQuotaRoot        | string $quota_root                                                              | array             | Retrieve the quota settings per user                                                                                          |
-| countMessages       |                                                                                 | int               | Gets the number of messages in the current mailbox                                                                            |
-| countRecentMessages |                                                                                 | int               | Gets the number of recent messages in current mailbox                                                                         |
-| getAlerts           |                                                                                 | array             | Returns all IMAP alert messages that have occurred                                                                            |
-| getErrors           |                                                                                 | array             | Returns all of the IMAP errors that have occurred                                                                             |
-| getLastError        |                                                                                 | string            | Gets the last IMAP error that occurred during this page request                                                               |
-| expunge             |                                                                                 | bool              | Delete all messages marked for deletion                                                                                       |
-| checkCurrentMailbox |                                                                                 | object            | Check current mailbox                                                                                                         |
+
+| Method                    | Arguments                                                                       | Return            | Description                                                                                                                   |
+| ------------------------- | ------------------------------------------------------------------------------- | :---------------: | ----------------------------------------------------------------------------------------------------------------------------  |
+| setConfig                 | array $config                                                                   | self              | Set the Client configuration. Take a look at `config/imap.php` for more inspiration.                                          |
+| getConnection             | resource $connection                                                            | resource          | Get the current imap resource                                                                                                 |
+| setReadOnly               | bool $readOnly                                                                  | self              | Set read only property and reconnect if it's necessary.                                                                       |
+| isReadOnly                |                                                                                 | bool              | Determine if connection is in read only mode.                                                                                 |
+| isConnected               |                                                                                 | bool              | Determine if connection was established.                                                                                      |
+| checkConnection           |                                                                                 |                   | Determine if connection was established and connect if not.                                                                   |
+| connect                   | int $attempts                                                                   |                   | Connect to server.                                                                                                            |
+| disconnect                |                                                                                 |                   | Disconnect from server.                                                                                                       |
+| getFolder                 | string $folder_name, int $attributes = 32, int or null $delimiter               | Folder            | Get a Folder instance by name                                                                                                 |
+| getFolders                | bool $hierarchical, string or null $parent_folder                               | FolderCollection  | Get folders list. If hierarchical order is set to true, it will make a tree of folders, otherwise it will return flat array.  |
+| openFolder                | string or Folder $folder, integer $attempts                                     |                   | Open a given folder.                                                                                                          |
+| createFolder              | string $name                                                                    | boolean           | Create a new folder.                                                                                                          |
+| renameFolder              | string $old_name, string $new_name                                              | boolean           | Rename a folder. |
+| deleteFolder              | string $name                                                                    | boolean           | Delete a folder. |
+| getMessages               | Folder $folder, string $criteria, bool $fetch_body, bool $fetch_attachment, bool $fetch_flags       | MessageCollection | Get messages from folder.                                                                                 |
+| getUnseenMessages         | Folder $folder, string $criteria, bool $fetch_body, bool $fetch_attachment, bool $fetch_flags       | MessageCollection | Get Unseen messages from folder.                                                                          |
+| searchMessages            | array $where, Folder $folder, $fetch_options, bool $fetch_body, string $charset, bool $fetch_attachment, bool $fetch_flags | MessageCollection | Get specific messages from a given folder.                                         |
+| getQuota                  |                                                                                 | array             | Retrieve the quota level settings, and usage statics per mailbox                                                              |
+| getQuotaRoot              | string $quota_root                                                              | array             | Retrieve the quota settings per user                                                                                          |
+| countMessages             |                                                                                 | int               | Gets the number of messages in the current mailbox                                                                            |
+| countRecentMessages       |                                                                                 | int               | Gets the number of recent messages in current mailbox                                                                         |
+| getAlerts                 |                                                                                 | array             | Returns all IMAP alert messages that have occurred                                                                            |
+| getErrors                 |                                                                                 | array             | Returns all of the IMAP errors that have occurred                                                                             |
+| getLastError              |                                                                                 | string            | Gets the last IMAP error that occurred during this page request                                                               |
+| expunge                   |                                                                                 | bool              | Delete all messages marked for deletion                                                                                       |
+| checkCurrentMailbox       |                                                                                 | object            | Check current mailbox                                                                                                         |
+| setTimeout                | string or int $type, int $timeout                                               | boolean           | Set the timeout for certain imap operations: 1: Open, 2: Read, 3: Write, 4: Close                                             |
+| getTimeout                | string or int $type                                                             | int               | Check current mailbox                                                                                                         |
+| setDefaultMessageMask     | string $mask                                                                    | self              | Set the default message mask class                                                                                            |
+| getDefaultMessageMask     |                                                                                 | string            | Get the current default message mask class name                                                                               | 
+| setDefaultAttachmentMask  | string $mask                                                                    | self              | Set the default attachment mask class                                                                                         |
+| getDefaultAttachmentMask  |                                                                                 | string            | Get the current default attachment mask class name                                                                            | 
+| getFolderPath             |                                                                                 | string            | Get the current folder path                                                                                                   | 
 
 ### [Message::class](src/Message.php)
+
 | Method          | Arguments                     | Return               | Description                            |
 | --------------- | ----------------------------- | :------------------: | -------------------------------------- |
 | parseBody       |                               | Message              | Parse the Message body                 |
-| delete          |                               |                      | Delete the current Message             |
-| restore         |                               |                      | Restore a deleted Message              |
-| copy            | string $mailbox, int $options |                      | Copy the current Messages to a mailbox |
-| move            | string $mailbox, int $options |                      | Move the current Messages to a mailbox |
+| delete          | boolean $expunge              | boolean              | Delete the current Message             |
+| restore         | boolean $expunge              | boolean              | Restore a deleted Message              |
+| copy            | string $mailbox, int $options | boolean              | Copy the current Messages to a mailbox |
+| move            | string $mailbox, int $options | boolean              | Move the current Messages to a mailbox |
 | getContainingFolder | Folder or null $folder    | Folder or null       | Get the folder containing the message  |
-| moveToFolder    | string $mailbox, int $options |                      | Move the Message into an other Folder  |
+| moveToFolder    | string $mailbox, boolean $expunge, boolean $create_folder | Message | Move the Message into an other Folder  |
 | setFlag         | string or array $flag         | boolean              | Set one or many flags                  |
 | unsetFlag       | string or array $flag         | boolean              | Unset one or many flags                |
 | hasTextBody     |                               |                      | Check if the Message has a text body   |
@@ -498,7 +615,7 @@ if you're just wishing a feature ;)
 | getMsglist      |                               | integer              | Get the current message list           |
 | getHeaderInfo   |                               | object               | Get the current header_info object     |
 | getHeader       |                               | string               | Get the current raw header             |
-| getMessageId    |                               | integer              | Get the current message ID             |
+| getMessageId    |                               | string               | Get the current message ID             |
 | getMessageNo    |                               | integer              | Get the current message number         |
 | getPriority     |                               | integer              | Get the current message priority       |
 | getSubject      |                               | string               | Get the current subject                |
@@ -515,8 +632,14 @@ if you're just wishing a feature ;)
 | getRawBody      |                               | mixed                | Get the current raw message body       |
 | getFlags        |                               | FlagCollection       | Get the current message flags          |
 | is              |                               | boolean              | Does this message match another one?   |
+| getStructure    |                               | object               | The raw message structure              |
+| getFolder       |                               | Folder               | The current folder                     |
+| mask            | string $mask = null           | Mask                 | Get a masked instance                  |
+| setMask         | string $mask                  | Message              | Set the mask class                     |
+| getMask         |                               | string               | Get the current mask class name        |
 
 ### [Folder::class](src/Folder.php)
+
 | Method            | Arguments                                                                           | Return            | Description                                    |
 | ----------------- | ----------------------------------------------------------------------------------- | :---------------: | ---------------------------------------------- |
 | hasChildren       |                                                                                     | bool              | Determine if folder has children.              |
@@ -535,16 +658,17 @@ if you're just wishing a feature ;)
 | search            | string $charset = 'UTF-8'                                                           | WhereQuery        | Alias for Folder::query()                      |
       
 ### [Query::class](src/Query/WhereQuery.php)
+
 | Method             | Arguments                         | Return            | Description                                    |
 | ------------------ | --------------------------------- | :---------------: | ---------------------------------------------- |
 | where              | mixed $criteria, $value = null    | WhereQuery        | Add new criteria to the current query |
-| orWhere            | Closure $$closure                 | WhereQuery        | If supported you can perform extended search requests |
-| andWhere           | Closure $$closure                 | WhereQuery        | If supported you can perform extended search requests |
+| orWhere            | Closure $closure                  | WhereQuery        | If supported you can perform extended search requests |
+| andWhere           | Closure $closure                  | WhereQuery        | If supported you can perform extended search requests |
 | all                |                                   | WhereQuery        | Select all available messages |
-| answered           |                                   | WhereQuery        | Select answered messages |
 | answered           |                                   | WhereQuery        | Select answered messages |
 | deleted            |                                   | WhereQuery        | Select deleted messages |
 | new                |                                   | WhereQuery        | Select new messages |
+| not                |                                   | WhereQuery        | Not select messages |
 | old                |                                   | WhereQuery        | Select old messages |
 | recent             |                                   | WhereQuery        | Select recent messages |
 | seen               |                                   | WhereQuery        | Select seen messages |
@@ -552,7 +676,11 @@ if you're just wishing a feature ;)
 | undeleted          |                                   | WhereQuery        | Select undeleted messages |
 | unflagged          |                                   | WhereQuery        | Select unflagged messages |
 | unseen             |                                   | WhereQuery        | Select unseen messages |
+| noXSpam            |                                   | WhereQuery        | Select as no xspam flagged messages |
+| isXSpam            |                                   | WhereQuery        | Select as xspam flagged messages |
+| language           | string $value                     | WhereQuery        | Select messages matching a given language |
 | unkeyword          | string $value                     | WhereQuery        | Select messages matching a given unkeyword |
+| messageId          | string $value                     | WhereQuery        | Select messages matching a given message id |
 | to                 | string $value                     | WhereQuery        | Select messages matching a given receiver (To:) |
 | text               | string $value                     | WhereQuery        | Select messages matching a given text body |
 | subject            | string $value                     | WhereQuery        | Select messages matching a given subject |
@@ -565,6 +693,7 @@ if you're just wishing a feature ;)
 | body               | string $value                     | WhereQuery        | Select messages matching a given HTML body |
 | before             | string $value                     | WhereQuery        | Select messages before a given date |
 | bcc                | string $value                     | WhereQuery        | Select messages matching a given receiver (BCC:) |
+| count              |                                   | integer           | Count all available messages matching the current search criteria |
 | get                |                                   | MessageCollection | Fetch messages with the current query |
 | limit              | integer $limit, integer $page = 1 | WhereQuery        | Limit the amount of messages being fetched |
 | setFetchOptions    | boolean $fetch_options            | WhereQuery        | Set the fetch options |
@@ -572,9 +701,12 @@ if you're just wishing a feature ;)
 | getFetchAttachment | boolean $fetch_attachment         | WhereQuery        | Set the fetch attachment option |
 | setFetchFlags      | boolean $fetch_flags              | WhereQuery        | Set the fetch flags option |
 | leaveUnread        |                                   | WhereQuery        | Don't mark all messages as "read" while fetching:  |
-| markAsRead         |                                   | WhereQuery        | Mark all messages as "read" while fetching |
+| markAsRead         |                                   | WhereQuery        | Mark all messages as "read" while fetching |  
+| paginate           | int $perPage = 5, $page = null, $pageName = 'imap_page' | LengthAwarePaginator | Paginate the current query. |
+     
            
 ### [Attachment::class](src/Attachment.php)
+
 | Method         | Arguments                      | Return         | Description                                            |
 | -------------- | ------------------------------ | :------------: | ------------------------------------------------------ |
 | getContent     |                                | string or null | Get attachment content                                 |     
@@ -585,7 +717,36 @@ if you're just wishing a feature ;)
 | getDisposition |                                | string or null | Get attachment disposition                             | 
 | getContentType |                                | string or null | Get attachment content type                            | 
 | getImgSrc      |                                | string or null | Get attachment image source as base64 encoded data url |      
-| save           | string $path, string $filename | boolean        | Save the attachment content to your filesystem         |      
+| save           | string $path, string $filename | boolean        | Save the attachment content to your filesystem         |    
+| mask           | string $mask = null            | Mask           | Get a masked instance                                  |
+| setMask        | string $mask                   | Attachment     | Set the mask class                                     |
+| getMask        |                                | string         | Get the current mask class name                        |  
+
+### [Mask::class](src/Support/Masks/Mask.php)
+
+| Method         | Arguments                      | Return         | Description                                            |
+| -------------- | ------------------------------ | :------------: | ------------------------------------------------------ |
+| getParent      |                                | Masked parent  | Get the masked parent object                           |     
+| getAttributes  |                                | array          | Get all cloned attributes                              |  
+| __get          |                                | mixed          | Access any cloned parent attribute                     |  
+| __set          |                                | mixed          | Set any cloned parent attribute                        |  
+| __inherit      |                                | mixed          | All public methods of the given parent are callable    |
+
+### [MessageMask::class](src/Support/Masks/MessageMask.php)
+
+| Method                              | Arguments                              | Return         | Description                                |
+| ----------------------------------- | -------------------------------------- | :------------: | ------------------------------------------ |
+| getHtmlBody                         |                                        | string or null | Get HTML body                              |     
+| getCustomHTMLBody                   | callable or bool $callback             | string or null | Get a custom HTML body                     |  
+| getHTMLBodyWithEmbeddedBase64Images |                                        | string or null | Get HTML body with embedded base64 images  |  
+| getHTMLBodyWithEmbeddedUrlImages    | string $route_name, array $params = [] | string or null | Get HTML body with embedded routed images  |  
+
+### [AttachmentMask::class](src/Support/Masks/AttachmentMask.php)
+
+| Method         | Arguments                      | Return         | Description                                            |
+| -------------- | ------------------------------ | :------------: | ------------------------------------------------------ |
+| getContentBase64Encoded     |                   | string or null | Get attachment content                                 |     
+| getImageSrc    |                                | string or null | Get attachment mime type                               |    
 
 ### [MessageCollection::class](src/Support/MessageCollection.php)
 Extends [Illuminate\Support\Collection::class](https://laravel.com/api/5.4/Illuminate/Support/Collection.html)

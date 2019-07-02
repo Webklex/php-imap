@@ -49,6 +49,7 @@ class ClientManager {
      * @param  array   $parameters
      *
      * @return mixed
+     * @throws Exceptions\MaskNotFoundException
      */
     public function __call($method, $parameters) {
         $callable = [$this->account(), $method];
@@ -57,11 +58,42 @@ class ClientManager {
     }
 
     /**
+     * Get a dotted config parameter
+     *
+     * @param string $key
+     * @param null   $default
+     *
+     * @return mixed|null
+     */
+    public static function get($key, $default = null) {
+        $parts = explode('.', $key);
+        $value = null;
+        foreach($parts as $part) {
+            if($value === null) {
+                if(isset(self::$config[$part])) {
+                    $value = self::$config[$part];
+                }else{
+                    break;
+                }
+            }else{
+                if(isset($value[$part])) {
+                    $value = $value[$part];
+                }else{
+                    break;
+                }
+            }
+        }
+
+        return $value === null ? $default : $value;
+    }
+
+    /**
      * Resolve a account instance.
      *
      * @param  string  $name
      *
      * @return Client
+     * @throws Exceptions\MaskNotFoundException
      */
     public function account($name = null) {
         $name = $name ?: $this->getDefaultAccount();
@@ -82,6 +114,7 @@ class ClientManager {
      * @param  string  $name
      *
      * @return Client
+     * @throws Exceptions\MaskNotFoundException
      */
     protected function resolve($name) {
         $config = $this->getClientConfig($name);

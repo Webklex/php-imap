@@ -17,6 +17,7 @@ use Webklex\PHPIMAP\Client;
 use Webklex\PHPIMAP\ClientManager;
 use Webklex\PHPIMAP\Exceptions\GetMessagesFailedException;
 use Webklex\PHPIMAP\Exceptions\MessageSearchValidationException;
+use Webklex\PHPIMAP\IMAP;
 use Webklex\PHPIMAP\Message;
 use Webklex\PHPIMAP\Support\MessageCollection;
 
@@ -57,6 +58,9 @@ class Query {
     /** @var int $fetch_flags */
     protected $fetch_flags = true;
 
+    /** @var string $date_format */
+    protected $date_format;
+
     /**
      * Query constructor.
      * @param Client $client
@@ -65,7 +69,9 @@ class Query {
     public function __construct(Client $client, $charset = 'UTF-8') {
         $this->setClient($client);
 
-        if(ClientManager::$config['options']['fetch'] === FT_PEEK) $this->leaveUnread();
+        if(ClientManager::get('options.fetch') === IMAP::FT_PEEK) $this->leaveUnread();
+
+        $this->date_format = ClientManager::get('date_format', 'd M y');
 
         $this->charset = $charset;
         $this->query = collect();
@@ -86,7 +92,7 @@ class Query {
     protected function parse_value($value){
         switch(true){
             case $value instanceof \Carbon\Carbon:
-                $value = $value->format('d M y');
+                $value = $value->format($this->date_format);
                 break;
         }
 
@@ -118,7 +124,7 @@ class Query {
      * @return $this
      */
     public function leaveUnread() {
-        $this->setFetchOptions(FT_PEEK);
+        $this->setFetchOptions(IMAP::FT_PEEK);
 
         return $this;
     }
@@ -129,9 +135,45 @@ class Query {
      * @return $this
      */
     public function markAsRead() {
-        $this->setFetchOptions(FT_UID);
+        $this->setFetchOptions(IMAP::FT_UID);
 
         return $this;
+    }
+
+    /**
+     * Perform an imap search request
+     *
+     * @return \Illuminate\Support\Collection
+     * @throws \Webklex\PHPIMAP\Exceptions\ConnectionFailedException
+     */
+    protected function search(){
+        $this->generate_query();
+
+        /**
+         * Don't set the charset if it isn't used - prevent strange outlook mail server errors
+         * @see https://github.com/Webklex/laravel-imap/issues/100
+         */
+        if($this->getCharset() === null){
+            $available_messages = imap_search($this->getClient()->getConnection(), $this->getRawQuery(), IMAP::SE_UID);
+        }else{
+            $available_messages = imap_search($this->getClient()->getConnection(), $this->getRawQuery(), IMAP::SE_UID, $this->getCharset());
+        }
+
+        if ($available_messages !== false) {
+            return collect($available_messages);
+        }
+
+        return collect();
+    }
+
+    /**
+     * Count all available messages matching the current search criteria
+     *
+     * @return int
+     * @throws \Webklex\PHPIMAP\Exceptions\ConnectionFailedException
+     */
+    public function count() {
+        return $this->search()->count();
     }
 
     /**
@@ -144,29 +186,23 @@ class Query {
         $messages = MessageCollection::make([]);
 
         try {
-            $this->generate_query();
+            $available_messages = $this->search();
+            $available_messages_count = $available_messages->count();
 
-            /**
-             * Don't set the charset if it isn't used - prevent strange outlook mail server errors
-             * @see https://github.com/Webklex/laravel-imap/issues/100
-             */
-            if($this->getCharset() === null){
-                $available_messages = imap_search($this->getClient()->getConnection(), $this->getRawQuery(), SE_UID);
-            }else{
-                $available_messages = imap_search($this->getClient()->getConnection(), $this->getRawQuery(), SE_UID, $this->getCharset());
-            }
+            if ($available_messages_count > 0) {
 
-            if ($available_messages !== false) {
+                $messages->total($available_messages_count);
 
-                $available_messages = collect($available_messages);
-                $options = ClientManager::$config['options'];
+                $options = ClientManager::get('options');
 
                 if(strtolower($options['fetch_order']) === 'desc'){
                     $available_messages = $available_messages->reverse();
                 }
 
-                $available_messages->forPage($this->page, $this->limit)->each(function($msgno, $msglist) use(&$messages, $options) {
-                    $oMessage = new Message($msgno, $msglist, $this->getClient(), $this->getFetchOptions(), $this->getFetchBody(), $this->getFetchAttachment(), $this->getFetchFlags());
+                $query =& $this;
+
+                $available_messages->forPage($this->page, $this->limit)->each(function($msgno, $msglist) use(&$messages, $options, $query) {
+                    $oMessage = new Message($msgno, $msglist, $query->getClient(), $query->getFetchOptions(), $query->getFetchBody(), $query->getFetchAttachment(), $query->getFetchFlags());
                     switch ($options['message_key']){
                         case 'number':
                             $message_key = $oMessage->getMessageNo();
@@ -185,10 +221,24 @@ class Query {
 
             return $messages;
         } catch (\Exception $e) {
-            $message = $e->getMessage();
-
-            throw new GetMessagesFailedException($message);
+            throw new GetMessagesFailedException($e->getMessage());
         }
+    }
+
+    /**
+     * Paginate the current query
+     * @param int $per_page
+     * @param null $page
+     * @param string $page_name
+     *
+     * @return \Illuminate\Pagination\LengthAwarePaginator
+     * @throws GetMessagesFailedException
+     */
+    public function paginate($per_page = 5, $page = null, $page_name = 'imap_page'){
+        $this->page = $page > $this->page ? $page : $this->page;
+        $this->limit = $per_page;
+
+        return $this->get()->paginate($per_page, $this->page, $page_name);
     }
 
     /**

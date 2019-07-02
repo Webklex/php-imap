@@ -25,6 +25,7 @@ use Webklex\PHPIMAP\Support\MessageCollection;
  */
 class Folder {
 
+
     /**
      * Client instance
      *
@@ -51,7 +52,7 @@ class Folder {
      *
      * @var string
      */
-    public $fullName;
+    public $full_name;
 
     /**
      * Children folders
@@ -111,15 +112,15 @@ class Folder {
      *
      * @param \Webklex\PHPIMAP\Client $client
      *
-     * @param object structure
+     * @param object $structure
      */
     public function __construct(Client $client, $structure) {
         $this->client = $client;
 
         $this->setDelimiter($structure->delimiter);
         $this->path      = $structure->name;
-        $this->fullName  = $this->decodeName($structure->name);
-        $this->name      = $this->getSimpleName($this->delimiter, $this->fullName);
+        $this->full_name  = $this->decodeName($structure->name);
+        $this->name      = $this->getSimpleName($this->delimiter, $this->full_name);
 
         $this->parseAttributes($structure->attributes);
     }
@@ -133,7 +134,7 @@ class Folder {
      */
     public function query($charset = 'UTF-8'){
         $this->getClient()->checkConnection();
-        $this->getClient()->openFolder($this);
+        $this->getClient()->openFolder($this->path);
 
         return new WhereQuery($this->getClient(), $charset);
     }
@@ -188,8 +189,10 @@ class Folder {
      *
      * @return Message|null
      * @throws Exceptions\ConnectionFailedException
+     * @throws Exceptions\InvalidMessageDateException
      */
     public function getMessage($uid, $msglist = null, $fetch_options = null, $fetch_body = false, $fetch_attachment = false, $fetch_flags = true) {
+        $this->client->openFolder($this->path);
         if (imap_msgno($this->getClient()->getConnection(), $uid) > 0) {
             return new Message($uid, $msglist, $this->getClient(), $fetch_options, $fetch_body, $fetch_attachment, $fetch_flags);
         }
@@ -237,6 +240,7 @@ class Folder {
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\InvalidWhereQueryCriteriaException
      * @throws GetMessagesFailedException
+     * @throws MessageSearchValidationException
      *
      * @deprecated 1.0.5:2.0.0 No longer needed. Use Folder::getMessages('UNSEEN') instead
      * @see Folder::getMessages()
@@ -338,12 +342,12 @@ class Folder {
      * Get simple name (without parent folders).
      *
      * @param $delimiter
-     * @param $fullName
+     * @param $full_name
      *
      * @return mixed
      */
-    protected function getSimpleName($delimiter, $fullName) {
-        $arr = explode($delimiter, $fullName);
+    protected function getSimpleName($delimiter, $full_name) {
+        $arr = explode($delimiter, $full_name);
 
         return end($arr);
     }
@@ -434,13 +438,12 @@ class Folder {
         return $this->client;
     }
 
-
     /**
      * @param $delimiter
      */
     public function setDelimiter($delimiter){
         if(in_array($delimiter, [null, '', ' ', false]) === true) {
-            $delimiter = ClientManager::$config['options']['delimiter'];
+            $delimiter = ClientManager::get('options.delimiter', '/');
         }
 
         $this->delimiter = $delimiter;

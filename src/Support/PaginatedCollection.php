@@ -23,23 +23,28 @@ use Illuminate\Pagination\Paginator;
  */
 class PaginatedCollection extends Collection {
 
+    /** @var int $total */
+    protected $total;
+
     /**
      * Paginate the current collection.
      *
-     * @param int      $perPage
+     * @param int      $per_page
      * @param int|null $page
-     * @param string   $pageName
+     * @param string   $page_name
      *
      * @return LengthAwarePaginator
      */
-    public function paginate($perPage = 15, $page = null, $pageName = 'page') {
-        $page = $page ?: Paginator::resolveCurrentPage($pageName);
+    public function paginate($per_page = 15, $page = null, $page_name = 'page') {
+        $page = $page ?: Paginator::resolveCurrentPage($page_name);
 
-        $results = ($total = $this->count()) ? $this->forPage($page, $perPage) : $this->all();
+        $total = $this->total ? $this->total : $this->count();
 
-        return $this->paginator($results, $total, $perPage, $page, [
+        $results = $total ? $this->forPage($page, $per_page) : $this->all();
+
+        return $this->paginator($results, $total, $per_page, $page, [
             'path'      => Paginator::resolveCurrentPath(),
-            'pageName'  => $pageName,
+            'pageName'  => $page_name,
         ]);
     }
 
@@ -48,13 +53,26 @@ class PaginatedCollection extends Collection {
      *
      * @param  array    $items
      * @param  int      $total
-     * @param  int      $perPage
-     * @param  int|null $currentPage
+     * @param  int      $per_page
+     * @param  int|null $current_page
      * @param  array    $options
      *
      * @return LengthAwarePaginator
      */
-    protected function paginator($items, $total, $perPage, $currentPage, array $options) {
-        return new LengthAwarePaginator($items, $total, $perPage, $currentPage, $options);
+    protected function paginator($items, $total, $per_page, $current_page, array $options) {
+        return new LengthAwarePaginator($items, $total, $per_page, $current_page, $options);
+    }
+
+    /**
+     * @param null $total
+     *
+     * @return int|null
+     */
+    public function total($total = null) {
+        if($total === null) {
+            return $this->total;
+        }
+
+        return $this->total = $total;
     }
 }

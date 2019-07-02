@@ -56,25 +56,35 @@ class WhereQuery extends Query {
     protected $available_criteria = [
         'OR', 'AND',
         'ALL', 'ANSWERED', 'BCC', 'BEFORE', 'BODY', 'CC', 'DELETED', 'FLAGGED', 'FROM', 'KEYWORD',
-        'NEW', 'OLD', 'ON', 'RECENT', 'SEEN', 'SINCE', 'SUBJECT', 'TEXT', 'TO',
+        'NEW', 'NOT', 'OLD', 'ON', 'RECENT', 'SEEN', 'SINCE', 'SUBJECT', 'TEXT', 'TO',
         'UNANSWERED', 'UNDELETED', 'UNFLAGGED', 'UNKEYWORD', 'UNSEEN'
     ];
 
     /**
-     * Magic method in order to allow alias usage of all "where" methods
+     * Magic method in order to allow alias usage of all "where" methods in an optional connection with "NOT"
      * @param string $name
      * @param array|null $arguments
      *
      * @return mixed
+     * @throws InvalidWhereQueryCriteriaException
      * @throws MethodNotFoundException
      */
     public function __call($name, $arguments) {
-        $method = 'where'.ucfirst($name);
-        if(method_exists($this, $method) === true){
-            return call_user_func_array([$this, $method], $arguments);
+        $that = $this;
+
+        $name = camel_case($name);
+
+        if(strtolower(substr($name, 0, 3)) === 'not') {
+            $that = $that->whereNot();
+            $name = substr($name, 3);
         }
 
-        throw new MethodNotFoundException();
+        $method = 'where'.ucfirst($name);
+        if(method_exists($this, $method) === true){
+            return call_user_func_array([$that, $method], $arguments);
+        }
+
+        throw new MethodNotFoundException("Method ".self::class.'::'.$method.'() is not supported');
     }
 
     /**
@@ -97,7 +107,7 @@ class WhereQuery extends Query {
     /**
      * @param mixed $criteria
      * @param null  $value
-     * 
+     *
      * @return $this
      * @throws InvalidWhereQueryCriteriaException
      */
@@ -166,7 +176,7 @@ class WhereQuery extends Query {
 
     /**
      * @param string $value
-     * 
+     *
      * @return WhereQuery
      * @throws InvalidWhereQueryCriteriaException
      */
@@ -249,6 +259,14 @@ class WhereQuery extends Query {
      */
     public function whereNew() {
         return $this->where('NEW');
+    }
+
+    /**
+     * @return WhereQuery
+     * @throws InvalidWhereQueryCriteriaException
+     */
+    public function whereNot() {
+        return $this->where('NOT');
     }
 
     /**
@@ -369,5 +387,41 @@ class WhereQuery extends Query {
      */
     public function whereUnseen() {
         return $this->where('UNSEEN');
+    }
+
+    /**
+     * @param $msg_id
+     *
+     * @return WhereQuery
+     * @throws InvalidWhereQueryCriteriaException
+     */
+    public function whereMessageId($msg_id) {
+        return $this->where("Message-ID <$msg_id>");
+    }
+
+    /**
+     * @return WhereQuery
+     * @throws InvalidWhereQueryCriteriaException
+     */
+    public function whereNoXSpam(){
+        return $this->where("X-Spam-Flag NO");
+    }
+
+    /**
+     * @return WhereQuery
+     * @throws InvalidWhereQueryCriteriaException
+     */
+    public function whereIsXSpam(){
+        return $this->where("X-Spam-Flag YES");
+    }
+
+    /**
+     * @param $country_code
+     *
+     * @return WhereQuery
+     * @throws InvalidWhereQueryCriteriaException
+     */
+    public function whereLanguage($country_code){
+        return $this->where("Content-Language $country_code");
     }
 }
