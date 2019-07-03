@@ -14,6 +14,11 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Affected Classes
 - NaN
 
+## [1.4.2.1] - 2019-07-03
+### Fixed
+- Error in Attachment::__construct #3
+- Examples added
+
 ## [1.4.2] - 2019-07-02
 ### Fixed
 - Pagination count total bug #213
