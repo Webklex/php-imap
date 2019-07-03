@@ -86,7 +86,7 @@ class Attachment {
      * @throws Exceptions\ConnectionFailedException
      */
     public function __construct(Message $oMessage, $structure, $part_number = 1) {
-        $this->config = config('imap.options');
+        $this->config = ClientManager::get('options');
 
         $this->oMessage = $oMessage;
         $this->structure = $structure;
