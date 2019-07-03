@@ -1,7 +1,7 @@
 {
     "name": "webklex/php-imap",
     "type": "library",
-    "description": "Laravel IMAP client",
+    "description": "PHP IMAP client",
     "keywords": [
         "webklex",
         "imap",
