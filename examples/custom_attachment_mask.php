@@ -25,12 +25,10 @@ class CustomAttachmentMask extends \Webklex\PHPIMAP\Support\Masks\AttachmentMask
      * @return bool
      */
     public function custom_save() {
-        $path = storage_path('foo');
+        $path = "foo".DIRECTORY_SEPARATOR."bar".DIRECTORY_SEPARATOR;
         $filename = $this->token();
 
-        $path = substr($path, -1) == DIRECTORY_SEPARATOR ? $path : $path.DIRECTORY_SEPARATOR;
-
-        return \Illuminate\Support\Facades\File::put($path.$filename, $this->getContent()) !== false;
+        return file_put_contents($path.$filename, $this->getContent()) !== false;
     }
 
 }
