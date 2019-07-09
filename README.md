@@ -197,50 +197,50 @@ $aFolder = $oClient->getFolders();
 #### Search for messages
 Search for specific emails:
 ``` php
-/** @var \Webklex\IMAP\Folder $oFolder */
+/** @var \Webklex\PHPIMAP\Folder $oFolder */
 
 //Get all messages
-/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->all()->get();
 
 //Get all messages from example@domain.com
-/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->from('example@domain.com')->get();
 
 //Get all messages since march 15 2018
-/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->since('15.03.2018')->get();
 
 //Get all messages within the last 5 days
-/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->since(now()->subDays(5))->get();
 //Or for older laravel versions..
 $aMessage = $oFolder->query()->since(\Carbon::now()->subDays(5))->get();
 
 //Get all messages containing "hello world"
-/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->text('hello world')->get();
 
 //Get all unseen messages containing "hello world"
-/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->unseen()->text('hello world')->get();
 
 //Extended custom search query for all messages containing "hello world" 
 //and have been received since march 15 2018
-/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->text('hello world')->since('15.03.2018')->get();
 $aMessage = $oFolder->query()->Text('hello world')->Since('15.03.2018')->get();
 $aMessage = $oFolder->query()->whereText('hello world')->whereSince('15.03.2018')->get();
 
 // Build a custom search query
-/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()
 ->where([['TEXT', 'Hello world'], ['SINCE', \Carbon::parse('15.03.2018')]])
 ->get();
 
 //!EXPERIMENTAL!
 //Get all messages NOT containing "hello world"
-/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->notText('hello world')->get();
 $aMessage = $oFolder->query()->not_text('hello world')->get();
 $aMessage = $oFolder->query()->not()->text('hello world')->get();
@@ -249,11 +249,11 @@ $aMessage = $oFolder->query()->not()->text('hello world')->get();
 Available search aliases for a better code reading:
 ``` php
 // Folder::search() is just an alias for Folder::query()
-/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->search()->text('hello world')->since('15.03.2018')->get();
 
 // Folder::messages() is just an alias for Folder::query()
-/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->messages()->text('hello world')->since('15.03.2018')->get();
 
 ```
@@ -296,20 +296,20 @@ Further information:
 #### Result limiting
 Limiting the request emails:
 ``` php
-/** @var \Webklex\IMAP\Folder $oFolder */
+/** @var \Webklex\PHPIMAP\Folder $oFolder */
 
 //Get all messages for page 2 since march 15 2018 where each apge contains 10 messages
-/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->since('15.03.2018')->limit(10, 2)->get();
 ```
 
 #### Counting messages
 Count all available messages matching the current search criteria:
 ``` php
-/** @var \Webklex\IMAP\Folder $oFolder */
+/** @var \Webklex\PHPIMAP\Folder $oFolder */
 
 //Count all messages
-/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
 $count = $oFolder->query()->all()->count();
 
 //Count all messages since march 15 2018
@@ -319,21 +319,21 @@ $count = $oFolder->query()->since('15.03.2018')->count();
 #### Pagination
 Paginate a query:
 ``` php
-/** @var \Webklex\IMAP\Folder $oFolder */
+/** @var \Webklex\PHPIMAP\Folder $oFolder */
 
 /** @var \Illuminate\Pagination\LengthAwarePaginator $paginator */
 $paginator = $oFolder->query()->since('15.03.2018')->paginate();
 ```
 Paginate a message collection:
 ``` php
-/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
 
 /** @var \Illuminate\Pagination\LengthAwarePaginator $paginator */
 $paginator = $aMessage->paginate();
 ```
 View example for a paginated list:
 ``` php
-/** @var \Webklex\IMAP\Folder $oFolder */
+/** @var \Webklex\PHPIMAP\Folder $oFolder */
 
 /** @var \Illuminate\Pagination\LengthAwarePaginator $paginator */
 $paginator = $oFolder->search()
@@ -380,44 +380,44 @@ You can find a few blade examples under [/examples](https://github.com/Webklex/p
 #### Fetch a specific message
 Get a specific message by uid (Please note that the uid is not unique and can change):
 ``` php
-/** @var \Webklex\IMAP\Folder $oFolder */
+/** @var \Webklex\PHPIMAP\Folder $oFolder */
 
-/** @var \Webklex\IMAP\Message $oMessage */
+/** @var \Webklex\PHPIMAP\Message $oMessage */
 $oMessage = $oFolder->getMessage($uid = 1);
 ```
 
 #### Message flags
 Flag or "unflag" a message:
 ``` php
-/** @var \Webklex\IMAP\Message $oMessage */
+/** @var \Webklex\PHPIMAP\Message $oMessage */
 $oMessage->setFlag(['Seen', 'Spam']);
 $oMessage->unsetFlag('Spam');
 ```
 
 Mark all messages as "read" while fetching:
 ``` php
-/** @var \Webklex\IMAP\Folder $oFolder */
-/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\PHPIMAP\Folder $oFolder */
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->text('Hello world')->markAsRead()->get();
 ```
 
 Don't mark all messages as "read" while fetching:
 ``` php
-/** @var \Webklex\IMAP\Folder $oFolder */
-/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\PHPIMAP\Folder $oFolder */
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->text('Hello world')->leaveUnread()->get();
 ```
 
 #### Attachments
 Save message attachments:
 ``` php
-/** @var \Webklex\IMAP\Message $oMessage */
+/** @var \Webklex\PHPIMAP\Message $oMessage */
 
-/** @var \Webklex\IMAP\Support\AttachmentCollection $aAttachment */
+/** @var \Webklex\PHPIMAP\Support\AttachmentCollection $aAttachment */
 $aAttachment = $oMessage->getAttachments();
 
 $aAttachment->each(function ($oAttachment) {
-    /** @var \Webklex\IMAP\Attachment $oAttachment */
+    /** @var \Webklex\PHPIMAP\Attachment $oAttachment */
     $oAttachment->save();
 });
 ```
@@ -425,27 +425,27 @@ $aAttachment->each(function ($oAttachment) {
 #### Advanced fetching
 Fetch messages without body fetching (decrease load):
 ``` php
-/** @var \Webklex\IMAP\Folder $oFolder */
+/** @var \Webklex\PHPIMAP\Folder $oFolder */
 
-/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->whereText('Hello world')->setFetchBody(false)->get();
 
-/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->whereAll()->setFetchBody(false)->setFetchAttachment();
 ```
 
 Fetch messages without body, flag and attachment fetching (decrease load):
 ``` php
-/** @var \Webklex\IMAP\Folder $oFolder */
+/** @var \Webklex\PHPIMAP\Folder $oFolder */
 
-/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->whereText('Hello world')
 ->setFetchFlags(false)
 ->setFetchBody(false)
 ->setFetchAttachment(false)
 ->get();
 
-/** @var \Webklex\IMAP\Support\MessageCollection $aMessage */
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->whereAll()
 ->setFetchFlags(false)
 ->setFetchBody(false)
@@ -460,16 +460,16 @@ The masked instance has to be called manually and is designed to add custom func
 
 You can call the default mask by calling the mask method without any arguments.
 ``` php
-/** @var \Webklex\IMAP\Message $oMessage */
+/** @var \Webklex\PHPIMAP\Message $oMessage */
 $mask = $oMessage->mask();
 ```
 
 There are several methods available to set the default mask:
 ``` php
-/** @var \Webklex\IMAP\Client $oClient */
-/** @var \Webklex\IMAP\Message $oMessage */
+/** @var \Webklex\PHPIMAP\Client $oClient */
+/** @var \Webklex\PHPIMAP\Message $oMessage */
 
-$message_mask = \Webklex\IMAP\Support\Masks\MessageMask::class;
+$message_mask = \Webklex\PHPIMAP\Support\Masks\MessageMask::class;
 
 $oClient->setDefaultMessageMask($message_mask);
 $oMessage->setMask($message_mask);
@@ -481,9 +481,9 @@ You could also set the default masks inside your `config/imap.php` file under `m
 
 You can also apply a mask on [attachments](#attachmentclass):
 ``` php
-/** @var \Webklex\IMAP\Client $oClient */
-/** @var \Webklex\IMAP\Attachment $oAttachment */
-$attachment_mask = \Webklex\IMAP\Support\Masks\AttachmentMask::class;
+/** @var \Webklex\PHPIMAP\Client $oClient */
+/** @var \Webklex\PHPIMAP\Attachment $oAttachment */
+$attachment_mask = \Webklex\PHPIMAP\Support\Masks\AttachmentMask::class;
 
 $oClient->setDefaultAttachmentMask($attachment_mask);
 $oAttachment->setMask($attachment_mask);
@@ -494,8 +494,8 @@ If you want to implement your own mask just extend [MessageMask::class](#message
 or [Mask::class](#maskclass) and implement your desired logic:
 
 ``` php
-/** @var \Webklex\IMAP\Message $oMessage */
-class CustomMessageMask extends \Webklex\IMAP\Support\Masks\MessageMask {
+/** @var \Webklex\PHPIMAP\Message $oMessage */
+class CustomMessageMask extends \Webklex\PHPIMAP\Support\Masks\MessageMask {
 
     /**
      * New custom method which can be called through a mask
