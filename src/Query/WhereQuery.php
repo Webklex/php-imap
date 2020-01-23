@@ -12,6 +12,7 @@
 
 namespace Webklex\PHPIMAP\Query;
 
+use Illuminate\Support\Str;
 use Webklex\PHPIMAP\Exceptions\InvalidWhereQueryCriteriaException;
 use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
 use Webklex\PHPIMAP\Exceptions\MessageSearchValidationException;
@@ -72,7 +73,7 @@ class WhereQuery extends Query {
     public function __call($name, $arguments) {
         $that = $this;
 
-        $name = camel_case($name);
+        $name = Str::camel($name);
 
         if(strtolower(substr($name, 0, 3)) === 'not') {
             $that = $that->whereNot();
@@ -97,6 +98,9 @@ class WhereQuery extends Query {
     protected function validate_criteria($criteria) {
         $criteria = strtoupper($criteria);
 
+        if (substr($criteria, 0, 6) === "CUSTOM") {
+            return substr($criteria, 6);
+        }
         if(in_array($criteria, $this->available_criteria) === false) {
             throw new InvalidWhereQueryCriteriaException();
         }

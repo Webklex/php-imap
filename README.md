@@ -115,7 +115,7 @@ Detailed [config/imap.php](src/config/imap.php) configuration:
 ## Usage
 #### Basic usage example
 This is a basic example, which will echo out all Mails within all imap folders
-and will move every message into INBOX.read. Please be aware that this should not ben
+and will move every message into INBOX.read. Please be aware that this should not be
 tested in real live but it gives an impression on how things work.
 
 ``` php
@@ -178,6 +178,8 @@ For an easier access please take a look at the new config option `imap.options.d
 method takes three options: the required (string) $folder_name and two optional variables. An integer $attributes which 
 seems to be sometimes 32 or 64 (I honestly have no clue what this number does, so feel free to enlighten me and anyone 
 else) and a delimiter which if it isn't set will use the default option configured inside the [config/imap.php](src/config/imap.php) file.
+> If you are using Exchange you might want to set all parameter and the last `$prefix_address` to `false` e.g. `$oClient->getFolder('name', 32, null, false)` #234
+
 ``` php
 /** @var \Webklex\PHPIMAP\Client $oClient */
 
@@ -244,6 +246,10 @@ $aMessage = $oFolder->query()
 $aMessage = $oFolder->query()->notText('hello world')->get();
 $aMessage = $oFolder->query()->not_text('hello world')->get();
 $aMessage = $oFolder->query()->not()->text('hello world')->get();
+
+//Get all messages by custom search criteria
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
+$aMessage = $oFolder->query()->where(["CUSTOM_FOOBAR" => "fooBar"]])->get();
 ```
 
 Available search aliases for a better code reading:
@@ -298,7 +304,7 @@ Limiting the request emails:
 ``` php
 /** @var \Webklex\PHPIMAP\Folder $oFolder */
 
-//Get all messages for page 2 since march 15 2018 where each apge contains 10 messages
+//Get all messages for page 2 since march 15 2018 where each page contains 10 messages
 /** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->since('15.03.2018')->limit(10, 2)->get();
 ```
@@ -564,7 +570,7 @@ if you're just wishing a feature ;)
 | checkConnection           |                                                                                 |                   | Determine if connection was established and connect if not.                                                                   |
 | connect                   | int $attempts                                                                   |                   | Connect to server.                                                                                                            |
 | disconnect                |                                                                                 |                   | Disconnect from server.                                                                                                       |
-| getFolder                 | string $folder_name, int $attributes = 32, int or null $delimiter               | Folder            | Get a Folder instance by name                                                                                                 |
+| getFolder                 | string $folder_name, int $attributes = 32, int or null $delimiter, bool $prefix_address | Folder            | Get a Folder instance by name                                                                                                 |
 | getFolders                | bool $hierarchical, string or null $parent_folder                               | FolderCollection  | Get folders list. If hierarchical order is set to true, it will make a tree of folders, otherwise it will return flat array.  |
 | openFolder                | string or Folder $folder, integer $attempts                                     |                   | Open a given folder.                                                                                                          |
 | createFolder              | string $name                                                                    | boolean           | Create a new folder.                                                                                                          |
@@ -712,7 +718,11 @@ if you're just wishing a feature ;)
 | getContent     |                                | string or null | Get attachment content                                 |     
 | getMimeType    |                                | string or null | Get attachment mime type                               |     
 | getExtension   |                                | string or null | Get a guessed attachment extension                     |     
+| getId          |                                | string or null | Get attachment id                                      |        
 | getName        |                                | string or null | Get attachment name                                    |        
+| getPartNumber  |                                | int or null    | Get attachment part number                             |        
+| getContent     |                                | string or null | Get attachment content                                 |                
+| setSize        |                                | int or null    | Get attachment size                                    |        
 | getType        |                                | string or null | Get attachment type                                    |        
 | getDisposition |                                | string or null | Get attachment disposition                             | 
 | getContentType |                                | string or null | Get attachment content type                            | 
@@ -785,6 +795,8 @@ Extends [Illuminate\Support\Collection::class](https://laravel.com/api/5.4/Illum
 | DateTime::__construct(): Failed to parse time string (...)                | Please report any new invalid timestamps to [#45](https://github.com/Webklex/php-imap/issues/45)  | 
 | imap_open(): Couldn't open (...) Please log in your web browser: (...)    | In order to use IMAP on some services (such as Gmail) you need to enable it first. [Google help page]( https://support.google.com/mail/answer/7126229?hl=en) |
 | imap_headerinfo(): Bad message number                                     | This happens if no Message number is available. Please make sure Message::parseHeader() has run before |
+| imap_fetchheader(): Bad message number                                    | Try to change the `message_key` [#243](https://github.com/Webklex/laravel-imap/issues/243)
+
 
 ## Milestones & upcoming features
 * Wiki!!

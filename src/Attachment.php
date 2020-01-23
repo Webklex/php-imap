@@ -12,6 +12,7 @@
 
 namespace Webklex\PHPIMAP;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
 use Webklex\PHPIMAP\Exceptions\MaskNotFoundException;
@@ -24,6 +25,7 @@ use Webklex\PHPIMAP\Support\Masks\AttachmentMask;
  * @package Webklex\PHPIMAP
  *
  * @property integer part_number
+ * @property integer size
  * @property string content
  * @property string type
  * @property string content_type
@@ -42,6 +44,8 @@ use Webklex\PHPIMAP\Support\Masks\AttachmentMask;
  * @method string  setContentType(string $content_type)
  * @method string  getId()
  * @method string  setId(string $id)
+ * @method string  getSize()
+ * @method string  setSize(integer $size)
  * @method string  getName()
  * @method string  getDisposition()
  * @method string  setDisposition(string $disposition)
@@ -68,6 +72,7 @@ class Attachment {
         'name' => null,
         'disposition' => null,
         'img_src' => null,
+        'size' => null,
     ];
 
     /**
@@ -111,7 +116,7 @@ class Attachment {
      */
     public function __call($method, $arguments) {
         if(strtolower(substr($method, 0, 3)) === 'get') {
-            $name = snake_case(substr($method, 3));
+            $name = Str::snake(substr($method, 3));
 
             if(isset($this->attributes[$name])) {
                 return $this->attributes[$name];
@@ -119,7 +124,7 @@ class Attachment {
 
             return null;
         }elseif (strtolower(substr($method, 0, 3)) === 'set') {
-            $name = snake_case(substr($method, 3));
+            $name = Str::snake(substr($method, 3));
 
             $this->attributes[$name] = array_pop($arguments);
 
@@ -203,6 +208,10 @@ class Attachment {
 
         if (property_exists($this->structure, 'id')) {
             $this->id = str_replace(['<', '>'], '', $this->structure->id);
+        }
+
+        if (property_exists($this->structure, 'bytes')) {
+            $this->size = $this->structure->bytes;
         }
 
         if (property_exists($this->structure, 'dparameters')) {

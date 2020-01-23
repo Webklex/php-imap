@@ -19,6 +19,7 @@ use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
 use Webklex\PHPIMAP\Support\AttachmentCollection;
 use Webklex\PHPIMAP\Support\FlagCollection;
 use Webklex\PHPIMAP\Support\Masks\MessageMask;
+use Illuminate\Support\Str;
 
 /**
  * Class Message
@@ -239,14 +240,14 @@ class Message {
      */
     public function __call($method, $arguments) {
         if(strtolower(substr($method, 0, 3)) === 'get') {
-            $name = snake_case(substr($method, 3));
+            $name = Str::snake(substr($method, 3));
 
             if(in_array($name, array_keys($this->attributes))) {
                 return $this->attributes[$name];
             }
 
         }elseif (strtolower(substr($method, 0, 3)) === 'set') {
-            $name = snake_case(substr($method, 3));
+            $name = Str::snake(substr($method, 3));
 
             if(in_array($name, array_keys($this->attributes))) {
                 $this->attributes[$name] = array_pop($arguments);
@@ -499,6 +500,7 @@ class Message {
                     case preg_match('/([A-Z]{2,3}\,\ [0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ UT)+$/i', $date) > 0:
                         $date .= 'C';
                         break;
+                    case preg_match('/([A-Z]{2,3}\,\ [0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ \+[0-9]{2,4}\ \(\+[0-9]{1,2}\))+$/i', $date) > 0:
                     case preg_match('/([A-Z]{2,3}[\,|\ \,]\ [0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}.*)+$/i', $date) > 0:
                     case preg_match('/([A-Z]{2,3}\,\ [0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ [\-|\+][0-9]{4}\ \(.*)\)+$/i', $date) > 0:
                     case preg_match('/([A-Z]{2,3}\, \ [0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ [\-|\+][0-9]{4}\ \(.*)\)+$/i', $date) > 0:
@@ -601,12 +603,18 @@ class Message {
             if (!property_exists($address, 'personal')) {
                 $address->personal = false;
             }
+            if (!property_exists($address, 'personal')) {
+                $address->personal = false;
+            } else {
+                $personalParts = imap_mime_header_decode($address->personal);
 
-            $personalParts = imap_mime_header_decode($address->personal);
-
-            $address->personal = '';
-            foreach ($personalParts as $p) {
-                $address->personal .= $p->text;
+                if(is_array($personalParts)) {
+                    $address->personal = '';
+                    foreach ($personalParts as $p) {
+                        $encoding = $this->getEncoding($p->text);
+                        $address->personal .= $this->convertEncoding($p->text, $encoding);
+                    }
+                }
             }
 
             $address->mail = ($address->mailbox && $address->host) ? $address->mailbox.'@'.$address->host : false;
@@ -663,10 +671,10 @@ class Message {
 
         if ($structure->type == IMAP::MESSAGE_TYPE_TEXT &&
             ($structure->ifdisposition == 0 ||
-                ($structure->ifdisposition == 1 && !isset($structure->parts) && $partNumber != null)
+                (empty($structure->disposition) || strtolower($structure->disposition) != 'attachment')
             )
         ) {
-            if ($structure->subtype == "PLAIN") {
+            if (strtolower($structure->subtype) == "plain" || strtolower($structure->subtype) == "csv") {
                 if (!$partNumber) {
                     $partNumber = 1;
                 }
@@ -699,7 +707,7 @@ class Message {
 
                 $this->fetchAttachment($structure, $partNumber);
 
-            } elseif ($structure->subtype == "HTML") {
+            } elseif (strtolower($structure->subtype) == "html") {
                 if (!$partNumber) {
                     $partNumber = 1;
                 }
@@ -717,6 +725,10 @@ class Message {
                 $body->content = $content;
 
                 $this->bodies['html'] = $body;
+            } elseif ($structure->ifdisposition == 1 && strtolower($structure->disposition) == 'attachment') {
+                if ($this->getFetchAttachmentOption() === true) {
+                    $this->fetchAttachment($structure, $partNumber);
+                }
             }
         } elseif ($structure->type == IMAP::MESSAGE_TYPE_MULTIPART) {
             foreach ($structure->parts as $index => $subStruct) {

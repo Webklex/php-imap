@@ -14,6 +14,29 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Affected Classes
 - NaN
 
+## [1.4.5] - 2019-01-23
+### Fixed
+- .csv attachement is not processed
+- mail part structure property comparison changed to lowercase
+- Replace helper functions for Laravel 6.0 #4 (@koenhoeijmakers)
+- Date handling in Folder::appendMessage() fixed
+- Carbon Exception Parse Data
+- Convert sender name from non-utf8 to uf8 (@hwilok)
+- Convert encoding of personal data struct
+
+### Added
+- Path prefix option added to Client::getFolder() method
+- Attachment size handling added
+- Find messages by custom search criteria
+
+### Affected Classes
+- [Query::class](src/Query/WhereQuery.php)
+- [Mask::class](src/Support/Masks/Mask.php)
+- [Attachment::class](src/Attachment.php)
+- [Client::class](src/Client.php)
+- [Folder::class](src/Folder.php)
+- [Message::class](src/Message.php)
+
 ## [1.4.2.1] - 2019-07-03
 ### Fixed
 - Error in Attachment::__construct #3
