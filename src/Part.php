@@ -103,10 +103,12 @@ class Part {
     /**
      * Part constructor.
      * @param $raw_part
+     * @param Header $header
      * @throws InvalidMessageDateException
      */
-    public function __construct($raw_part) {
+    public function __construct($raw_part, $header = null) {
         $this->raw = $raw_part;
+        $this->header = $header;
         $this->parse();
     }
 
@@ -115,17 +117,19 @@ class Part {
      * @throws InvalidMessageDateException
      */
     protected function parse(){
-        $headers = "";
         $body = $this->raw;
 
-        if (preg_match_all("/(.*)(?s)(?-m)\\r\\n.+?(?=\n([^A-Z]|.{1,2}[^A-Z])|$)/im", $body, $matches)) {
-            if (isset($matches[0][0])) {
-                $headers = $matches[0][0];
-                $body = substr($body, strlen($headers) + 2, -2);
+        if ($this->header === null) {
+            $headers = "";
+            if (preg_match_all("/(.*)(?s)(?-m)\\r\\n.+?(?=\n([^A-Z]|.{1,2}[^A-Z])|$)/im", $body, $matches)) {
+                if (isset($matches[0][0])) {
+                    $headers = $matches[0][0];
+                    $body = substr($body, strlen($headers) + 2, -2);
+                }
             }
-        }
 
-        $this->header = new Header($headers);
+            $this->header = new Header($headers);
+        }
         $this->parseSubtype();
         $this->parseDisposition();
         $this->parseDescription();

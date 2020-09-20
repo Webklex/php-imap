@@ -114,6 +114,6 @@ class Structure {
             return $parts;
         }
 
-        return [new Part($this->raw)];
+        return [new Part($this->raw, $this->header)];
     }
 }
