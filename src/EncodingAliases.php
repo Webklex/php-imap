@@ -466,16 +466,16 @@ class EncodingAliases {
     
     /**
      * Returns proper encoding mapping, if exsists. If it doesn't, return unchanged $encoding
-     * 
      * @param string $encoding
+     * @param string|null $fallback
+     *
      * @return string
      */
-    public static function get($encoding) {
+    public static function get($encoding, $fallback = null) {
         if (isset(self::$aliases[strtolower($encoding)])) {
             return self::$aliases[strtolower($encoding)];
-        } else {
-            return $encoding;
         }
+        return $fallback !== null ? $fallback : $encoding;
     }
     
 }

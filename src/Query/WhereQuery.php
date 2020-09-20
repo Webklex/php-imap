@@ -20,8 +20,8 @@ use Webklex\PHPIMAP\Exceptions\MessageSearchValidationException;
 /**
  * Class WhereQuery
  *
- * @package Webklex\PHPIMAP\Query
- * 
+ * @package Webklex\IMAP\Query
+ *
  * @method WhereQuery all()
  * @method WhereQuery answered()
  * @method WhereQuery deleted()
@@ -33,6 +33,7 @@ use Webklex\PHPIMAP\Exceptions\MessageSearchValidationException;
  * @method WhereQuery undeleted()
  * @method WhereQuery unflagged()
  * @method WhereQuery unseen()
+ * @method WhereQuery not()
  * @method WhereQuery unkeyword($value)
  * @method WhereQuery to($value)
  * @method WhereQuery text($value)
@@ -80,7 +81,12 @@ class WhereQuery extends Query {
             $name = substr($name, 3);
         }
 
-        $method = 'where'.ucfirst($name);
+        if (strpos(strtolower($name), "where") === false){
+            $method = 'where'.ucfirst($name);
+        }else{
+            $method = lcfirst($name);
+        }
+
         if(method_exists($this, $method) === true){
             return call_user_func_array([$that, $method], $arguments);
         }
@@ -97,9 +103,8 @@ class WhereQuery extends Query {
      */
     protected function validate_criteria($criteria) {
         $criteria = strtoupper($criteria);
-
-        if (substr($criteria, 0, 6) === "CUSTOM") {
-            return substr($criteria, 6);
+        if (substr($criteria, 0, 7) === "CUSTOM ") {
+            return substr($criteria, 7);
         }
         if(in_array($criteria, $this->available_criteria) === false) {
             throw new InvalidWhereQueryCriteriaException();
@@ -117,12 +122,11 @@ class WhereQuery extends Query {
      */
     public function where($criteria, $value = null) {
         if(is_array($criteria)){
-            foreach($criteria as $arguments){
-                if(count($arguments) == 1){
-                    $this->where($arguments[0]);
-                }elseif(count($arguments) == 2){
-                    $this->where($arguments[0], $arguments[1]);
+            foreach($criteria as $key => $value){
+                if(is_numeric($key)){
+                    return $this->where($value);
                 }
+                return $this->where($key, $value);
             }
         }else{
             $criteria = $this->validate_criteria($criteria);
@@ -394,21 +398,11 @@ class WhereQuery extends Query {
     }
 
     /**
-     * @param $msg_id
-     *
-     * @return WhereQuery
-     * @throws InvalidWhereQueryCriteriaException
-     */
-    public function whereMessageId($msg_id) {
-        return $this->where("Message-ID <$msg_id>");
-    }
-
-    /**
      * @return WhereQuery
      * @throws InvalidWhereQueryCriteriaException
      */
     public function whereNoXSpam(){
-        return $this->where("X-Spam-Flag NO");
+        return $this->where("CUSTOM X-Spam-Flag NO");
     }
 
     /**
@@ -416,7 +410,7 @@ class WhereQuery extends Query {
      * @throws InvalidWhereQueryCriteriaException
      */
     public function whereIsXSpam(){
-        return $this->where("X-Spam-Flag YES");
+        return $this->where("CUSTOM X-Spam-Flag YES");
     }
 
     /**

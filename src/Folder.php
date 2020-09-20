@@ -13,6 +13,7 @@
 namespace Webklex\PHPIMAP;
 
 use Carbon\Carbon;
+use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
 use Webklex\PHPIMAP\Exceptions\GetMessagesFailedException;
 use Webklex\PHPIMAP\Exceptions\MessageSearchValidationException;
 use Webklex\PHPIMAP\Query\WhereQuery;
@@ -25,7 +26,6 @@ use Webklex\PHPIMAP\Support\MessageCollection;
  * @package Webklex\PHPIMAP
  */
 class Folder {
-
 
     /**
      * Client instance
@@ -110,20 +110,20 @@ class Folder {
 
     /**
      * Folder constructor.
-     *
-     * @param \Webklex\PHPIMAP\Client $client
-     *
-     * @param object $structure
+     * @param Client $client
+     * @param string $folder_name
+     * @param string $delimiter
+     * @param string[] $attributes
      */
-    public function __construct(Client $client, $structure) {
+    public function __construct(Client $client, $folder_name, $delimiter, $attributes) {
         $this->client = $client;
 
-        $this->setDelimiter($structure->delimiter);
-        $this->path      = $structure->name;
-        $this->full_name  = $this->decodeName($structure->name);
+        $this->setDelimiter($delimiter);
+        $this->path      = $folder_name;
+        $this->full_name  = $this->decodeName($folder_name);
         $this->name      = $this->getSimpleName($this->delimiter, $this->full_name);
 
-        $this->parseAttributes($structure->attributes);
+        $this->parseAttributes($attributes);
     }
 
     /**
@@ -179,154 +179,6 @@ class Folder {
     }
 
     /**
-     * Get a specific message by UID
-     *
-     * @param integer      $uid     Please note that the uid is not unique and can change
-     * @param integer|null $msglist
-     * @param integer|null $fetch_options
-     * @param boolean      $fetch_body
-     * @param boolean      $fetch_attachment
-     * @param boolean      $fetch_flags
-     *
-     * @return Message|null
-     * @throws Exceptions\ConnectionFailedException
-     * @throws Exceptions\InvalidMessageDateException
-     */
-    public function getMessage($uid, $msglist = null, $fetch_options = null, $fetch_body = false, $fetch_attachment = false, $fetch_flags = true) {
-        $this->client->openFolder($this->path);
-        if (\imap_msgno($this->getClient()->getConnection(), $uid) > 0) {
-            return new Message($uid, $msglist, $this->getClient(), $fetch_options, $fetch_body, $fetch_attachment, $fetch_flags);
-        }
-
-        return null;
-    }
-
-    /**
-     * Get all messages
-     *
-     * @param string    $criteria
-     * @param int|null  $fetch_options
-     * @param boolean   $fetch_body
-     * @param boolean   $fetch_attachment
-     * @param boolean   $fetch_flags
-     * @param int|null  $limit
-     * @param int       $page
-     * @param string    $charset
-     *
-     * @return MessageCollection
-     * @throws Exceptions\ConnectionFailedException
-     * @throws Exceptions\InvalidWhereQueryCriteriaException
-     * @throws GetMessagesFailedException
-     */
-    public function getMessages($criteria = 'ALL', $fetch_options = null, $fetch_body = true, $fetch_attachment = true, $fetch_flags = true, $limit = null, $page = 1, $charset = "UTF-8") {
-
-        return $this->query($charset)->where($criteria)->setFetchOptions($fetch_options)->setFetchBody($fetch_body)
-            ->setFetchAttachment($fetch_attachment)->setFetchFlags($fetch_flags)
-            ->limit($limit, $page)->get();
-    }
-
-    /**
-     * Get all unseen messages
-     *
-     * @param string    $criteria
-     * @param int|null  $fetch_options
-     * @param boolean   $fetch_body
-     * @param boolean   $fetch_attachment
-     * @param boolean   $fetch_flags
-     * @param int|null  $limit
-     * @param int       $page
-     * @param string    $charset
-     *
-     * @return MessageCollection
-     * @throws Exceptions\ConnectionFailedException
-     * @throws Exceptions\InvalidWhereQueryCriteriaException
-     * @throws GetMessagesFailedException
-     * @throws MessageSearchValidationException
-     *
-     * @deprecated 1.0.5:2.0.0 No longer needed. Use Folder::getMessages('UNSEEN') instead
-     * @see Folder::getMessages()
-     */
-    public function getUnseenMessages($criteria = 'UNSEEN', $fetch_options = null, $fetch_body = true, $fetch_attachment = true, $fetch_flags = true, $limit = null, $page = 1, $charset = "UTF-8") {
-        return $this->getMessages($criteria, $fetch_options, $fetch_body, $fetch_attachment, $fetch_flags, $limit, $page, $charset);
-    }
-
-    /**
-     * Search messages by a given search criteria
-     *
-     * @param array   $where  Is a two dimensional array where each array represents a criteria set:
-     *                        ---------------------------------------------------------------------------------------
-     *                        The following sample would search for all messages received from someone@example.com or
-     *                        contain the text "Hello world!":
-     *                        [['FROM' => 'someone@example.com'],[' TEXT' => 'Hello world!']]
-     *                        ---------------------------------------------------------------------------------------
-     *                        The following sample would search for all messages received since march 15 2018:
-     *                        [['SINCE' => Carbon::parse('15.03.2018')]]
-     *                        ---------------------------------------------------------------------------------------
-     *                        The following sample would search for all flagged messages:
-     *                        [['FLAGGED']]
-     *                        ---------------------------------------------------------------------------------------
-     * @param int|null  $fetch_options
-     * @param boolean   $fetch_body
-     * @param boolean   $fetch_attachment
-     * @param boolean   $fetch_flags
-     * @param int|null  $limit
-     * @param int       $page
-     * @param string    $charset
-     *
-     * @return MessageCollection
-     *
-     * @throws Exceptions\ConnectionFailedException
-     * @throws Exceptions\InvalidWhereQueryCriteriaException
-     * @throws GetMessagesFailedException
-     *
-     * @doc http://php.net/manual/en/function.imap-search.php
-     *      \imap_search() only supports IMAP2 search criterias, because the function mail_criteria() (from c-client lib)
-     *      is used in ext/imap/php_imap.c for parsing the search string.
-     *      IMAP2 search criteria is defined in RFC 1176, section "tag SEARCH search_criteria".
-     *
-     *      https://tools.ietf.org/html/rfc1176 - INTERACTIVE MAIL ACCESS PROTOCOL - VERSION 2
-     *      https://tools.ietf.org/html/rfc1064 - INTERACTIVE MAIL ACCESS PROTOCOL - VERSION 2
-     *      https://tools.ietf.org/html/rfc822  - STANDARD FOR THE FORMAT OF ARPA INTERNET TEXT MESSAGES
-     *      Date and time example from RFC822:
-     *      date-time   =  [ day "," ] date time        ; dd mm yy
-     *                                                  ;  hh:mm:ss zzz
-     *
-     *      day         =  "Mon"  / "Tue" /  "Wed"  / "Thu" /  "Fri"  / "Sat" /  "Sun"
-     *
-     *      date        =  1*2DIGIT month 2DIGIT        ; day month year
-     *                                                  ;  e.g. 20 Jun 82
-     *
-     *      month       =  "Jan"  /  "Feb" /  "Mar"  /  "Apr" /  "May"  /  "Jun" /  "Jul"  /  "Aug" /  "Sep"  /  "Oct" /  "Nov"  /  "Dec"
-     *
-     *      time        =  hour zone                    ; ANSI and Military
-     *
-     *      hour        =  2DIGIT ":" 2DIGIT [":" 2DIGIT] ; 00:00:00 - 23:59:59
-     *
-     *      zone        =  "UT"  / "GMT"         ; Universal Time
-     *                                           ; North American : UT
-     *                  =  "EST" / "EDT"         ;  Eastern:  - 5/ - 4
-     *                  =  "CST" / "CDT"         ;  Central:  - 6/ - 5
-     *                  =  "MST" / "MDT"         ;  Mountain: - 7/ - 6
-     *                  =  "PST" / "PDT"         ;  Pacific:  - 8/ - 7
-     *                  =  1ALPHA                ; Military: Z = UT;
-     *                                           ;  A:-1; (J not used)
-     *                                           ;  M:-12; N:+1; Y:+12
-     *                  / ( ("+" / "-") 4DIGIT ) ; Local differential
-     *                                           ;  hours+min. (HHMM)
-     *
-     * @deprecated 1.2.1:2.0.0 No longer needed. Use Folder::query() instead
-     * @see Folder::query()
-     */
-    public function searchMessages(array $where, $fetch_options = null, $fetch_body = true,  $fetch_attachment = true, $fetch_flags = true, $limit = null, $page = 1, $charset = "UTF-8") {
-        $this->getClient()->checkConnection();
-
-        return $this->query($charset)->where($where)->setFetchOptions($fetch_options)->setFetchBody($fetch_body)
-            ->setFetchAttachment($fetch_attachment)->setFetchFlags($fetch_flags)
-            ->limit($limit, $page)->get();
-
-    }
-
-    /**
      * Decode name.
      * It converts UTF7-IMAP encoding to UTF-8.
      *
@@ -335,8 +187,7 @@ class Folder {
      * @return mixed|string
      */
     protected function decodeName($name) {
-        preg_match('#\{(.*)\}(.*)#', $name, $preg);
-        return mb_convert_encoding($preg[2], "UTF-8", "UTF7-IMAP");
+        return mb_convert_encoding($name, "UTF-8", "UTF7-IMAP");
     }
 
     /**
@@ -359,61 +210,29 @@ class Folder {
      * @param $attributes
      */
     protected function parseAttributes($attributes) {
-        $this->no_inferiors = ($attributes & LATT_NOINFERIORS) ? true : false;
-        $this->no_select    = ($attributes & LATT_NOSELECT) ? true : false;
-        $this->marked       = ($attributes & LATT_MARKED) ? true : false;
-        $this->referal      = ($attributes & LATT_REFERRAL) ? true : false;
-        $this->has_children = ($attributes & LATT_HASCHILDREN) ? true : false;
+        $this->no_inferiors = in_array('\NoInferiors', $attributes) ? true : false;
+        $this->no_select    = in_array('\NoSelect', $attributes) ? true : false;
+        $this->marked       = in_array('\Marked', $attributes) ? true : false;
+        $this->referal      = in_array('\Referal', $attributes) ? true : false;
+        $this->has_children = in_array('\HasChildren', $attributes) ? true : false;
     }
 
     /**
-     * Delete the current Mailbox
+     * Move or rename the current folder
+     *
+     * @param string $new_name
      * @param boolean $expunge
      *
      * @return bool
-     *
      * @throws Exceptions\ConnectionFailedException
+     * @throws Exceptions\RuntimeException
      */
-    public function delete($expunge = true) {
-        $status = \imap_deletemailbox($this->client->getConnection(), $this->path);
+    public function move($new_name, $expunge = true) {
+        $this->client->checkConnection();
+        $status = $this->client->getConnection()->renameFolder($this->full_name, $new_name);
         if($expunge) $this->client->expunge();
 
         return $status;
-    }
-
-    /**
-     * Move or Rename the current Mailbox
-     *
-     * @param string $target_mailbox
-     * @param boolean $expunge
-     *
-     * @return bool
-     *
-     * @throws Exceptions\ConnectionFailedException
-     */
-    public function move($target_mailbox, $expunge = true) {
-        $status = \imap_renamemailbox($this->client->getConnection(), $this->path, $target_mailbox);
-        if($expunge) $this->client->expunge();
-
-        return $status;
-    }
-
-    /**
-     * Returns status information on a mailbox
-     *
-     * @param integer   $options
-     *                  SA_MESSAGES     - set $status->messages to the number of messages in the mailbox
-     *                  SA_RECENT       - set $status->recent to the number of recent messages in the mailbox
-     *                  SA_UNSEEN       - set $status->unseen to the number of unseen (new) messages in the mailbox
-     *                  SA_UIDNEXT      - set $status->uidnext to the next uid to be used in the mailbox
-     *                  SA_UIDVALIDITY  - set $status->uidvalidity to a constant that changes when uids for the mailbox may no longer be valid
-     *                  SA_ALL          - set all of the above
-     *
-     * @return object
-     * @throws Exceptions\ConnectionFailedException
-     */
-    public function getStatus($options) {
-        return \imap_status($this->client->getConnection(), $this->path, $options);
     }
 
     /**
@@ -425,6 +244,7 @@ class Folder {
      *
      * @return bool
      * @throws Exceptions\ConnectionFailedException
+     * @throws Exceptions\RuntimeException
      */
     public function appendMessage($message, $options = null, $internal_date = null) {
         /**
@@ -437,10 +257,130 @@ class Folder {
             if ($internal_date instanceof Carbon){
                 $internal_date = $internal_date->format('d-M-Y H:i:s O');
             }
-            return \imap_append($this->client->getConnection(), $this->path, $message, $options, $internal_date);
         }
 
-        return \imap_append($this->client->getConnection(), $this->path, $message, $options);
+        return $this->client->getConnection()->appendMessage($this->full_name, $message, $options, $internal_date);
+    }
+
+    /**
+     * Rename the current folder
+     * @param string $new_name
+     * @param boolean $expunge
+     *
+     * @return bool
+     * @throws ConnectionFailedException
+     * @throws Exceptions\RuntimeException
+     */
+    public function rename($new_name, $expunge = true) {
+        return $this->move($new_name, $expunge);
+    }
+
+    /**
+     * Delete the current folder
+     * @param boolean $expunge
+     *
+     * @return bool
+     *
+     * @throws Exceptions\ConnectionFailedException
+     * @throws Exceptions\RuntimeException
+     */
+    public function delete($expunge = true) {
+        $status = $this->client->getConnection()->deleteFolder($this->path);
+        if($expunge) $this->client->expunge();
+
+        return $status;
+    }
+
+    /**
+     * Subscribe the current folder
+     *
+     * @return bool
+     *
+     * @throws Exceptions\ConnectionFailedException
+     * @throws Exceptions\RuntimeException
+     */
+    public function subscribe() {
+        $this->client->openFolder($this->path);
+        return $this->client->getConnection()->subscribeFolder($this->path);
+    }
+
+    /**
+     * Unsubscribe the current folder
+     *
+     * @return bool
+     *
+     * @throws Exceptions\ConnectionFailedException
+     */
+    public function unsubscribe() {
+        $this->client->openFolder($this->path);
+        return $this->client->getConnection()->unsubscribeFolder($this->path);
+    }
+
+    /**
+     * Idle the current connection
+     * @param callable $callback
+     * @param integer $timeout max 1740 seconds - recommended by rfc2177 §3
+     *
+     * @throws ConnectionFailedException
+     * @throws Exceptions\InvalidMessageDateException
+     * @throws Exceptions\MessageContentFetchingException
+     * @throws Exceptions\MessageHeaderFetchingException
+     * @throws Exceptions\RuntimeException
+     */
+    public function idle(callable $callback, $timeout = 1200) {
+        $this->client->getConnection()->setConnectionTimeout($timeout);
+
+        $this->client->reconnect();
+        $this->client->openFolder($this->path);
+        $connection = $this->client->getConnection();
+        $connection->idle();
+
+        while (true) {
+            try {
+                $line = $connection->nextLine();
+                if (($pos = strpos($line, "EXISTS")) !== false) {
+                    $msgn = (int) substr($line, 2, $pos -2);
+                    $connection->done();
+
+                    $message = $this->query()->getMessage($msgn);
+                    $callback($message);
+
+                    $connection->idle();
+                }
+            }catch (Exceptions\RuntimeException $e) {
+                if(strpos($e->getMessage(), "connection closed") === false) {
+                    throw $e;
+                }else{
+                    $this->client->connect();
+                    $this->client->openFolder($this->path);
+                    $connection = $this->client->getConnection();
+                    $connection->idle();
+                }
+            }
+        }
+    }
+
+    /**
+     * Get folder status information
+     *
+     * @return array|bool
+     * @throws Exceptions\ConnectionFailedException
+     * @throws Exceptions\RuntimeException
+     */
+    public function getStatus() {
+        return $this->examine();
+    }
+
+    /**
+     * Examine the current folder
+     *
+     * @return array
+     *
+     * @throws Exceptions\ConnectionFailedException
+     * @throws Exceptions\RuntimeException
+     */
+    public function examine() {
+        return $this->client->getConnection()->examineFolder($this->path);
     }
 
     /**

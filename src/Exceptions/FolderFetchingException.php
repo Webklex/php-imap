@@ -1,9 +1,9 @@
 <?php
 /*
-* File:     InvalidImapTimeoutTypeException.php
+* File:     FolderFetchingException.php
 * Category: Exception
 * Author:   M. Goldenbaum
-* Created:  12.03.19 18:41
+* Created:  05.03.18 23:21
 * Updated:  -
 *
 * Description:
@@ -15,10 +15,10 @@ namespace Webklex\PHPIMAP\Exceptions;
 use \Exception;
 
 /**
- * Class InvalidImapTimeoutTypeException
+ * Class FolderFetchingException
  *
  * @package Webklex\PHPIMAP\Exceptions
  */
-class InvalidImapTimeoutTypeException extends Exception {
+class FolderFetchingException extends Exception {
 
 }
