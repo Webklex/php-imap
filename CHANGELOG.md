@@ -4,19 +4,15 @@ All notable changes to `webklex/php-imap` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
-## [UNRELEASED]
+## [UNRELEASED] [2.x]
 ### Fixed
-- Point to root namespace if handling native functions #279
-
-### Added
 - NaN
 
+### Added
+- php-imap replaced by direct socket communication
+
 ### Affected Classes
-- [Query::class](src/Query/WhereQuery.php)
-- [Attachment::class](src/Attachment.php)
-- [Client::class](src/Client.php)
-- [Folder::class](src/Folder.php)
-- [Message::class](src/Message.php)
+- All
 
 ## [1.4.5] - 2019-01-23
 ### Fixed
