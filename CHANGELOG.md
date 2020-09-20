@@ -14,6 +14,10 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Affected Classes
 - NaN
 
+## [2.0.1] - 2020-09-20
+### Fixed
+- Carbon dependency fixed
+
 ## [2.0.0] - 2020-09-20
 ### Fixed
 - Missing pagination item records fixed
