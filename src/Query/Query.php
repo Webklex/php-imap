@@ -13,10 +13,15 @@
 namespace Webklex\PHPIMAP\Query;
 
 use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Webklex\PHPIMAP\Client;
 use Webklex\PHPIMAP\ClientManager;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
 use Webklex\PHPIMAP\Exceptions\GetMessagesFailedException;
+use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
+use Webklex\PHPIMAP\Exceptions\MessageContentFetchingException;
+use Webklex\PHPIMAP\Exceptions\MessageHeaderFetchingException;
 use Webklex\PHPIMAP\Exceptions\MessageSearchValidationException;
 use Webklex\PHPIMAP\Exceptions\RuntimeException;
 use Webklex\PHPIMAP\IMAP;
@@ -142,7 +147,7 @@ class Query {
     /**
      * Perform an imap search request
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      * @throws GetMessagesFailedException
      */
     protected function search(){
@@ -228,9 +233,9 @@ class Query {
      * @return Message
      * @throws ConnectionFailedException
      * @throws RuntimeException
-     * @throws \Webklex\PHPIMAP\Exceptions\InvalidMessageDateException
-     * @throws \Webklex\PHPIMAP\Exceptions\MessageContentFetchingException
-     * @throws \Webklex\PHPIMAP\Exceptions\MessageHeaderFetchingException
+     * @throws InvalidMessageDateException
+     * @throws MessageContentFetchingException
+     * @throws MessageHeaderFetchingException
      */
     public function getMessage($msgno, $msglist = null){
         return new Message($msgno, $msglist, $this->getClient(), $this->getFetchOptions(), $this->getFetchBody(), $this->getFetchFlags());
@@ -242,7 +247,7 @@ class Query {
      * @param null $page
      * @param string $page_name
      *
-     * @return \Illuminate\Pagination\LengthAwarePaginator
+     * @return LengthAwarePaginator
      * @throws GetMessagesFailedException
      */
     public function paginate($per_page = 5, $page = null, $page_name = 'imap_page'){
@@ -291,7 +296,7 @@ class Query {
 
     /**
      * @return Client
-     * @throws \Webklex\PHPIMAP\Exceptions\ConnectionFailedException
+     * @throws ConnectionFailedException
      */
     public function getClient() {
         $this->client->checkConnection();

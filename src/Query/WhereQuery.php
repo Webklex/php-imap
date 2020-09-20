@@ -20,7 +20,7 @@ use Webklex\PHPIMAP\Exceptions\MessageSearchValidationException;
 /**
  * Class WhereQuery
  *
- * @package Webklex\IMAP\Query
+ * @package Webklex\PHPIMAP\Query
  *
  * @method WhereQuery all()
  * @method WhereQuery answered()
