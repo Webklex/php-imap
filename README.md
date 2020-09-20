@@ -3,18 +3,12 @@
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Software License][ico-license]](LICENSE.md)
 [![Total Downloads][ico-downloads]][link-downloads]
+[![Hits][ico-hits]][link-hits]
 
 ## Description
 
-PHPIMAP is an easy way to integrate the native php imap library into your php app.
-
->This package is a fork of one of my other projects [webklex/laravel-imap](https://github.com/Webklex/laravel-imap) 
-which was specially designed to work with the laravel framework. 
-
->Since this library received way more interest than I thought, I decided to take the core features and 
-and move them into a new repository.
-
->This repository will be part of [webklex/laravel-imap](https://github.com/Webklex/laravel-imap) within the next few releases.
+PHP-IMAP is a wrapper for common IMAP communication without the need to have the php-imap module installed / enabled.
+The functionality is almost completely integrated and even supports IDLE operation.
 
 ## Table of Contents
 
@@ -23,6 +17,8 @@ and move them into a new repository.
 - [Usage](#usage)
     - [Basic usage example](#basic-usage-example)
     - [Folder / Mailbox](#folder--mailbox)
+    - [oAuth](#oauth)
+    - [Idle](#idle)
     - [Search](#search-for-messages)
     - [Counting messages](#counting-messages)
     - [Result limiting](#result-limiting)
@@ -56,15 +52,20 @@ and move them into a new repository.
 
 ## Installation
 
-1) Install the php-imap library if it isn't already installed:
+1) Install decoding modules:
 
 ``` shell
-sudo apt-get install php*-imap php*-mbstring php*-mcrypt && sudo apache2ctl graceful
+sudo apt-get install php*-mbstring php*-mcrypt && sudo apache2ctl graceful
+```
+1.1) (optional) Install php-imap module if you are having encoding problems:
+
+``` shell
+sudo apt-get install php*-imap && sudo apache2ctl graceful
 ```
 
-You might also want to check `phpinfo()` if the extension is enabled.
+You might also want to check `phpinfo()` if the extensions are enabled.
 
-2) Now install the Laravel IMAP package by running the following command:
+2) Now install the PHP-IMAP package by running the following command:
 
 ``` shell
 composer require webklex/php-imap
@@ -76,6 +77,7 @@ composer require webklex/php-imap
 
 Supported protocols:
 - `imap` &mdash; Use IMAP [default]
+- `legacy-imap` &mdash; Use the php imap module instead
 - `pop3` &mdash; Use POP3
 - `nntp` &mdash; Use NNTP
 
@@ -83,8 +85,8 @@ The following encryption methods are supported:
 - `false` &mdash; Disable encryption 
 - `ssl` &mdash; Use SSL
 - `tls` &mdash; Use TLS
-- `starttls` &mdash; Use STARTTLS (alias TLS)
-- `notls` &mdash; Use NoTLS
+- `starttls` &mdash; Use STARTTLS (alias TLS) (legacy only)
+- `notls` &mdash; Use NoTLS (legacy only)
 
 Detailed [config/imap.php](src/config/imap.php) configuration:
  - `default` &mdash; used default account. It will be used as default for any missing account parameters. If however the default account is missing a parameter the package default will be used. Set to `false` to disable this functionality.
@@ -96,18 +98,17 @@ Detailed [config/imap.php](src/config/imap.php) configuration:
      - `validate_cert` &mdash; decide weather you want to verify the certificate or not
      - `username` &mdash; imap account username
      - `password` &mdash; imap account password
+     - `authentication` &mdash; imap authentication method. Use `oauth` to use oAuth for Google, etc.
  - `date_format` &mdash; The default date format is used to convert any given Carbon::class object into a valid date string. (`d-M-Y`, `d-M-y`, `d M y`)
  - `options` &mdash; additional fetch options
    - `delimiter` &mdash; you can use any supported char such as ".", "/", etc
-   - `fetch` &mdash; `IMAP::FT_UID` (message marked as read by fetching the message) or `IMAP::FT_PEEK` (fetch the message without setting the "read" flag)
    - `fetch_body` &mdash; If set to `false` all messages will be fetched without the body and any potential attachments
-   - `fetch_attachment` &mdash;  If set to `false` all messages will be fetched without any attachments
    - `fetch_flags` &mdash;  If set to `false` all messages will be fetched without any flags
    - `message_key` &mdash; Message key identifier option
    - `fetch_order` &mdash; Message fetch order
    - `open` &mdash; special configuration for imap_open()
-     - `DISABLE_AUTHENTICATOR` &mdash; Disable authentication properties.
-   - `decoder` &mdash; Currently only the message subject and attachment name decoder can be set
+     - `DISABLE_AUTHENTICATOR` &mdash; disable authentication properties.
+   - `decoder` &mdash; Currently only the message and attachment decoder can be set
    - `masks` &mdash; Default [masking](#masking) config
      - `message` &mdash; Default message mask
      - `attachment` &mdash; Default attachment mask
@@ -173,20 +174,6 @@ foreach($aFolder as $oFolder){
 ```
 
 #### Folder / Mailbox
-There is an experimental function available to get a Folder instance by name. 
-For an easier access please take a look at the new config option `imap.options.delimiter` however the `getFolder` 
-method takes three options: the required (string) $folder_name and two optional variables. An integer $attributes which 
-seems to be sometimes 32 or 64 (I honestly have no clue what this number does, so feel free to enlighten me and anyone 
-else) and a delimiter which if it isn't set will use the default option configured inside the [config/imap.php](src/config/imap.php) file.
-> If you are using Exchange you might want to set all parameter and the last `$prefix_address` to `false` e.g. `$oClient->getFolder('name', 32, null, false)` #234
-
-``` php
-/** @var \Webklex\PHPIMAP\Client $oClient */
-
-/** @var \Webklex\PHPIMAP\Folder $oFolder */
-$oFolder = $oClient->getFolder('INBOX.name');
-```
-
 List all available folders:
 ``` php
 /** @var \Webklex\PHPIMAP\Client $oClient */
@@ -195,6 +182,43 @@ List all available folders:
 $aFolder = $oClient->getFolders();
 ```
 
+Get a specific folder:
+``` php
+/** @var \Webklex\PHPIMAP\Client $oClient */
+
+/** @var \Webklex\PHPIMAP\Folder $oFolder */
+$oFolder = $oClient->getFolder('INBOX.name');
+```
+
+#### oAuth
+If you are using google mail or something similar, you might want to use oauth instead:
+``` php
+/** @var \Webklex\PHPIMAP\Client $oClient */
+$oClient = new Client([
+    'host' => 'imap.gmail.com',
+    'port' => 993,
+    'encryption' => 'ssl',
+    'validate_cert' => true,
+    'username' => 'example@gmail.com',
+    'password' => 'PASSWORD',
+    'authentication' => "oath",
+    'protocol' => 'imap'
+]);
+
+//Connect to the IMAP Server
+$oClient->connect();
+```
+
+#### Idle
+Every time a new message is received the server will notify the client and return the new message.
+``` php
+/** @var \Webklex\PHPIMAP\Client $oClient */
+
+/** @var \Webklex\PHPIMAP\Folder $oFolder */
+$oFolder->idle(function($message){
+    dump($message->subject);
+});
+```
 
 #### Search for messages
 Search for specific emails:
@@ -263,7 +287,7 @@ $aMessage = $oFolder->search()->text('hello world')->since('15.03.2018')->get();
 $aMessage = $oFolder->messages()->text('hello world')->since('15.03.2018')->get();
 
 ```
-All available query / search methods can be found here: [Query::class](src/IMAP/Query/WhereQuery.php)
+All available query / search methods can be found here: [Query::class](src/Query/WhereQuery.php)
 
 Available search criteria:
 - `ALL` &mdash; return all messages matching the rest of the criteria
@@ -381,7 +405,7 @@ $paginator = $oFolder->search()
 
 
 #### View examples
-You can find a few blade examples under [/examples](https://github.com/Webklex/php-imap/tree/master/examples).
+You can find a few blade examples under [/examples](examples).
 
 #### Fetch a specific message
 Get a specific message by uid (Please note that the uid is not unique and can change):
@@ -389,7 +413,7 @@ Get a specific message by uid (Please note that the uid is not unique and can ch
 /** @var \Webklex\PHPIMAP\Folder $oFolder */
 
 /** @var \Webklex\PHPIMAP\Message $oMessage */
-$oMessage = $oFolder->getMessage($uid = 1);
+$oMessage = $oFolder->query()->getMessage($msgn = 1);
 ```
 
 #### Message flags
@@ -398,20 +422,6 @@ Flag or "unflag" a message:
 /** @var \Webklex\PHPIMAP\Message $oMessage */
 $oMessage->setFlag(['Seen', 'Spam']);
 $oMessage->unsetFlag('Spam');
-```
-
-Mark all messages as "read" while fetching:
-``` php
-/** @var \Webklex\PHPIMAP\Folder $oFolder */
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
-$aMessage = $oFolder->query()->text('Hello world')->markAsRead()->get();
-```
-
-Don't mark all messages as "read" while fetching:
-``` php
-/** @var \Webklex\PHPIMAP\Folder $oFolder */
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
-$aMessage = $oFolder->query()->text('Hello world')->leaveUnread()->get();
 ```
 
 #### Attachments
@@ -424,7 +434,7 @@ $aAttachment = $oMessage->getAttachments();
 
 $aAttachment->each(function ($oAttachment) {
     /** @var \Webklex\PHPIMAP\Attachment $oAttachment */
-    $oAttachment->save();
+    $oAttachment->save("/some/path/");
 });
 ```
 
@@ -437,7 +447,7 @@ Fetch messages without body fetching (decrease load):
 $aMessage = $oFolder->query()->whereText('Hello world')->setFetchBody(false)->get();
 
 /** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
-$aMessage = $oFolder->query()->whereAll()->setFetchBody(false)->setFetchAttachment();
+$aMessage = $oFolder->query()->whereAll()->setFetchBody(false)->get();
 ```
 
 Fetch messages without body, flag and attachment fetching (decrease load):
@@ -448,14 +458,12 @@ Fetch messages without body, flag and attachment fetching (decrease load):
 $aMessage = $oFolder->query()->whereText('Hello world')
 ->setFetchFlags(false)
 ->setFetchBody(false)
-->setFetchAttachment(false)
 ->get();
 
 /** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
 $aMessage = $oFolder->query()->whereAll()
 ->setFetchFlags(false)
 ->setFetchBody(false)
-->setFetchAttachment(false)
 ->get();
 ```
 
@@ -525,7 +533,7 @@ Additional examples can be found here:
 #### Specials
 Find the folder containing a message:
 ``` php
-$oFolder = $aMessage->getContainingFolder();
+$oFolder = $aMessage->getFolder();
 ```
 
 ## Support
@@ -564,30 +572,18 @@ if you're just wishing a feature ;)
 | ------------------------- | ------------------------------------------------------------------------------- | :---------------: | ----------------------------------------------------------------------------------------------------------------------------  |
 | setConfig                 | array $config                                                                   | self              | Set the Client configuration. Take a look at `config/imap.php` for more inspiration.                                          |
 | getConnection             | resource $connection                                                            | resource          | Get the current imap resource                                                                                                 |
-| setReadOnly               | bool $readOnly                                                                  | self              | Set read only property and reconnect if it's necessary.                                                                       |
-| isReadOnly                |                                                                                 | bool              | Determine if connection is in read only mode.                                                                                 |
 | isConnected               |                                                                                 | bool              | Determine if connection was established.                                                                                      |
 | checkConnection           |                                                                                 |                   | Determine if connection was established and connect if not.                                                                   |
-| connect                   | int $attempts                                                                   |                   | Connect to server.                                                                                                            |
+| connect                   |                                                                                 |                   | Connect to server.                                                                                                            |
+| reconnect                 |                                                                                 |                   | Terminate and reconnect to server.                                                                                                            |
 | disconnect                |                                                                                 |                   | Disconnect from server.                                                                                                       |
 | getFolder                 | string $folder_name, int $attributes = 32, int or null $delimiter, bool $prefix_address | Folder            | Get a Folder instance by name                                                                                                 |
 | getFolders                | bool $hierarchical, string or null $parent_folder                               | FolderCollection  | Get folders list. If hierarchical order is set to true, it will make a tree of folders, otherwise it will return flat array.  |
 | openFolder                | string or Folder $folder, integer $attempts                                     |                   | Open a given folder.                                                                                                          |
 | createFolder              | string $name                                                                    | boolean           | Create a new folder.                                                                                                          |
-| renameFolder              | string $old_name, string $new_name                                              | boolean           | Rename a folder. |
-| deleteFolder              | string $name                                                                    | boolean           | Delete a folder. |
-| getMessages               | Folder $folder, string $criteria, bool $fetch_body, bool $fetch_attachment, bool $fetch_flags       | MessageCollection | Get messages from folder.                                                                                 |
-| getUnseenMessages         | Folder $folder, string $criteria, bool $fetch_body, bool $fetch_attachment, bool $fetch_flags       | MessageCollection | Get Unseen messages from folder.                                                                          |
-| searchMessages            | array $where, Folder $folder, $fetch_options, bool $fetch_body, string $charset, bool $fetch_attachment, bool $fetch_flags | MessageCollection | Get specific messages from a given folder.                                         |
 | getQuota                  |                                                                                 | array             | Retrieve the quota level settings, and usage statics per mailbox                                                              |
 | getQuotaRoot              | string $quota_root                                                              | array             | Retrieve the quota settings per user                                                                                          |
-| countMessages             |                                                                                 | int               | Gets the number of messages in the current mailbox                                                                            |
-| countRecentMessages       |                                                                                 | int               | Gets the number of recent messages in current mailbox                                                                         |
-| getAlerts                 |                                                                                 | array             | Returns all IMAP alert messages that have occurred                                                                            |
-| getErrors                 |                                                                                 | array             | Returns all of the IMAP errors that have occurred                                                                             |
-| getLastError              |                                                                                 | string            | Gets the last IMAP error that occurred during this page request                                                               |
 | expunge                   |                                                                                 | bool              | Delete all messages marked for deletion                                                                                       |
-| checkCurrentMailbox       |                                                                                 | object            | Check current mailbox                                                                                                         |
 | setTimeout                | string or int $type, int $timeout                                               | boolean           | Set the timeout for certain imap operations: 1: Open, 2: Read, 3: Write, 4: Close                                             |
 | getTimeout                | string or int $type                                                             | int               | Check current mailbox                                                                                                         |
 | setDefaultMessageMask     | string $mask                                                                    | self              | Set the default message mask class                                                                                            |
@@ -603,10 +599,8 @@ if you're just wishing a feature ;)
 | parseBody       |                               | Message              | Parse the Message body                 |
 | delete          | boolean $expunge              | boolean              | Delete the current Message             |
 | restore         | boolean $expunge              | boolean              | Restore a deleted Message              |
-| copy            | string $mailbox, int $options | boolean              | Copy the current Messages to a mailbox |
-| move            | string $mailbox, int $options | boolean              | Move the current Messages to a mailbox |
-| getContainingFolder | Folder or null $folder    | Folder or null       | Get the folder containing the message  |
-| moveToFolder    | string $mailbox, boolean $expunge, boolean $create_folder | Message | Move the Message into an other Folder  |
+| copy            | string $mailbox               | boolean              | Copy the current Messages to a mailbox |
+| move            | string $mailbox, boolean $expunge  | boolean         | Move the current Messages to a mailbox |
 | setFlag         | string or array $flag         | boolean              | Set one or many flags                  |
 | unsetFlag       | string or array $flag         | boolean              | Unset one or many flags                |
 | hasTextBody     |                               |                      | Check if the Message has a text body   |
@@ -650,13 +644,14 @@ if you're just wishing a feature ;)
 | ----------------- | ----------------------------------------------------------------------------------- | :---------------: | ---------------------------------------------- |
 | hasChildren       |                                                                                     | bool              | Determine if folder has children.              |
 | setChildren       | array $children                                                                     | self              | Set children.                                  |
-| getMessage        | integer $uid, integer or null $msglist, int or null fetch_options, bool $fetch_body, bool $fetch_attachment, bool $fetch_flags | Message           | Get a specific message from folder.            |
-| getMessages       | string $criteria, int or null $fetch_options, bool $fetch_body, bool $fetch_attachment, bool $fetch_flags                                                  | MessageCollection | Get messages from folder.                      |
-| getUnseenMessages | string $criteria, int or null $fetch_options, bool $fetch_body, bool $fetch_attachment, bool $fetch_flags                                                  | MessageCollection | Get Unseen messages from folder.               |
-| searchMessages    | array $where, int or null $fetch_options, bool $fetch_body, string $charset, bool $fetch_attachment, bool $fetch_flags                     | MessageCollection | Get specific messages from a given folder.     |
 | delete            |                                                                                     |                   | Delete the current Mailbox                     |
+| subscribe         |                                                                                     |                   | Subscribe to the current Mailbox               |
+| unsubscribe       |                                                                                     |                   | Unsubscribe from the current Mailbox           |
+| idle              | callable $callback(Message $new_message)                                            |                   | Idle the current folder                        |
 | move              | string $mailbox                                                                     |                   | Move or Rename the current Mailbox             |
-| getStatus         | integer $options                                                                    | object            | Returns status information on a mailbox        |
+| rename            | string $mailbox                                                                     |                   | Move or Rename the current Mailbox             |
+| getStatus         |                                                                                     | array             | Returns status information on the current mailbox |
+| examine           |                                                                                     | array             | Returns status information on the current mailbox |
 | appendMessage     | string $message, string $options, string $internal_date                             | bool              | Append a string message to the current mailbox |
 | getClient         |                                                                                     | Client            | Get the current Client instance                |
 | query             | string $charset = 'UTF-8'                                                           | WhereQuery        | Get the current Client instance                |
@@ -704,7 +699,6 @@ if you're just wishing a feature ;)
 | limit              | integer $limit, integer $page = 1 | WhereQuery        | Limit the amount of messages being fetched |
 | setFetchOptions    | boolean $fetch_options            | WhereQuery        | Set the fetch options |
 | setFetchBody       | boolean $fetch_body               | WhereQuery        | Set the fetch body option |
-| getFetchAttachment | boolean $fetch_attachment         | WhereQuery        | Set the fetch attachment option |
 | setFetchFlags      | boolean $fetch_flags              | WhereQuery        | Set the fetch flags option |
 | leaveUnread        |                                   | WhereQuery        | Don't mark all messages as "read" while fetching:  |
 | markAsRead         |                                   | WhereQuery        | Mark all messages as "read" while fetching |  
@@ -720,13 +714,11 @@ if you're just wishing a feature ;)
 | getExtension   |                                | string or null | Get a guessed attachment extension                     |     
 | getId          |                                | string or null | Get attachment id                                      |        
 | getName        |                                | string or null | Get attachment name                                    |        
-| getPartNumber  |                                | int or null    | Get attachment part number                             |        
 | getContent     |                                | string or null | Get attachment content                                 |                
 | setSize        |                                | int or null    | Get attachment size                                    |        
 | getType        |                                | string or null | Get attachment type                                    |        
 | getDisposition |                                | string or null | Get attachment disposition                             | 
 | getContentType |                                | string or null | Get attachment content type                            | 
-| getImgSrc      |                                | string or null | Get attachment image source as base64 encoded data url |      
 | save           | string $path, string $filename | boolean        | Save the attachment content to your filesystem         |    
 | mask           | string $mask = null            | Mask           | Get a masked instance                                  |
 | setMask        | string $mask                   | Attachment     | Set the mask class                                     |
@@ -789,13 +781,7 @@ Extends [Illuminate\Support\Collection::class](https://laravel.com/api/5.4/Illum
 ### Known issues
 | Error                                                                     | Solution                                                   |
 | ------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| Kerberos error: No credentials cache file found (try running kinit) (...) | Uncomment "DISABLE_AUTHENTICATOR" inside `config/imap.php` | 
-| imap_fetchbody() expects parameter 4 to be long, string given (...)       | Make sure that `imap.options.fetch` is a valid integer     | 
-| Use of undefined constant FT_UID - assumed 'FT_UID' (...)                 | Please take a look at [#14](https://github.com/Webklex/php-imap/issues/14) [#30](https://github.com/Webklex/php-imap/issues/30)     | 
-| DateTime::__construct(): Failed to parse time string (...)                | Please report any new invalid timestamps to [#45](https://github.com/Webklex/php-imap/issues/45)  | 
-| imap_open(): Couldn't open (...) Please log in your web browser: (...)    | In order to use IMAP on some services (such as Gmail) you need to enable it first. [Google help page]( https://support.google.com/mail/answer/7126229?hl=en) |
-| imap_headerinfo(): Bad message number                                     | This happens if no Message number is available. Please make sure Message::parseHeader() has run before |
-| imap_fetchheader(): Bad message number                                    | Try to change the `message_key` [#243](https://github.com/Webklex/laravel-imap/issues/243)
+| NaN | NaN | 
 
 
 ## Milestones & upcoming features
@@ -825,6 +811,7 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 [ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/Webklex/php-imap.svg?style=flat-square
 [ico-code-quality]: https://img.shields.io/scrutinizer/g/Webklex/php-imap.svg?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/Webklex/php-imap.svg?style=flat-square
+[ico-hits]: https://hits.webklex.com/svg/webklex/php-imap
 
 [link-packagist]: https://packagist.org/packages/Webklex/php-imap
 [link-travis]: https://travis-ci.org/Webklex/php-imap
@@ -834,3 +821,4 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 [link-author]: https://github.com/webklex
 [link-contributors]: https://github.com/Webklex/php-imap/graphs/contributors
 [link-jetbrains]: https://www.jetbrains.com
+[link-hits]: https://hits.webklex.com

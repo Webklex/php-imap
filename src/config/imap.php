@@ -54,6 +54,7 @@ return [
             'validate_cert' => true,
             'username' => 'root@example.com',
             'password' => '',
+            'authentication' => null,
         ],
 
         /*
@@ -64,6 +65,7 @@ return [
             'validate_cert' => true,
             'username' => 'example@gmail.com',
             'password' => 'PASSWORD',
+            'authentication' => 'oauth',
         ],
 
         'another' => [ // account identifier
@@ -86,12 +88,7 @@ return [
     |   -Delimiter (optional):
     |       This option is only used when calling $oClient->
     |       You can use any supported char such as ".", "/", (...)
-    |   -Fetch option:
-    |       IMAP::FT_UID  - Message marked as read by fetching the message
-    |       IMAP::FT_PEEK - Fetch the message without setting the "read" flag
     |   -Body download option
-    |       Default TRUE
-    |   -Attachment download option
     |       Default TRUE
     |   -Flag download option
     |       Default TRUE
@@ -116,22 +113,16 @@ return [
     */
     'options' => [
         'delimiter' => '/',
-        'fetch' => \Webklex\PHPIMAP\IMAP::FT_UID,
         'fetch_body' => true,
-        'fetch_attachment' => true,
         'fetch_flags' => true,
-        'message_key' => 'id',
+        'message_key' => 'list',
         'fetch_order' => 'asc',
         'open' => [
             // 'DISABLE_AUTHENTICATOR' => 'GSSAPI'
         ],
         'decoder' => [
-            'message' => [
-                'subject' => 'utf-8' // mimeheader
-            ],
-            'attachment' => [
-                'name' => 'utf-8' // mimeheader
-            ]
+            'message' => 'utf-8', // mimeheader
+            'attachment' => 'utf-8' // mimeheader
         ]
     ],
 

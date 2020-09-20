@@ -15,8 +15,10 @@ namespace Webklex\PHPIMAP\Query;
 use Carbon\Carbon;
 use Webklex\PHPIMAP\Client;
 use Webklex\PHPIMAP\ClientManager;
+use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
 use Webklex\PHPIMAP\Exceptions\GetMessagesFailedException;
 use Webklex\PHPIMAP\Exceptions\MessageSearchValidationException;
+use Webklex\PHPIMAP\Exceptions\RuntimeException;
 use Webklex\PHPIMAP\IMAP;
 use Webklex\PHPIMAP\Message;
 use Webklex\PHPIMAP\Support\MessageCollection;
@@ -51,9 +53,6 @@ class Query {
 
     /** @var int $fetch_body */
     protected $fetch_body = true;
-
-    /** @var int $fetch_attachment */
-    protected $fetch_attachment = true;
 
     /** @var int $fetch_flags */
     protected $fetch_flags = true;
@@ -144,19 +143,17 @@ class Query {
      * Perform an imap search request
      *
      * @return \Illuminate\Support\Collection
-     * @throws \Webklex\PHPIMAP\Exceptions\ConnectionFailedException
+     * @throws GetMessagesFailedException
      */
     protected function search(){
         $this->generate_query();
 
-        /**
-         * Don't set the charset if it isn't used - prevent strange outlook mail server errors
-         * @see https://github.com/Webklex/laravel-imap/issues/100
-         */
-        if($this->getCharset() === null){
-            $available_messages = \imap_search($this->getClient()->getConnection(), $this->getRawQuery(), IMAP::SE_UID);
-        }else{
-            $available_messages = \imap_search($this->getClient()->getConnection(), $this->getRawQuery(), IMAP::SE_UID, $this->getCharset());
+        try {
+            $available_messages = $this->client->getConnection()->search([$this->getRawQuery()]);
+        } catch (RuntimeException $e) {
+            $available_messages = false;
+        } catch (ConnectionFailedException $e) {
+            throw new GetMessagesFailedException("failed to fetch messages", 0, $e);
         }
 
         if ($available_messages !== false) {
@@ -170,7 +167,7 @@ class Query {
      * Count all available messages matching the current search criteria
      *
      * @return int
-     * @throws \Webklex\PHPIMAP\Exceptions\ConnectionFailedException
+     * @throws GetMessagesFailedException
      */
     public function count() {
         return $this->search()->count();
@@ -185,11 +182,9 @@ class Query {
     public function get() {
         $messages = MessageCollection::make([]);
 
+        $available_messages = $this->search();
         try {
-            $available_messages = $this->search();
-            $available_messages_count = $available_messages->count();
-
-            if ($available_messages_count > 0) {
+            if (($available_messages_count = $available_messages->count()) > 0) {
 
                 $messages->total($available_messages_count);
 
@@ -202,27 +197,43 @@ class Query {
                 $query =& $this;
 
                 $available_messages->forPage($this->page, $this->limit)->each(function($msgno, $msglist) use(&$messages, $options, $query) {
-                    $oMessage = new Message($msgno, $msglist, $query->getClient(), $query->getFetchOptions(), $query->getFetchBody(), $query->getFetchAttachment(), $query->getFetchFlags());
+                    $message = $query->getMessage($msgno, $msglist);
                     switch ($options['message_key']){
                         case 'number':
-                            $message_key = $oMessage->getMessageNo();
+                            $message_key = $message->getMessageNo();
                             break;
                         case 'list':
                             $message_key = $msglist;
                             break;
                         default:
-                            $message_key = $oMessage->getMessageId();
+                            $message_key = $message->getMessageId();
                             break;
 
                     }
-                    $messages->put($message_key, $oMessage);
+                    $messages->put($message_key, $message);
                 });
             }
 
             return $messages;
         } catch (\Exception $e) {
-            throw new GetMessagesFailedException($e->getMessage());
+            throw new GetMessagesFailedException($e->getMessage(),0, $e);
         }
+    }
+
+    /**
+     * Get a new Message instance
+     * @param $msgno
+     * @param null $msglist
+     *
+     * @return Message
+     * @throws ConnectionFailedException
+     * @throws RuntimeException
+     * @throws \Webklex\PHPIMAP\Exceptions\InvalidMessageDateException
+     * @throws \Webklex\PHPIMAP\Exceptions\MessageContentFetchingException
+     * @throws \Webklex\PHPIMAP\Exceptions\MessageHeaderFetchingException
+     */
+    public function getMessage($msgno, $msglist = null){
+        return new Message($msgno, $msglist, $this->getClient(), $this->getFetchOptions(), $this->getFetchBody(), $this->getFetchFlags());
     }
 
     /**
@@ -238,7 +249,18 @@ class Query {
         $this->page = $page > $this->page ? $page : $this->page;
         $this->limit = $per_page;
 
-        return $this->get()->paginate($per_page, $this->page, $page_name);
+        $messages = $this->get();
+        if (($count = $messages->count()) > 0) {
+            $limit = $this->limit > $count ? $count : $this->limit;
+            $collection = array_fill(0, $messages->total() - $limit, true);
+            $messages->each(function($message) use(&$collection){
+                $collection[] = $message;
+            });
+        }else{
+            $collection = array_fill(0, $messages->total(), true);
+        }
+
+        return MessageCollection::make($collection)->paginate($per_page, $this->page, $page_name);
     }
 
     /**
@@ -425,30 +447,6 @@ class Query {
      */
     public function fetchBody($fetch_body) {
         return $this->setFetchBody($fetch_body);
-    }
-
-    /**
-     * @return boolean
-     */
-    public function getFetchAttachment() {
-        return $this->fetch_attachment;
-    }
-
-    /**
-     * @param boolean $fetch_attachment
-     * @return Query
-     */
-    public function setFetchAttachment($fetch_attachment) {
-        $this->fetch_attachment = $fetch_attachment;
-        return $this;
-    }
-
-    /**
-     * @param boolean $fetch_attachment
-     * @return Query
-     */
-    public function fetchAttachment($fetch_attachment) {
-        return $this->setFetchAttachment($fetch_attachment);
     }
 
     /**

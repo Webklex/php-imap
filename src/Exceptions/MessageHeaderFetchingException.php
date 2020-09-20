@@ -1,6 +1,6 @@
 <?php
 /*
-* File:     MailboxFetchingException.php
+* File:     MessageHeaderFetchingException.php
 * Category: Exception
 * Author:   M. Goldenbaum
 * Created:  05.03.18 23:21
@@ -15,10 +15,10 @@ namespace Webklex\PHPIMAP\Exceptions;
 use \Exception;
 
 /**
- * Class MailboxFetchingException
+ * Class MessageHeaderFetchingException
  *
  * @package Webklex\PHPIMAP\Exceptions
  */
-class MailboxFetchingException extends Exception {
+class MessageHeaderFetchingException extends Exception {
 
 }
