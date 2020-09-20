@@ -10,6 +10,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Added
 - php-imap replaced by direct socket communication
+- Legacy support added
 
 ### Affected Classes
 - All
