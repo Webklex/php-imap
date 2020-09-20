@@ -76,13 +76,16 @@ composer require webklex/php-imap
 
 Supported protocols:
 - `imap` &mdash; Use IMAP [default]
-- `pop3` &mdash; ~~Use POP3~~ [not supported jet]
-- `nntp` &mdash; ~~Use NNTP~~ [not supported jet]
+- `legacy-imap` &mdash; Use the php imap module instead
+- `pop3` &mdash; Use POP3
+- `nntp` &mdash; Use NNTP
 
 The following encryption methods are supported:
 - `false` &mdash; Disable encryption 
 - `ssl` &mdash; Use SSL
 - `tls` &mdash; Use TLS
+- `starttls` &mdash; Use STARTTLS (alias TLS) (legacy only)
+- `notls` &mdash; Use NoTLS (legacy only)
 
 Detailed [config/imap.php](src/config/imap.php) configuration:
  - `default` &mdash; used default account. It will be used as default for any missing account parameters. If however the default account is missing a parameter the package default will be used. Set to `false` to disable this functionality.

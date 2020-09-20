@@ -90,23 +90,6 @@ interface ProtocolInterface {
     public function examineFolder($folder = 'INBOX');
 
     /**
-     * Fetch one or more items of one or more messages
-     *
-     * @param string|array $items items to fetch from message(s) as string (if only one item)
-     *                             or array of strings
-     * @param int|array $from message for items or start message if $to !== null
-     * @param int|null $to if null only one message ($from) is fetched, else it's the
-     *                             last message, INF means last message available
-     * @param bool $uid set to true if passing a unique id
-     * @return string|array if only one item of one message is fetched it's returned as string
-     *                      if items of one message are fetched it's returned as (name => value)
-     *                      if one items of messages are fetched it's returned as (msgno => value)
-     *                      if items of messages are fetched it's returned as (msgno => (name => value))
-     * @throws RuntimeException
-     */
-    public function fetch($items, $from, $to = null, $uid = false);
-
-    /**
      * Fetch message headers
      * @param array|int $uids
      * @param string $rfc

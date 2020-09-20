@@ -13,6 +13,7 @@
 namespace Webklex\PHPIMAP;
 
 use Webklex\PHPIMAP\Connection\Protocols\ImapProtocol;
+use Webklex\PHPIMAP\Connection\Protocols\LegacyProtocol;
 use Webklex\PHPIMAP\Connection\Protocols\Protocol;
 use Webklex\PHPIMAP\Connection\Protocols\ProtocolInterface;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
@@ -257,13 +258,21 @@ class Client {
      */
     public function connect() {
         $this->disconnect();
+        $protocol = strtolower($this->protocol);
 
-        if (strtolower($this->protocol) == "imap") {
+        if ($protocol == "imap") {
             $timeout = $this->connection !== false ? $this->connection->getConnectionTimeout() : null;
             $this->connection = new ImapProtocol($this->validate_cert);
             $this->connection->setConnectionTimeout($timeout);
         }else{
-            throw new ConnectionFailedException("connection setup failed", 0, new ProtocolNotSupportedException($this->protocol." is an unsupported protocol"));
+            if (extension_loaded('imap') === false) {
+                throw new ConnectionFailedException("connection setup failed", 0, new ProtocolNotSupportedException($protocol." is an unsupported protocol"));
+            }
+            $this->connection = new LegacyProtocol($this->validate_cert);
+            if (strpos($protocol, "legacy-") === 0) {
+                $protocol = substr($protocol, 7);
+            }
+            $this->connection->setProtocol($protocol);
         }
 
         $this->connection->connect($this->host, $this->port, $this->encryption);

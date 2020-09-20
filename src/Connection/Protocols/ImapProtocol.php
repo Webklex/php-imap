@@ -535,7 +535,7 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
      *                      if items of messages are fetched it's returned as (msgno => (name => value))
      * @throws RuntimeException
      */
-    public function fetch($items, $from, $to = null, $uid = false) {
+    protected function fetch($items, $from, $to = null, $uid = false) {
         if (is_array($from)) {
             $set = implode(',', $from);
         } elseif ($to === null) {

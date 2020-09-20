@@ -216,7 +216,7 @@ class Query {
 
             return $messages;
         } catch (\Exception $e) {
-            throw new GetMessagesFailedException($e->getMessage());
+            throw new GetMessagesFailedException($e->getMessage(),0, $e);
         }
     }
 
