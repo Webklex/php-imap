@@ -4,7 +4,17 @@ All notable changes to `webklex/php-imap` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
-## [UNRELEASED] [2.x]
+## [UNRELEASED]
+### Fixed
+- NaN
+
+### Added
+- NaN
+
+### Affected Classes
+- NaN
+
+## [2.0.0] - 2020-09-20
 ### Fixed
 - Missing pagination item records fixed
 
