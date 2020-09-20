@@ -6,11 +6,15 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED] [2.x]
 ### Fixed
-- NaN
+- Missing pagination item records fixed
 
 ### Added
-- php-imap replaced by direct socket communication
+- php-imap module replaced by direct socket communication
 - Legacy support added
+- IDLE support added
+- oAuth support added
+- Charset detection method updated
+- Decoding fallback charsets added
 
 ### Affected Classes
 - All
