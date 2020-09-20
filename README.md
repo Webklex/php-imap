@@ -17,6 +17,7 @@ The functionality is almost completely integrated and even supports IDLE operati
 - [Usage](#usage)
     - [Basic usage example](#basic-usage-example)
     - [Folder / Mailbox](#folder--mailbox)
+    - [oAuth](#oauth)
     - [Idle](#idle)
     - [Search](#search-for-messages)
     - [Counting messages](#counting-messages)
@@ -105,6 +106,8 @@ Detailed [config/imap.php](src/config/imap.php) configuration:
    - `fetch_flags` &mdash;  If set to `false` all messages will be fetched without any flags
    - `message_key` &mdash; Message key identifier option
    - `fetch_order` &mdash; Message fetch order
+   - `open` &mdash; special configuration for imap_open()
+     - `DISABLE_AUTHENTICATOR` &mdash; disable authentication properties.
    - `decoder` &mdash; Currently only the message and attachment decoder can be set
    - `masks` &mdash; Default [masking](#masking) config
      - `message` &mdash; Default message mask
@@ -185,6 +188,25 @@ Get a specific folder:
 
 /** @var \Webklex\PHPIMAP\Folder $oFolder */
 $oFolder = $oClient->getFolder('INBOX.name');
+```
+
+#### oAuth
+If you are using google mail or something similar, you might want to use oauth instead:
+``` php
+/** @var \Webklex\PHPIMAP\Client $oClient */
+$oClient = new Client([
+    'host' => 'imap.gmail.com',
+    'port' => 993,
+    'encryption' => 'ssl',
+    'validate_cert' => true,
+    'username' => 'example@gmail.com',
+    'password' => 'PASSWORD',
+    'authentication' => "oath",
+    'protocol' => 'imap'
+]);
+
+//Connect to the IMAP Server
+$oClient->connect();
 ```
 
 #### Idle
