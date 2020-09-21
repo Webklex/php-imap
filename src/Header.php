@@ -484,7 +484,6 @@ class Header {
      *
      * @param object $header
      *
-     * @return Carbon|null
      * @throws InvalidMessageDateException
      */
     private function parseDate($header) {

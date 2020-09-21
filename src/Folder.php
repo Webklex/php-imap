@@ -19,6 +19,7 @@ use Webklex\PHPIMAP\Exceptions\MessageSearchValidationException;
 use Webklex\PHPIMAP\Query\WhereQuery;
 use Webklex\PHPIMAP\Support\FolderCollection;
 use Webklex\PHPIMAP\Support\MessageCollection;
+use Webklex\PHPIMAP\Traits\HasEvents;
 
 /**
  * Class Folder
@@ -26,6 +27,7 @@ use Webklex\PHPIMAP\Support\MessageCollection;
  * @package Webklex\PHPIMAP
  */
 class Folder {
+    use HasEvents;
 
     /**
      * Client instance
@@ -117,6 +119,9 @@ class Folder {
      */
     public function __construct(Client $client, $folder_name, $delimiter, $attributes) {
         $this->client = $client;
+
+        $this->events["message"] = $client->getDefaultEvents("message");
+        $this->events["folder"] = $client->getDefaultEvents("folder");
 
         $this->setDelimiter($delimiter);
         $this->path      = $folder_name;
@@ -224,13 +229,19 @@ class Folder {
      * @param boolean $expunge
      *
      * @return bool
-     * @throws Exceptions\ConnectionFailedException
+     * @throws ConnectionFailedException
+     * @throws Exceptions\EventNotFoundException
+     * @throws Exceptions\FolderFetchingException
      * @throws Exceptions\RuntimeException
      */
     public function move($new_name, $expunge = true) {
         $this->client->checkConnection();
         $status = $this->client->getConnection()->renameFolder($this->full_name, $new_name);
         if($expunge) $this->client->expunge();
+
+        $folder = $this->client->getFolder($new_name);
+        $event = $this->getEvent("folder", "moved");
+        $event::dispatch($this, $folder);
 
         return $status;
     }
@@ -269,6 +280,8 @@ class Folder {
      *
      * @return bool
      * @throws ConnectionFailedException
+     * @throws Exceptions\EventNotFoundException
+     * @throws Exceptions\FolderFetchingException
      * @throws Exceptions\RuntimeException
      */
     public function rename($new_name, $expunge = true) {
@@ -283,10 +296,14 @@ class Folder {
      *
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\RuntimeException
+     * @throws Exceptions\EventNotFoundException
      */
     public function delete($expunge = true) {
         $status = $this->client->getConnection()->deleteFolder($this->path);
         if($expunge) $this->client->expunge();
+
+        $event = $this->getEvent("folder", "deleted");
+        $event::dispatch($this);
 
         return $status;
     }
@@ -326,6 +343,7 @@ class Folder {
      * @throws Exceptions\MessageContentFetchingException
      * @throws Exceptions\MessageHeaderFetchingException
      * @throws Exceptions\RuntimeException
+     * @throws Exceptions\EventNotFoundException
      */
     public function idle(callable $callback, $timeout = 1200) {
         $this->client->getConnection()->setConnectionTimeout($timeout);
@@ -344,6 +362,9 @@ class Folder {
 
                     $message = $this->query()->getMessage($msgn);
                     $callback($message);
+
+                    $event = $this->getEvent("message", "new");
+                    $event::dispatch($message);
 
                     $connection->idle();
                 }

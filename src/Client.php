@@ -23,6 +23,7 @@ use Webklex\PHPIMAP\Exceptions\ProtocolNotSupportedException;
 use Webklex\PHPIMAP\Support\FolderCollection;
 use Webklex\PHPIMAP\Support\Masks\AttachmentMask;
 use Webklex\PHPIMAP\Support\Masks\MessageMask;
+use Webklex\PHPIMAP\Traits\HasEvents;
 
 /**
  * Class Client
@@ -30,6 +31,7 @@ use Webklex\PHPIMAP\Support\Masks\MessageMask;
  * @package Webklex\PHPIMAP
  */
 class Client {
+    use HasEvents;
 
 
     /**
@@ -128,6 +130,7 @@ class Client {
     public function __construct($config = []) {
         $this->setConfig($config);
         $this->setMaskFromConfig($config);
+        $this->setEventsFromConfig($config);
     }
 
     /**
@@ -153,6 +156,21 @@ class Client {
         }
 
         return $this;
+    }
+
+    /**
+     * Look for a possible events in any available config
+     * @param $config
+     */
+    protected function setEventsFromConfig($config) {
+        $this->events = ClientManager::get("events");
+        if(isset($config['events'])){
+            if(isset($config['events'])) {
+                foreach($config['events'] as $section => $events) {
+                    $this->events[$section] = array_merge($this->events[$section], $events);
+                }
+            }
+        }
     }
 
     /**
@@ -383,13 +401,21 @@ class Client {
      *
      * @return bool
      * @throws ConnectionFailedException
+     * @throws FolderFetchingException
+     * @throws Exceptions\EventNotFoundException
      */
     public function createFolder($folder, $expunge = true) {
         $this->checkConnection();
         $status = $this->connection->createFolder($folder);
         if($expunge) $this->expunge();
 
-        return $status;
+        $folder = $this->getFolder($folder);
+        if($status && $folder) {
+            $event = $this->getEvent("folder", "new");
+            $event::dispatch($folder);
+        }
+
+        return $folder;
     }
 
     /**
@@ -472,6 +498,14 @@ class Client {
      */
     public function getDefaultMessageMask(){
         return $this->default_message_mask;
+    }
+
+    /**
+     * @param $section
+     * @return array
+     */
+    public function getDefaultEvents($section){
+        return $this->events[$section];
     }
 
     /**

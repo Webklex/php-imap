@@ -6,10 +6,10 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
+- Quota handling fixed
 
 ### Added
-- NaN
+- Event system and callbacks added
 
 ### Affected Classes
 - NaN

@@ -22,6 +22,7 @@ use Webklex\PHPIMAP\Support\AttachmentCollection;
 use Webklex\PHPIMAP\Support\FlagCollection;
 use Webklex\PHPIMAP\Support\Masks\MessageMask;
 use Illuminate\Support\Str;
+use Webklex\PHPIMAP\Traits\HasEvents;
 
 /**
  * Class Message
@@ -78,6 +79,7 @@ use Illuminate\Support\Str;
  * @method array setSender(array $sender)
  */
 class Message {
+    use HasEvents;
 
     /**
      * Client instance
@@ -179,6 +181,8 @@ class Message {
         if($default_mask != null) {
             $this->mask = $default_mask;
         }
+        $this->events["message"] = $client->getDefaultEvents("message");
+        $this->events["flag"] = $client->getDefaultEvents("flag");
 
         $this->folder_path = $client->getFolderPath();
 
@@ -639,6 +643,7 @@ class Message {
      * @throws InvalidMessageDateException
      * @throws MessageContentFetchingException
      * @throws MessageHeaderFetchingException
+     * @throws Exceptions\EventNotFoundException
      */
     public function copy($folder) {
         $this->client->openFolder($this->folder_path);
@@ -650,7 +655,12 @@ class Message {
             if ($this->client->getConnection()->copyMessage($folder->path, $this->msgn) == true) {
                 $this->client->openFolder($folder->path);
                 $message_num = $this->client->getConnection()->getMessageNumber($next_uid);
-                return $folder->query()->getMessage($message_num);
+
+                $message = $folder->query()->getMessage($message_num);
+                $event = $this->getEvent("message", "copied");
+                $event::dispatch($this, $message);
+
+                return $message;
             }
         }
 
@@ -669,13 +679,19 @@ class Message {
      * @throws InvalidMessageDateException
      * @throws MessageContentFetchingException
      * @throws MessageHeaderFetchingException
+     * @throws Exceptions\EventNotFoundException
      */
     public function move($folder, $expunge = false) {
-        $status = $this->copy($folder);
-        if ($status !== null) {
+        $message = $this->copy($folder);
+        if ($message !== null) {
             $status = $this->delete($expunge);
+
+            $event = $this->getEvent("message", "moved");
+            $event::dispatch($this, $message);
         }
-        return $status;
+
+
+        return $message;
     }
 
     /**
@@ -685,10 +701,14 @@ class Message {
      * @return bool
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\RuntimeException
+     * @throws Exceptions\EventNotFoundException
      */
     public function delete($expunge = true) {
         $status = $this->setFlag("Deleted");
         if($expunge) $this->client->expunge();
+
+        $event = $this->getEvent("message", "deleted");
+        $event::dispatch($this);
 
         return $status;
     }
@@ -700,10 +720,14 @@ class Message {
      * @return bool
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\RuntimeException
+     * @throws Exceptions\EventNotFoundException
      */
     public function restore($expunge = true) {
         $status = $this->unsetFlag("Deleted");
         if($expunge) $this->client->expunge();
+
+        $event = $this->getEvent("message", "restored");
+        $event::dispatch($this);
 
         return $status;
     }
@@ -715,12 +739,16 @@ class Message {
      * @return bool
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\RuntimeException
+     * @throws Exceptions\EventNotFoundException
      */
     public function setFlag($flag) {
         $this->client->openFolder($this->folder_path);
         $flag = "\\".trim(is_array($flag) ? implode(" \\", $flag) : $flag);
         $status = $this->client->getConnection()->store([$flag], $this->msgn, $this->msgn, "+");
         $this->parseFlags();
+
+        $event = $this->getEvent("flag", "new");
+        $event::dispatch($this);
 
         return $status;
     }
@@ -732,6 +760,7 @@ class Message {
      * @return bool
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\RuntimeException
+     * @throws Exceptions\EventNotFoundException
      */
     public function unsetFlag($flag) {
         $this->client->openFolder($this->folder_path);
@@ -739,6 +768,9 @@ class Message {
         $flag = "\\".trim(is_array($flag) ? implode(" \\", $flag) : $flag);
         $status = $this->client->getConnection()->store([$flag], $this->msgn, $this->msgn, "-");
         $this->parseFlags();
+
+        $event = $this->getEvent("flag", "deleted");
+        $event::dispatch($this);
 
         return $status;
     }

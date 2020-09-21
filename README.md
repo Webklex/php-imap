@@ -28,6 +28,7 @@ The functionality is almost completely integrated and even supports IDLE operati
     - [Message flags](#message-flags)
     - [Attachments](#attachments)
     - [Advanced fetching](#advanced-fetching)
+    - [Events](#events)
     - [Masking](#masking)
     - [Specials](#specials)
 - [Support](#support)
@@ -210,13 +211,13 @@ $oClient->connect();
 ```
 
 #### Idle
-Every time a new message is received the server will notify the client and return the new message.
+Every time a new message is received, the server will notify the client and return the new message.
 ``` php
 /** @var \Webklex\PHPIMAP\Client $oClient */
 
 /** @var \Webklex\PHPIMAP\Folder $oFolder */
 $oFolder->idle(function($message){
-    dump($message->subject);
+    echo $message->subject."\n";
 });
 ```
 
@@ -466,6 +467,39 @@ $aMessage = $oFolder->query()->whereAll()
 ->setFetchBody(false)
 ->get();
 ```
+
+#### Events
+The following events are available:
+- `Webklex\PHPIMAP\Events\MessageNewEvent($message)` &mdash; can get triggered by `Folder::idle`
+- `Webklex\PHPIMAP\Events\MessageDeletedEvent($message)` &mdash; triggered by `Message::delete`
+- `Webklex\PHPIMAP\Events\MessageRestoredEvent($message)` &mdash; triggered by `Message::restore`
+- `Webklex\PHPIMAP\Events\MessageMovedEvent($old_message, $new_message)` &mdash; triggered by `Message::move`
+- `Webklex\PHPIMAP\Events\MessageCopiedEvent($old_message, $new_message)` &mdash; triggered by `Message::copy`
+- `Webklex\PHPIMAP\Events\FlagNewEvent($flag)` &mdash; triggered by `Message::setFlag`
+- `Webklex\PHPIMAP\Events\FlagDeletedEvent($flag)` &mdash; triggered by `Message::unsetFlag`
+- `Webklex\PHPIMAP\Events\FolderNewEvent($folder)` &mdash; can get triggered by `Client::createFolder`
+- `Webklex\PHPIMAP\Events\FolderDeletedEvent($folder)` &mdash; triggered by `Folder::delete`
+- `Webklex\PHPIMAP\Events\FolderMovedEvent($old_folder, $new_folder)` &mdash; triggered by `Folder::move`
+
+Create and register your own custom event:
+``` php
+class CustomMessageNewEvent extends Webklex\PHPIMAP\Events\MessageNewEvent {
+
+    /**
+     * Create a new event instance.
+     * @var Message[] $messages
+     * @return void
+     */
+    public function __construct($messages) {
+        $this->message = $messages[0];
+        echo "New message: ".$this->message->subject."\n";
+    }
+}
+
+/** @var \Webklex\PHPIMAP\Client $client */
+$client->setEvent("message", "new", CustomMessageNewEvent::class);
+```
+..or set it in your config file under `events.message.new`,
 
 #### Masking
 Laravel-IMAP already comes with two default masks [MessageMask::class](#messagemaskclass) and [AttachmentMask::class](#attachmentmaskclass).

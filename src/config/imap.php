@@ -128,6 +128,31 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Available events
+    |--------------------------------------------------------------------------
+    |
+     */
+    'events' => [
+        "message" => [
+            'new' => \Webklex\PHPIMAP\Events\MessageNewEvent::class,
+            'moved' => \Webklex\PHPIMAP\Events\MessageMovedEvent::class,
+            'copied' => \Webklex\PHPIMAP\Events\MessageCopiedEvent::class,
+            'deleted' => \Webklex\PHPIMAP\Events\MessageDeletedEvent::class,
+            'restored' => \Webklex\PHPIMAP\Events\MessageRestoredEvent::class,
+        ],
+        "folder" => [
+            'new' => \Webklex\PHPIMAP\Events\FolderNewEvent::class,
+            'moved' => \Webklex\PHPIMAP\Events\FolderMovedEvent::class,
+            'deleted' => \Webklex\PHPIMAP\Events\FolderDeletedEvent::class,
+        ],
+        "flag" => [
+            'new' => \Webklex\PHPIMAP\Events\FlagNewEvent::class,
+            'deleted' => \Webklex\PHPIMAP\Events\FlagDeletedEvent::class,
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Available masking options
     |--------------------------------------------------------------------------
     |
