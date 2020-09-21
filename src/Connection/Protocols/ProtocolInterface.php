@@ -230,6 +230,25 @@ interface ProtocolInterface {
     public function expunge();
 
     /**
+     * Retrieve the quota level settings, and usage statics per mailbox
+     * @param $username
+     *
+     * @return array
+     * @throws RuntimeException
+     */
+    public function getQuota($username);
+
+    /**
+     * Retrieve the quota settings per user
+     *
+     * @param string $quota_root
+     *
+     * @return array
+     * @throws ConnectionFailedException
+     */
+    public function getQuotaRoot($quota_root = 'INBOX');
+
+    /**
      * Send noop command
      *
      * @return bool success

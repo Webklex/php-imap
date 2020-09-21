@@ -420,7 +420,7 @@ class Client {
      */
     public function getQuota() {
         $this->checkConnection();
-        return $this->connection->requestAndResponse("GETQUOTA", ['"#user/'.$this->username.'"']);
+        return $this->connection->getQuota($this->username);
     }
 
     /**
@@ -433,7 +433,7 @@ class Client {
      */
     public function getQuotaRoot($quota_root = 'INBOX') {
         $this->checkConnection();
-        return $this->connection->requestAndResponse("QUOTA", [$quota_root]);
+        return $this->connection->getQuotaRoot($quota_root);
     }
 
     /**

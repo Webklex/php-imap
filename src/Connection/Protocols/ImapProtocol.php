@@ -882,6 +882,28 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
     }
 
     /**
+     * Retrieve the quota level settings, and usage statics per mailbox
+     * @param $username
+     *
+     * @return array
+     * @throws RuntimeException
+     */
+    public function getQuota($username) {
+        return $this->requestAndResponse("GETQUOTA", ['"#user/'.$username.'"']);
+    }
+
+    /**
+     * Retrieve the quota settings per user
+     * @param string $quota_root
+     *
+     * @return array
+     * @throws RuntimeException
+     */
+    public function getQuotaRoot($quota_root = 'INBOX') {
+        return $this->requestAndResponse("QUOTA", [$quota_root]);
+    }
+
+    /**
      * Send idle command
      * @throws RuntimeException
      */

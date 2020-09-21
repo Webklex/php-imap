@@ -489,8 +489,28 @@ class LegacyProtocol extends Protocol implements ProtocolInterface {
     }
 
     /**
+     * Retrieve the quota level settings, and usage statics per mailbox
+     * @param $username
+     *
+     * @return array
+     */
+    public function getQuota($username) {
+        return \imap_get_quota($this->stream, 'user.'.$username);
+    }
+
+    /**
+     * Retrieve the quota settings per user
+     * @param string $quota_root
+     *
+     * @return array
+     */
+    public function getQuotaRoot($quota_root = 'INBOX') {
+        return \imap_get_quotaroot($this->stream, $quota_root);
+    }
+
+    /**
      * @param string $protocol
-     * @return Pop3Protocol
+     * @return LegacyProtocol
      */
     public function setProtocol($protocol) {
         $this->protocol = $protocol;
