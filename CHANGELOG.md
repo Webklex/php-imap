@@ -6,13 +6,25 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
+- NaN
+
+### Added
+- NaN
+
+### Affected Classes
+- NaN
+
+## [2.1.0] - 2020-09-22
+### Fixed
 - Quota handling fixed
 
 ### Added
 - Event system and callbacks added
 
 ### Affected Classes
-- NaN
+- [Client::class](src/Client.php)
+- [Folder::class](src/Folder.php)
+- [Message::class](src/Message.php)
 
 ## [2.0.1] - 2020-09-20
 ### Fixed
