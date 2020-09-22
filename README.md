@@ -12,6 +12,10 @@ process as well.
 You can enable the `php-imap` module in order to handle edge cases, improve message decoding quality and is required if 
 you want to use old protocols such as pop3.
 
+Wiki: [webklex/php-imap/wiki](https://github.com/Webklex/php-imap/wiki)
+
+Laravel wrapper: [webklex/laravel-imap](https://github.com/Webklex/laravel-imap)
+
 ## Table of Contents
 - [Installation](#installation)
 - [Configuration](#configuration)
@@ -496,10 +500,10 @@ class CustomMessageNewEvent extends Webklex\PHPIMAP\Events\MessageNewEvent {
 /** @var \Webklex\PHPIMAP\Client $client */
 $client->setEvent("message", "new", CustomMessageNewEvent::class);
 ```
-..or set it in your config file under `events.message.new`,
+..or set it in your config file under `events.message.new`.
 
 #### Masking
-Laravel-IMAP already comes with two default masks [MessageMask::class](#messagemaskclass) and [AttachmentMask::class](#attachmentmaskclass).
+PHP-IMAP already comes with two default masks [MessageMask::class](#messagemaskclass) and [AttachmentMask::class](#attachmentmaskclass).
 
 The masked instance has to be called manually and is designed to add custom functionality.
 
@@ -557,8 +561,8 @@ echo $mask->token().'@'.$mask->uid;
 ```
 
 Additional examples can be found here:
-- [Custom message mask](https://github.com/Webklex/laravel-imap/blob/master/examples/custom_message_mask.php)
-- [Custom attachment mask](https://github.com/Webklex/laravel-imap/blob/master/examples/custom_attachment_mask.php)
+- [Custom message mask](https://github.com/Webklex/php-imap/blob/master/examples/custom_message_mask.php)
+- [Custom attachment mask](https://github.com/Webklex/php-imap/blob/master/examples/custom_attachment_mask.php)
 
 
 #### Specials
