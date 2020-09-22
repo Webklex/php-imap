@@ -33,7 +33,6 @@ use Webklex\PHPIMAP\Traits\HasEvents;
 class Client {
     use HasEvents;
 
-
     /**
      * @var boolean|Protocol
      */
@@ -104,14 +103,6 @@ class Client {
     protected $active_folder = false;
 
     /**
-     * All valid and available account config parameters
-     *
-     * @var array $validConfigKeys
-     */
-    protected $valid_config_keys = ['host', 'port', 'encryption', 'validate_cert', 'username', 'password', 'protocol',
-                                    'authentication'];
-
-    /**
      * @var string $default_message_mask
      */
     protected $default_message_mask = MessageMask::class;
@@ -120,6 +111,20 @@ class Client {
      * @var string $default_attachment_mask
      */
     protected $default_attachment_mask = AttachmentMask::class;
+
+    /**
+     * @var array $default_account_config
+     */
+    protected $default_account_config = [
+        'host' => 'localhost',
+        'port' => 993,
+        'protocol'  => 'imap',
+        'encryption' => 'ssl',
+        'validate_cert' => true,
+        'username' => '',
+        'password' => '',
+        'authentication' => null,
+    ];
 
     /**
      * Client constructor.
@@ -151,11 +156,26 @@ class Client {
         $default_account = ClientManager::get('default');
         $default_config  = ClientManager::get("accounts.$default_account");
 
-        foreach ($this->valid_config_keys as $key) {
-            $this->$key = isset($config[$key]) ? $config[$key] : $default_config[$key];
+        foreach ($this->default_account_config as $key => $value) {
+            $this->setAccountConfig($key, $config, $default_config);
         }
 
         return $this;
+    }
+
+    /**
+     * @param string $key
+     * @param array $config
+     * @param array $default_config
+     */
+    private function setAccountConfig($key, $config, $default_config){
+        $value = $this->default_account_config[$key];
+        if(isset($config[$key])) {
+            $value = $config[$key];
+        }elseif(isset($default_config[$key])) {
+            $value = $default_config[$key];
+        }
+        $this->$key = $value;
     }
 
     /**

@@ -14,6 +14,16 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Affected Classes
 - NaN
 
+## [2.1.1] - 2020-09-23
+### Fixed
+- Missing default config parameter added
+
+### Added
+- Default account config fallback added
+
+### Affected Classes
+- [Client::class](src/Client.php)
+
 ## [2.1.0] - 2020-09-22
 ### Fixed
 - Quota handling fixed
