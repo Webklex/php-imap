@@ -75,6 +75,7 @@ return [
             'validate_cert' => true,
             'username' => '',
             'password' => '',
+            'authentication' => null,
         ]
         */
     ],
