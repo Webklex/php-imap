@@ -6,12 +6,13 @@
 [![Hits][ico-hits]][link-hits]
 
 ## Description
-
 PHP-IMAP is a wrapper for common IMAP communication without the need to have the php-imap module installed / enabled.
-The functionality is almost completely integrated and even supports IDLE operation.
+The protocol is completely integrated and therefore supports IMAP IDLE operation and the "new" oAuth authentication 
+process as well.
+You can enable the `php-imap` module in order to handle edge cases, improve message decoding quality and is required if 
+you want to use old protocols such as pop3.
 
 ## Table of Contents
-
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Usage](#usage)
@@ -52,14 +53,12 @@ The functionality is almost completely integrated and even supports IDLE operati
 - [License](#license)
 
 ## Installation
-
 1) Install decoding modules:
-
 ``` shell
 sudo apt-get install php*-mbstring php*-mcrypt && sudo apache2ctl graceful
 ```
-1.1) (optional) Install php-imap module if you are having encoding problems:
 
+1.1) (optional) Install php-imap module if you are having encoding problems:
 ``` shell
 sudo apt-get install php*-imap && sudo apache2ctl graceful
 ```
@@ -67,7 +66,6 @@ sudo apt-get install php*-imap && sudo apache2ctl graceful
 You might also want to check `phpinfo()` if the extensions are enabled.
 
 2) Now install the PHP-IMAP package by running the following command:
-
 ``` shell
 composer require webklex/php-imap
 ```
@@ -110,6 +108,7 @@ Detailed [config/imap.php](src/config/imap.php) configuration:
    - `open` &mdash; special configuration for imap_open()
      - `DISABLE_AUTHENTICATOR` &mdash; disable authentication properties.
    - `decoder` &mdash; Currently only the message and attachment decoder can be set
+   - `events` &mdash; Default [event handling](#events) config
    - `masks` &mdash; Default [masking](#masking) config
      - `message` &mdash; Default message mask
      - `attachment` &mdash; Default attachment mask
@@ -202,7 +201,7 @@ $oClient = new Client([
     'validate_cert' => true,
     'username' => 'example@gmail.com',
     'password' => 'PASSWORD',
-    'authentication' => "oath",
+    'authentication' => "oauth",
     'protocol' => 'imap'
 ]);
 
@@ -213,8 +212,6 @@ $oClient->connect();
 #### Idle
 Every time a new message is received, the server will notify the client and return the new message.
 ``` php
-/** @var \Webklex\PHPIMAP\Client $oClient */
-
 /** @var \Webklex\PHPIMAP\Folder $oFolder */
 $oFolder->idle(function($message){
     echo $message->subject."\n";
@@ -815,11 +812,7 @@ Extends [Illuminate\Support\Collection::class](https://laravel.com/api/5.4/Illum
 ### Known issues
 | Error                                                                     | Solution                                                   |
 | ------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| NaN | NaN | 
-
-
-## Milestones & upcoming features
-* Wiki!!
+| Kerberos error: No credentials cache file found (try running kinit) (...) | Uncomment "DISABLE_AUTHENTICATOR" inside and use the `legacy-imap` protocol |
 
 ## Change log
 
