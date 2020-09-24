@@ -1,21 +1,30 @@
 language: php
 
 php:
-  - 5.5
   - 5.6
   - 7.0
   - 7.1
   - 7.2
+  - 7.3
+  - hhvm
 
 matrix:
   fast_finish: true
+  allow_failures:
+    - php: 5.6
+    - php: 7.0
+    - php: 7.1
+    - php: hhvm
 
 sudo: false
 
-install: composer install --no-interaction
+before-install:
+  - COMPOSER_MEMORY_LIMIT=-1 composer install --prefer-source --no-interaction --dev
+
+install:
+  - COMPOSER_MEMORY_LIMIT=-1 composer install --no-interaction
 
 notifications:
   email:
     on_success: always
     on_failure: always
-
