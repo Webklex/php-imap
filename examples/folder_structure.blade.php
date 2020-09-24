@@ -12,7 +12,7 @@
 
 /**
  * @var \Webklex\PHPIMAP\Support\FolderCollection $paginator
- * @var \Webklex\PHPIMAP\Folder $oFolder
+ * @var \Webklex\PHPIMAP\Folder $folder
  */
 
 ?>
@@ -25,17 +25,17 @@
     </thead>
     <tbody>
     <?php if($paginator->count() > 0): ?>
-        <?php foreach($paginator as $oFolder): ?>
+        <?php foreach($paginator as $folder): ?>
                 <tr>
-                    <td><?php echo $oFolder->name; ?></td>
-                    <td><?php echo $oFolder->search()->unseen()->leaveUnread()->setFetchBody(false)->setFetchAttachment(false)->get()->count(); ?></td>
+                    <td><?php echo $folder->name; ?></td>
+                    <td><?php echo $folder->search()->unseen()->setFetchBody(false)->count(); ?></td>
                 </tr>
         <?php endforeach; ?>
     <?php else: ?>
         <tr>
             <td colspan="4">No folders found</td>
         </tr>
-    <?php endif: ?>
+    <?php endif; ?>
     </tbody>
 </table>
 

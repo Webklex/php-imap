@@ -30,13 +30,13 @@ class CustomMessageMask extends \Webklex\PHPIMAP\Support\Masks\MessageMask {
 
 }
 
-/** @var \Webklex\PHPIMAP\Client $oClient */
+/** @var \Webklex\PHPIMAP\Client $client */
 $cm = new \Webklex\PHPIMAP\ClientManager('path/to/config/imap.php');
-$oClient = $cm->account('default');
-$oClient->connect();
+$client = $cm->account('default');
+$client->connect();
 
 /** @var \Webklex\PHPIMAP\Folder $folder */
-$folder = $oClient->getFolder('INBOX');
+$folder = $client->getFolder('INBOX');
 
 /** @var \Webklex\PHPIMAP\Message $message */
 $message = $folder->query()->limit(1)->get()->first();
