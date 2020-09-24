@@ -1,20 +1,23 @@
 # IMAP Library for PHP
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
-[![Software License][ico-license]](LICENSE.md)
+[![Software License][ico-license]][link-license]
+[![Build Status][ico-build]][link-scrutinizer] 
 [![Total Downloads][ico-downloads]][link-downloads]
 [![Hits][ico-hits]][link-hits]
+
 
 ## Description
 PHP-IMAP is a wrapper for common IMAP communication without the need to have the php-imap module installed / enabled.
 The protocol is completely integrated and therefore supports IMAP IDLE operation and the "new" oAuth authentication 
 process as well.
 You can enable the `php-imap` module in order to handle edge cases, improve message decoding quality and is required if 
-you want to use old protocols such as pop3.
+you want to use legacy protocols such as pop3.
 
 Wiki: [webklex/php-imap/wiki](https://github.com/Webklex/php-imap/wiki)
 
 Laravel wrapper: [webklex/laravel-imap](https://github.com/Webklex/laravel-imap)
+
 
 ## Table of Contents
 - [Installation](#installation)
@@ -56,28 +59,29 @@ Laravel wrapper: [webklex/laravel-imap](https://github.com/Webklex/laravel-imap)
 - [Credits](#credits)
 - [License](#license)
 
+
 ## Installation
-1) Install decoding modules:
-``` shell
+1.) Install decoding modules:
+```shell script
 sudo apt-get install php*-mbstring php*-mcrypt && sudo apache2ctl graceful
 ```
 
-1.1) (optional) Install php-imap module if you are having encoding problems:
-``` shell
+1.1.) (optional) Install php-imap module if you are having encoding problems:
+```shell script
 sudo apt-get install php*-imap && sudo apache2ctl graceful
 ```
 
 You might also want to check `phpinfo()` if the extensions are enabled.
 
-2) Now install the PHP-IMAP package by running the following command:
-``` shell
+2.) Now install the PHP-IMAP package by running the following command:
+```shell script
 composer require webklex/php-imap
 ```
 
-3) Create your own custom config file like [config/imap.php](src/config/imap.php):
+3.) Create your own custom config file like [config/imap.php](src/config/imap.php):
+
 
 ## Configuration
-
 Supported protocols:
 - `imap` &mdash; Use IMAP [default]
 - `legacy-imap` &mdash; Use the php imap module instead
@@ -117,26 +121,27 @@ Detailed [config/imap.php](src/config/imap.php) configuration:
      - `message` &mdash; Default message mask
      - `attachment` &mdash; Default attachment mask
 
+
 ## Usage
 #### Basic usage example
 This is a basic example, which will echo out all Mails within all imap folders
 and will move every message into INBOX.read. Please be aware that this should not be
-tested in real live but it gives an impression on how things work.
+tested in real life and is only meant to gives an impression on how things work.
 
-``` php
+```php
 use Webklex\PHPIMAP\ClientManager;
 use Webklex\PHPIMAP\Client;
 
 $cm = new ClientManager('path/to/config/imap.php');
 
 // or use an array of options instead
-$cm = new ClientManager(array $options = []);
+$cm = new ClientManager($options = []);
 
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
-$oClient = $cm->account('account_identifier');
+/** @var \Webklex\PHPIMAP\Client $client */
+$client = $cm->account('account_identifier');
 
 // or create a new instance manually        
-$oClient = new Client([
+$client = new Client([
     'host'          => 'somehost.com',
     'port'          => 993,
     'encryption'    => 'ssl',
@@ -147,28 +152,28 @@ $oClient = new Client([
 ]);
 
 //Connect to the IMAP Server
-$oClient->connect();
+$client->connect();
 
 //Get all Mailboxes
-/** @var \Webklex\PHPIMAP\Support\FolderCollection $aFolder */
-$aFolder = $oClient->getFolders();
+/** @var \Webklex\PHPIMAP\Support\FolderCollection $folders */
+$folders = $client->getFolders();
 
 //Loop through every Mailbox
-/** @var \Webklex\PHPIMAP\Folder $oFolder */
-foreach($aFolder as $oFolder){
+/** @var \Webklex\PHPIMAP\Folder $folder */
+foreach($folders as $folder){
 
-    //Get all Messages of the current Mailbox $oFolder
-    /** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
-    $aMessage = $oFolder->messages()->all()->get();
+    //Get all Messages of the current Mailbox $folder
+    /** @var \Webklex\PHPIMAP\Support\MessageCollection $messages */
+    $messages = $folder->messages()->all()->get();
     
-    /** @var \Webklex\PHPIMAP\Message $oMessage */
-    foreach($aMessage as $oMessage){
-        echo $oMessage->getSubject().'<br />';
-        echo 'Attachments: '.$oMessage->getAttachments()->count().'<br />';
-        echo $oMessage->getHTMLBody(true);
+    /** @var \Webklex\PHPIMAP\Message $message */
+    foreach($messages as $message){
+        echo $message->getSubject().'<br />';
+        echo 'Attachments: '.$message->getAttachments()->count().'<br />';
+        echo $message->getHTMLBody();
         
         //Move the current Message to 'INBOX.read'
-        if($oMessage->moveToFolder('INBOX.read') == true){
+        if($message->moveToFolder('INBOX.read') == true){
             echo 'Message has ben moved';
         }else{
             echo 'Message could not be moved';
@@ -177,28 +182,32 @@ foreach($aFolder as $oFolder){
 }
 ```
 
+
 #### Folder / Mailbox
 List all available folders:
-``` php
-/** @var \Webklex\PHPIMAP\Client $oClient */
+```php
+/** @var \Webklex\PHPIMAP\Client $client */
 
-/** @var \Webklex\PHPIMAP\Support\FolderCollection $aFolder */
-$aFolder = $oClient->getFolders();
+/** @var \Webklex\PHPIMAP\Support\FolderCollection $folders */
+$folders = $client->getFolders();
 ```
 
 Get a specific folder:
-``` php
-/** @var \Webklex\PHPIMAP\Client $oClient */
+```php
+/** @var \Webklex\PHPIMAP\Client $client */
 
-/** @var \Webklex\PHPIMAP\Folder $oFolder */
-$oFolder = $oClient->getFolder('INBOX.name');
+/** @var \Webklex\PHPIMAP\Folder $folder */
+$folder = $client->getFolder('INBOX.name');
 ```
+
 
 #### oAuth
 If you are using google mail or something similar, you might want to use oauth instead:
-``` php
-/** @var \Webklex\PHPIMAP\Client $oClient */
-$oClient = new Client([
+```php
+use Webklex\PHPIMAP\Client;
+
+/** @var \Webklex\PHPIMAP\Client $client */
+$client = new Client([
     'host' => 'imap.gmail.com',
     'port' => 993,
     'encryption' => 'ssl',
@@ -210,84 +219,82 @@ $oClient = new Client([
 ]);
 
 //Connect to the IMAP Server
-$oClient->connect();
+$client->connect();
 ```
+
 
 #### Idle
 Every time a new message is received, the server will notify the client and return the new message.
-``` php
-/** @var \Webklex\PHPIMAP\Folder $oFolder */
-$oFolder->idle(function($message){
+```php
+/** @var \Webklex\PHPIMAP\Folder $folder */
+$folder->idle(function($message){
     echo $message->subject."\n";
 });
 ```
 
+
 #### Search for messages
 Search for specific emails:
-``` php
-/** @var \Webklex\PHPIMAP\Folder $oFolder */
+```php
+/** @var \Webklex\PHPIMAP\Folder $folder */
 
 //Get all messages
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
-$aMessage = $oFolder->query()->all()->get();
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $messages */
+$messages = $folder->query()->all()->get();
 
 //Get all messages from example@domain.com
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
-$aMessage = $oFolder->query()->from('example@domain.com')->get();
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $messages */
+$messages = $folder->query()->from('example@domain.com')->get();
 
 //Get all messages since march 15 2018
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
-$aMessage = $oFolder->query()->since('15.03.2018')->get();
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $messages */
+$messages = $folder->query()->since('15.03.2018')->get();
 
 //Get all messages within the last 5 days
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
-$aMessage = $oFolder->query()->since(now()->subDays(5))->get();
-//Or for older laravel versions..
-$aMessage = $oFolder->query()->since(\Carbon::now()->subDays(5))->get();
+$messages = $folder->query()->since(\Carbon\Carbon::now()->subDays(5))->get();
 
 //Get all messages containing "hello world"
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
-$aMessage = $oFolder->query()->text('hello world')->get();
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $messages */
+$messages = $folder->query()->text('hello world')->get();
 
 //Get all unseen messages containing "hello world"
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
-$aMessage = $oFolder->query()->unseen()->text('hello world')->get();
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $messages */
+$messages = $folder->query()->unseen()->text('hello world')->get();
 
 //Extended custom search query for all messages containing "hello world" 
 //and have been received since march 15 2018
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
-$aMessage = $oFolder->query()->text('hello world')->since('15.03.2018')->get();
-$aMessage = $oFolder->query()->Text('hello world')->Since('15.03.2018')->get();
-$aMessage = $oFolder->query()->whereText('hello world')->whereSince('15.03.2018')->get();
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $messages */
+$messages = $folder->query()->text('hello world')->since('15.03.2018')->get();
+$messages = $folder->query()->Text('hello world')->Since('15.03.2018')->get();
+$messages = $folder->query()->whereText('hello world')->whereSince('15.03.2018')->get();
 
 // Build a custom search query
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
-$aMessage = $oFolder->query()
-->where([['TEXT', 'Hello world'], ['SINCE', \Carbon::parse('15.03.2018')]])
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $messages */
+$messages = $folder->query()
+->where([['TEXT', 'Hello world'], ['SINCE', \Carbon\Carbon::parse('15.03.2018')]])
 ->get();
 
 //!EXPERIMENTAL!
 //Get all messages NOT containing "hello world"
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
-$aMessage = $oFolder->query()->notText('hello world')->get();
-$aMessage = $oFolder->query()->not_text('hello world')->get();
-$aMessage = $oFolder->query()->not()->text('hello world')->get();
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $messages */
+$messages = $folder->query()->notText('hello world')->get();
+$messages = $folder->query()->not_text('hello world')->get();
+$messages = $folder->query()->not()->text('hello world')->get();
 
 //Get all messages by custom search criteria
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
-$aMessage = $oFolder->query()->where(["CUSTOM_FOOBAR" => "fooBar"]])->get();
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $messages */
+$messages = $folder->query()->where(["CUSTOM_FOOBAR" => "fooBar"]])->get();
 ```
 
 Available search aliases for a better code reading:
-``` php
+```php
 // Folder::search() is just an alias for Folder::query()
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
-$aMessage = $oFolder->search()->text('hello world')->since('15.03.2018')->get();
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $messages */
+$messages = $folder->search()->text('hello world')->since('15.03.2018')->get();
 
 // Folder::messages() is just an alias for Folder::query()
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
-$aMessage = $oFolder->messages()->text('hello world')->since('15.03.2018')->get();
-
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $messages */
+$messages = $folder->messages()->text('hello world')->since('15.03.2018')->get();
 ```
 All available query / search methods can be found here: [Query::class](src/Query/WhereQuery.php)
 
@@ -325,55 +332,58 @@ Further information:
 - https://tools.ietf.org/html/rfc822
 - https://gist.github.com/martinrusev/6121028
 
+
 #### Result limiting
 Limiting the request emails:
-``` php
-/** @var \Webklex\PHPIMAP\Folder $oFolder */
+```php
+/** @var \Webklex\PHPIMAP\Folder $folder */
 
 //Get all messages for page 2 since march 15 2018 where each page contains 10 messages
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
-$aMessage = $oFolder->query()->since('15.03.2018')->limit(10, 2)->get();
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $messages */
+$messages = $folder->query()->since('15.03.2018')->limit(10, 2)->get();
 ```
+
 
 #### Counting messages
 Count all available messages matching the current search criteria:
-``` php
-/** @var \Webklex\PHPIMAP\Folder $oFolder */
+```php
+/** @var \Webklex\PHPIMAP\Folder $folder */
 
 //Count all messages
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
-$count = $oFolder->query()->all()->count();
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $messages */
+$count = $folder->query()->all()->count();
 
 //Count all messages since march 15 2018
-$count = $oFolder->query()->since('15.03.2018')->count();
+$count = $folder->query()->since('15.03.2018')->count();
 ```
+
 
 #### Pagination
 Paginate a query:
-``` php
-/** @var \Webklex\PHPIMAP\Folder $oFolder */
+```php
+/** @var \Webklex\PHPIMAP\Folder $folder */
 
 /** @var \Illuminate\Pagination\LengthAwarePaginator $paginator */
-$paginator = $oFolder->query()->since('15.03.2018')->paginate();
+$paginator = $folder->query()->since('15.03.2018')->paginate();
 ```
 Paginate a message collection:
-``` php
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
+```php
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $messages */
 
 /** @var \Illuminate\Pagination\LengthAwarePaginator $paginator */
-$paginator = $aMessage->paginate();
+$paginator = $messages->paginate();
 ```
 View example for a paginated list:
-``` php
-/** @var \Webklex\PHPIMAP\Folder $oFolder */
+```php
+/** @var \Webklex\PHPIMAP\Folder $folder */
 
 /** @var \Illuminate\Pagination\LengthAwarePaginator $paginator */
-$paginator = $oFolder->search()
-->since(\Carbon::now()->subDays(14))->get()
+$paginator = $folder->search()
+->since(\Carbon\Carbon::now()->subDays(14))->get()
 ->paginate($perPage = 5, $page = null, $pageName = 'imap_blade_example');
 ```
 
-``` html
+```html
 <table>
     <thead>
     <tr>
@@ -385,12 +395,12 @@ $paginator = $oFolder->search()
     </thead>
     <tbody>
         <?php if($paginator->count() > 0): ?>
-            <?php foreach($paginator as $oMessage): ?>
+            <?php foreach($paginator as $message): ?>
             <tr>
-                <td><?php echo $oMessage->getUid(); ?></td>
-                <td><?php echo $oMessage->getSubject(); ?></td>
-                <td><?php echo $oMessage->getFrom()[0]->mail; ?></td>
-                <td><?php echo $oMessage->getAttachments()->count() > 0 ? 'yes' : 'no'; ?></td>
+                <td><?php echo $message->getUid(); ?></td>
+                <td><?php echo $message->getSubject(); ?></td>
+                <td><?php echo $message->getFrom()[0]->mail; ?></td>
+                <td><?php echo $message->getAttachments()->count() > 0 ? 'yes' : 'no'; ?></td>
             </tr>
             <?php endforeach; ?>
         <?php else: ?>
@@ -409,65 +419,70 @@ $paginator = $oFolder->search()
 #### View examples
 You can find a few blade examples under [/examples](examples).
 
+
 #### Fetch a specific message
 Get a specific message by uid (Please note that the uid is not unique and can change):
-``` php
-/** @var \Webklex\PHPIMAP\Folder $oFolder */
+```php
+/** @var \Webklex\PHPIMAP\Folder $folder */
 
-/** @var \Webklex\PHPIMAP\Message $oMessage */
-$oMessage = $oFolder->query()->getMessage($msgn = 1);
+/** @var \Webklex\PHPIMAP\Message $message */
+$message = $folder->query()->getMessage($msgn = 1);
 ```
+
 
 #### Message flags
 Flag or "unflag" a message:
-``` php
-/** @var \Webklex\PHPIMAP\Message $oMessage */
-$oMessage->setFlag(['Seen', 'Spam']);
-$oMessage->unsetFlag('Spam');
+```php
+/** @var \Webklex\PHPIMAP\Message $message */
+$message->setFlag(['Seen', 'Spam']);
+$message->unsetFlag('Spam');
 ```
+
 
 #### Attachments
 Save message attachments:
-``` php
-/** @var \Webklex\PHPIMAP\Message $oMessage */
+```php
+/** @var \Webklex\PHPIMAP\Message $message */
 
-/** @var \Webklex\PHPIMAP\Support\AttachmentCollection $aAttachment */
-$aAttachment = $oMessage->getAttachments();
+/** @var \Webklex\PHPIMAP\Support\AttachmentCollection $attachments */
+$attachments = $message->getAttachments();
 
-$aAttachment->each(function ($oAttachment) {
-    /** @var \Webklex\PHPIMAP\Attachment $oAttachment */
-    $oAttachment->save("/some/path/");
+$attachments->each(function ($attachment) {
+    /** @var \Webklex\PHPIMAP\Attachment $attachment */
+    $attachment->save("/some/path/");
 });
 ```
 
+
 #### Advanced fetching
 Fetch messages without body fetching (decrease load):
-``` php
-/** @var \Webklex\PHPIMAP\Folder $oFolder */
+```php
+/** @var \Webklex\PHPIMAP\Folder $folder */
 
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
-$aMessage = $oFolder->query()->whereText('Hello world')->setFetchBody(false)->get();
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $messages */
+$messages = $folder->query()->whereText('Hello world')->setFetchBody(false)->get();
 
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
-$aMessage = $oFolder->query()->whereAll()->setFetchBody(false)->get();
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $messages */
+$messages = $folder->query()->whereAll()->setFetchBody(false)->get();
 ```
 
 Fetch messages without body, flag and attachment fetching (decrease load):
-``` php
-/** @var \Webklex\PHPIMAP\Folder $oFolder */
+```php
+/** @var \Webklex\PHPIMAP\Folder $folder */
 
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
-$aMessage = $oFolder->query()->whereText('Hello world')
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $messages */
+$messages = $folder->query()->whereText('Hello world')
 ->setFetchFlags(false)
 ->setFetchBody(false)
 ->get();
 
-/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
-$aMessage = $oFolder->query()->whereAll()
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $messages */
+$messages = $folder->query()->whereAll()
 ->setFetchFlags(false)
 ->setFetchBody(false)
 ->get();
 ```
+
 
 #### Events
 The following events are available:
@@ -483,12 +498,12 @@ The following events are available:
 - `Webklex\PHPIMAP\Events\FolderMovedEvent($old_folder, $new_folder)` &mdash; triggered by `Folder::move`
 
 Create and register your own custom event:
-``` php
+```php
 class CustomMessageNewEvent extends Webklex\PHPIMAP\Events\MessageNewEvent {
 
     /**
      * Create a new event instance.
-     * @var Message[] $messages
+     * @var \Webklex\PHPIMAP\Message[] $messages
      * @return void
      */
     public function __construct($messages) {
@@ -502,48 +517,49 @@ $client->setEvent("message", "new", CustomMessageNewEvent::class);
 ```
 ..or set it in your config file under `events.message.new`.
 
+
 #### Masking
 PHP-IMAP already comes with two default masks [MessageMask::class](#messagemaskclass) and [AttachmentMask::class](#attachmentmaskclass).
 
 The masked instance has to be called manually and is designed to add custom functionality.
 
 You can call the default mask by calling the mask method without any arguments.
-``` php
-/** @var \Webklex\PHPIMAP\Message $oMessage */
-$mask = $oMessage->mask();
+```php
+/** @var \Webklex\PHPIMAP\Message $message */
+$mask = $message->mask();
 ```
 
 There are several methods available to set the default mask:
-``` php
-/** @var \Webklex\PHPIMAP\Client $oClient */
-/** @var \Webklex\PHPIMAP\Message $oMessage */
+```php
+/** @var \Webklex\PHPIMAP\Client $client */
+/** @var \Webklex\PHPIMAP\Message $message */
 
 $message_mask = \Webklex\PHPIMAP\Support\Masks\MessageMask::class;
 
-$oClient->setDefaultMessageMask($message_mask);
-$oMessage->setMask($message_mask);
-$mask = $oMessage->mask($message_mask);
+$client->setDefaultMessageMask($message_mask);
+$message->setMask($message_mask);
+$mask = $message->mask($message_mask);
 ```
 The last one wont set the mask but generate a masked instance using the provided mask.
 
 You could also set the default masks inside your `config/imap.php` file under `masks`.
 
 You can also apply a mask on [attachments](#attachmentclass):
-``` php
-/** @var \Webklex\PHPIMAP\Client $oClient */
-/** @var \Webklex\PHPIMAP\Attachment $oAttachment */
+```php
+/** @var \Webklex\PHPIMAP\Client $client */
+/** @var \Webklex\PHPIMAP\Attachment $attachment */
 $attachment_mask = \Webklex\PHPIMAP\Support\Masks\AttachmentMask::class;
 
-$oClient->setDefaultAttachmentMask($attachment_mask);
-$oAttachment->setMask($attachment_mask);
-$mask = $oAttachment->mask($attachment_mask);
+$client->setDefaultAttachmentMask($attachment_mask);
+$attachment->setMask($attachment_mask);
+$mask = $attachment->mask($attachment_mask);
 ```
 
 If you want to implement your own mask just extend [MessageMask::class](#messagemaskclass), [AttachmentMask::class](#attachmentmaskclass)
 or [Mask::class](#maskclass) and implement your desired logic:
 
-``` php
-/** @var \Webklex\PHPIMAP\Message $oMessage */
+```php
+/** @var \Webklex\PHPIMAP\Message $message */
 class CustomMessageMask extends \Webklex\PHPIMAP\Support\Masks\MessageMask {
 
     /**
@@ -555,7 +571,7 @@ class CustomMessageMask extends \Webklex\PHPIMAP\Support\Masks\MessageMask {
     }
 }
 
-$mask = $oMessage->mask(CustomMessageMask::class);
+$mask = $message->mask(CustomMessageMask::class);
 
 echo $mask->token().'@'.$mask->uid;
 ```
@@ -567,15 +583,19 @@ Additional examples can be found here:
 
 #### Specials
 Find the folder containing a message:
-``` php
-$oFolder = $aMessage->getFolder();
+```php
+/** @var \Webklex\PHPIMAP\Message $message */
+$folder = $message->getFolder();
 ```
+
 
 ## Support
 If you encounter any problems or if you find a bug, please don't hesitate to create a new [issue](https://github.com/Webklex/php-imap/issues).
 However please be aware that it might take some time to get an answer.
+Off topic, rude or abusive issues will be deleted without any notice.
 
 If you need **immediate** or **commercial** support, feel free to send me a mail at github@webklex.com. 
+
 
 ##### A little notice
 If you write source code in your issue, please consider to format it correctly. This makes it so much nicer to read 
@@ -588,9 +608,10 @@ echo 'your php code...';
 &#96;&#96;&#96;
 
 will turn into:
-``` php
+```php
 echo 'your php code...';
 ```
+
 
 ### Features & pull requests
 Everyone can contribute to this project. Every pull request will be considered but it can also happen to be declined. 
@@ -598,11 +619,9 @@ To prevent unnecessary work, please consider to create a [feature issue](https:/
 first, if you're planning to do bigger changes. Of course you can also create a new [feature issue](https://github.com/Webklex/php-imap/issues/new?template=feature_request.md)
 if you're just wishing a feature ;)
 
->Off topic, rude or abusive issues will be deleted without any notice.
 
 ## Documentation
 ### [Client::class](src/Client.php)
-
 | Method                    | Arguments                                                                       | Return            | Description                                                                                                                   |
 | ------------------------- | ------------------------------------------------------------------------------- | :---------------: | ----------------------------------------------------------------------------------------------------------------------------  |
 | setConfig                 | array $config                                                                   | self              | Set the Client configuration. Take a look at `config/imap.php` for more inspiration.                                          |
@@ -627,8 +646,8 @@ if you're just wishing a feature ;)
 | getDefaultAttachmentMask  |                                                                                 | string            | Get the current default attachment mask class name                                                                            | 
 | getFolderPath             |                                                                                 | string            | Get the current folder path                                                                                                   | 
 
-### [Message::class](src/Message.php)
 
+### [Message::class](src/Message.php)
 | Method          | Arguments                     | Return               | Description                            |
 | --------------- | ----------------------------- | :------------------: | -------------------------------------- |
 | parseBody       |                               | Message              | Parse the Message body                 |
@@ -673,8 +692,8 @@ if you're just wishing a feature ;)
 | setMask         | string $mask                  | Message              | Set the mask class                     |
 | getMask         |                               | string               | Get the current mask class name        |
 
-### [Folder::class](src/Folder.php)
 
+### [Folder::class](src/Folder.php)
 | Method            | Arguments                                                                           | Return            | Description                                    |
 | ----------------- | ----------------------------------------------------------------------------------- | :---------------: | ---------------------------------------------- |
 | hasChildren       |                                                                                     | bool              | Determine if folder has children.              |
@@ -692,9 +711,9 @@ if you're just wishing a feature ;)
 | query             | string $charset = 'UTF-8'                                                           | WhereQuery        | Get the current Client instance                |
 | messages          | string $charset = 'UTF-8'                                                           | WhereQuery        | Alias for Folder::query()                      |
 | search            | string $charset = 'UTF-8'                                                           | WhereQuery        | Alias for Folder::query()                      |
-      
-### [Query::class](src/Query/WhereQuery.php)
 
+
+### [Query::class](src/Query/WhereQuery.php)
 | Method             | Arguments                         | Return            | Description                                    |
 | ------------------ | --------------------------------- | :---------------: | ---------------------------------------------- |
 | where              | mixed $criteria, $value = null    | WhereQuery        | Add new criteria to the current query |
@@ -741,7 +760,6 @@ if you're just wishing a feature ;)
      
            
 ### [Attachment::class](src/Attachment.php)
-
 | Method         | Arguments                      | Return         | Description                                            |
 | -------------- | ------------------------------ | :------------: | ------------------------------------------------------ |
 | getContent     |                                | string or null | Get attachment content                                 |     
@@ -759,8 +777,8 @@ if you're just wishing a feature ;)
 | setMask        | string $mask                   | Attachment     | Set the mask class                                     |
 | getMask        |                                | string         | Get the current mask class name                        |  
 
-### [Mask::class](src/Support/Masks/Mask.php)
 
+### [Mask::class](src/Support/Masks/Mask.php)
 | Method         | Arguments                      | Return         | Description                                            |
 | -------------- | ------------------------------ | :------------: | ------------------------------------------------------ |
 | getParent      |                                | Masked parent  | Get the masked parent object                           |     
@@ -769,8 +787,8 @@ if you're just wishing a feature ;)
 | __set          |                                | mixed          | Set any cloned parent attribute                        |  
 | __inherit      |                                | mixed          | All public methods of the given parent are callable    |
 
-### [MessageMask::class](src/Support/Masks/MessageMask.php)
 
+### [MessageMask::class](src/Support/Masks/MessageMask.php)
 | Method                              | Arguments                              | Return         | Description                                |
 | ----------------------------------- | -------------------------------------- | :------------: | ------------------------------------------ |
 | getHtmlBody                         |                                        | string or null | Get HTML body                              |     
@@ -778,12 +796,13 @@ if you're just wishing a feature ;)
 | getHTMLBodyWithEmbeddedBase64Images |                                        | string or null | Get HTML body with embedded base64 images  |  
 | getHTMLBodyWithEmbeddedUrlImages    | string $route_name, array $params = [] | string or null | Get HTML body with embedded routed images  |  
 
-### [AttachmentMask::class](src/Support/Masks/AttachmentMask.php)
 
+### [AttachmentMask::class](src/Support/Masks/AttachmentMask.php)
 | Method         | Arguments                      | Return         | Description                                            |
 | -------------- | ------------------------------ | :------------: | ------------------------------------------------------ |
 | getContentBase64Encoded     |                   | string or null | Get attachment content                                 |     
 | getImageSrc    |                                | string or null | Get attachment mime type                               |    
+
 
 ### [MessageCollection::class](src/Support/MessageCollection.php)
 Extends [Illuminate\Support\Collection::class](https://laravel.com/api/5.4/Illuminate/Support/Collection.html)
@@ -792,12 +811,14 @@ Extends [Illuminate\Support\Collection::class](https://laravel.com/api/5.4/Illum
 | -------- | --------------------------------------------------- | :------------------: | -------------------------------- |
 | paginate | int $perPage = 15, $page = null, $pageName = 'page' | LengthAwarePaginator | Paginate the current collection. |
 
+
 ### [FlagCollection::class](src/Support/FlagCollection.php)
 Extends [Illuminate\Support\Collection::class](https://laravel.com/api/5.4/Illuminate/Support/Collection.html)
 
 | Method   | Arguments                                           | Return               | Description                      |
 | -------- | --------------------------------------------------- | :------------------: | -------------------------------- |
 | paginate | int $perPage = 15, $page = null, $pageName = 'page' | LengthAwarePaginator | Paginate the current collection. |
+
 
 ### [AttachmentCollection::class](src/Support/AttachmentCollection.php)
 Extends [Illuminate\Support\Collection::class](https://laravel.com/api/5.4/Illuminate/Support/Collection.html)
@@ -806,6 +827,7 @@ Extends [Illuminate\Support\Collection::class](https://laravel.com/api/5.4/Illum
 | -------- | --------------------------------------------------- | :------------------: | -------------------------------- |
 | paginate | int $perPage = 15, $page = null, $pageName = 'page' | LengthAwarePaginator | Paginate the current collection. |
 
+
 ### [FolderCollection::class](src/Support/FolderCollection.php)
 Extends [Illuminate\Support\Collection::class](https://laravel.com/api/5.4/Illuminate/Support/Collection.html)
 
@@ -813,28 +835,29 @@ Extends [Illuminate\Support\Collection::class](https://laravel.com/api/5.4/Illum
 | -------- | --------------------------------------------------- | :------------------: | -------------------------------- |
 | paginate | int $perPage = 15, $page = null, $pageName = 'page' | LengthAwarePaginator | Paginate the current collection. |
 
+
 ### Known issues
 | Error                                                                     | Solution                                                   |
 | ------------------------------------------------------------------------- | ---------------------------------------------------------- |
 | Kerberos error: No credentials cache file found (try running kinit) (...) | Uncomment "DISABLE_AUTHENTICATOR" inside and use the `legacy-imap` protocol |
 
-## Change log
 
-Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
+## Change log
+Please see [CHANGELOG][link-changelog] for more information what has changed recently.
+
 
 ## Security
-
 If you discover any security related issues, please email github@webklex.com instead of using the issue tracker.
 
-## Credits
 
+## Credits
 - [Webklex][link-author]
 - [All Contributors][link-contributors]
 
 
 ## License
+The MIT License (MIT). Please see [License File][link-license] for more information.
 
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
 
 [ico-version]: https://img.shields.io/packagist/v/Webklex/php-imap.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
@@ -842,6 +865,8 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 [ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/Webklex/php-imap.svg?style=flat-square
 [ico-code-quality]: https://img.shields.io/scrutinizer/g/Webklex/php-imap.svg?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/Webklex/php-imap.svg?style=flat-square
+[ico-build]: https://img.shields.io/scrutinizer/build/g/Webklex/php-imap/master?style=flat-square
+[ico-quality]: https://img.shields.io/scrutinizer/quality/g/Webklex/php-imap/master?style=flat-square
 [ico-hits]: https://hits.webklex.com/svg/webklex/php-imap
 
 [link-packagist]: https://packagist.org/packages/Webklex/php-imap
@@ -851,5 +876,7 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 [link-downloads]: https://packagist.org/packages/Webklex/php-imap
 [link-author]: https://github.com/webklex
 [link-contributors]: https://github.com/Webklex/php-imap/graphs/contributors
+[link-license]: https://github.com/Webklex/php-imap/blob/master/LICENSE
+[link-changelog]: https://github.com/Webklex/php-imap/blob/master/CHANGELOG.md
 [link-jetbrains]: https://www.jetbrains.com
 [link-hits]: https://hits.webklex.com
