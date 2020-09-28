@@ -14,6 +14,13 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Affected Classes
 - NaN
 
+## [2.1.2] - 2020-09-28
+### Fixed
+- Dependency problem in `Attachement::getExtension()` fixed (#9)
+
+### Affected Classes
+- [Attachment::class](src/Attachment.php)
+
 ## [2.1.1] - 2020-09-23
 ### Fixed
 - Missing default config parameter added
