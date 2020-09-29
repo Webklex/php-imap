@@ -14,7 +14,6 @@ namespace Webklex\PHPIMAP;
 
 
 use Carbon\Carbon;
-use Illuminate\Support\Str;
 use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
 use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
 
@@ -67,7 +66,7 @@ class Header {
      */
     public function __call($method, $arguments) {
         if(strtolower(substr($method, 0, 3)) === 'get') {
-            $name = Str::snake(substr($method, 3));
+            $name = preg_replace('/(.)(?=[A-Z])/u', '$1_', substr(strtolower($method), 3));
 
             if(in_array($name, array_keys($this->attributes))) {
                 return $this->attributes[$name];
@@ -320,15 +319,24 @@ class Header {
         if ($value !== null) {
             if($decoder === 'utf-8' && extension_loaded('imap')) {
                 $value = \imap_utf8($value);
-                if (Str::startsWith(mb_strtolower($value), '=?utf-8?')) {
+                if (strpos(strtolower($value), '=?utf-8?') === 0) {
                     $value = mb_decode_mimeheader($value);
                 }
                 if ($this->notDecoded($original_value, $value)) {
-                    $value = $this->mime_header_decode(imap_utf8($value));
+                    $decoded_value = $this->mime_header_decode($value);
+                    if (count($decoded_value) > 0) {
+                        if(property_exists($decoded_value[0], "text")) {
+                            $value = $decoded_value[0]->text;
+                        }
+                    }
                 }
             }elseif($decoder === 'iconv') {
                 $value = iconv_mime_decode($value);
             }else{
+                $value = mb_decode_mimeheader($value);
+            }
+
+            if (strpos(strtolower($value), '=?utf-8?') === 0) {
                 $value = mb_decode_mimeheader($value);
             }
 

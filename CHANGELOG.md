@@ -14,6 +14,14 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Affected Classes
 - NaN
 
+## [2.1.3] - 2020-09-29
+### Fixed
+- Possible decoding problem fixed
+- `Str::class` dependency removed from `Header::class`
+
+### Affected Classes
+- [Header::class](src/Header.php)
+
 ## [2.1.2] - 2020-09-28
 ### Fixed
 - Dependency problem in `Attachement::getExtension()` fixed (#9)
