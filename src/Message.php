@@ -390,7 +390,6 @@ class Message {
      * Fetch the Message structure
      *
      * @param $structure
-     * @param mixed $partNumber
      *
      * @throws Exceptions\ConnectionFailedException
      */
@@ -404,7 +403,6 @@ class Message {
 
     /**
      * @param Part $part
-     * @throws Exceptions\ConnectionFailedException
      */
     private function fetchPart(Part $part) {
 
@@ -456,10 +454,7 @@ class Message {
 
     /**
      * Fetch the Message attachment
-     *
      * @param Part $part
-     *
-     * @throws Exceptions\ConnectionFailedException
      */
     protected function fetchAttachment($part) {
 
@@ -476,7 +471,6 @@ class Message {
 
     /**
      * Fail proof setter for $fetch_option
-     *
      * @param $option
      *
      * @return $this
@@ -494,7 +488,6 @@ class Message {
 
     /**
      * Fail proof setter for $fetch_body
-     *
      * @param $option
      *
      * @return $this
@@ -512,7 +505,6 @@ class Message {
 
     /**
      * Fail proof setter for $fetch_flags
-     *
      * @param $option
      *
      * @return $this
@@ -530,7 +522,6 @@ class Message {
 
     /**
      * Decode a given string
-     *
      * @param $string
      * @param $encoding
      *
@@ -557,7 +548,6 @@ class Message {
 
     /**
      * Convert the encoding
-     *
      * @param $str
      * @param string $from
      * @param string $to
@@ -600,7 +590,6 @@ class Message {
 
     /**
      * Get the encoding of a given abject
-     *
      * @param object|string $structure
      *
      * @return string
@@ -684,7 +673,7 @@ class Message {
     public function move($folder, $expunge = false) {
         $message = $this->copy($folder);
         if ($message !== null) {
-            $status = $this->delete($expunge);
+            $this->delete($expunge);
 
             $event = $this->getEvent("message", "moved");
             $event::dispatch($this, $message);
