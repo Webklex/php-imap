@@ -6,11 +6,18 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- Part header detection method changed (#10)
-- Fix header extension values
+- NaN
 
 ### Added
 - NaN
+
+### Affected Classes
+- NaN
+
+## [2.1.4] - 2020-09-30
+### Fixed
+- Fix header extension values
+- Part header detection method changed (#10)
 
 ### Affected Classes
 - [Header::class](src/Header.php)
