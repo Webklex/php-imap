@@ -6,6 +6,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
+- Part header detection method changed (#10)
 - Fix header extension values
 
 ### Added
@@ -13,6 +14,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Affected Classes
 - [Header::class](src/Header.php)
+- [Part::class](src/Part.php)
 
 ## [2.1.3] - 2020-09-29
 ### Fixed

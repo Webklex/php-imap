@@ -104,6 +104,7 @@ class Part {
      * Part constructor.
      * @param $raw_part
      * @param Header $header
+     *
      * @throws InvalidMessageDateException
      */
     public function __construct($raw_part, $header = null) {
@@ -114,22 +115,16 @@ class Part {
 
     /**
      * Parse the raw parts
+     *
      * @throws InvalidMessageDateException
      */
     protected function parse(){
-        $body = $this->raw;
-
         if ($this->header === null) {
-            $headers = "";
-            if (preg_match_all("/(.*)(?s)(?-m)\\r\\n.+?(?=\n([^A-Z]|.{1,2}[^A-Z])|$)/im", $body, $matches)) {
-                if (isset($matches[0][0])) {
-                    $headers = $matches[0][0];
-                    $body = substr($body, strlen($headers) + 2, -2);
-                }
-            }
-
-            $this->header = new Header($headers);
+            $body = $this->findHeaders();
+        }else{
+            $body = $this->raw;
         }
+
         $this->parseSubtype();
         $this->parseDisposition();
         $this->parseDescription();
@@ -142,6 +137,25 @@ class Part {
 
         $this->content = trim(rtrim($body));
         $this->bytes = strlen($this->content);
+    }
+
+    /**
+     * Find all available headers and return the left over body segment
+     *
+     * @return string
+     * @throws InvalidMessageDateException
+     */
+    private function findHeaders(){
+        $body = $this->raw;
+        while (($pos = strpos($body, "\r\n")) > 0) {
+            $body = substr($body, $pos + 2);
+        }
+        $headers = substr($this->raw, 0, strlen($body) * -1);
+        $body = substr($body, 0, -2);
+
+        $this->header = new Header($headers);
+
+        return (string) $body;
     }
 
     private function parseSubtype(){
