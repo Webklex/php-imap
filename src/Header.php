@@ -467,6 +467,7 @@ class Header {
                         if (($pos = strpos($extension, "=")) !== false){
                             $key = substr($extension, 0, $pos);
                             $value = substr($extension, $pos + 1);
+                            $value = str_replace('"', "", $value);
                             $this->attributes[trim(rtrim(strtolower($key)))] = trim(rtrim($value));
                         }
                     }

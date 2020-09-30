@@ -6,13 +6,13 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
+- Fix header extension values
 
 ### Added
 - NaN
 
 ### Affected Classes
-- NaN
+- [Header::class](src/Header.php)
 
 ## [2.1.3] - 2020-09-29
 ### Fixed
