@@ -14,6 +14,10 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Affected Classes
 - NaN
 
+## [2.1.5] - 2020-09-30
+### Fixed
+- Wrong message content property reference fixed (#10)
+
 ## [2.1.4] - 2020-09-30
 ### Fixed
 - Fix header extension values

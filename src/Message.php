@@ -293,7 +293,7 @@ class Message {
             return false;
         }
 
-        return $this->bodies['text']->content;
+        return $this->bodies['text'];
     }
 
     /**
@@ -315,7 +315,7 @@ class Message {
             return null;
         }
 
-        return $this->bodies['html']->content;
+        return $this->bodies['html'];
     }
 
     /**
