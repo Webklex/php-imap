@@ -34,8 +34,7 @@ class ClientManager {
     protected $accounts = [];
 
     /**
-     * Client constructor.
-     *
+     * ClientManager constructor.
      * @param array|string $config
      */
     public function __construct($config = []) {
@@ -44,7 +43,6 @@ class ClientManager {
 
     /**
      * Dynamically pass calls to the default account.
-     *
      * @param  string  $method
      * @param  array   $parameters
      *
@@ -59,7 +57,6 @@ class ClientManager {
 
     /**
      * Get a dotted config parameter
-     *
      * @param string $key
      * @param null   $default
      *
@@ -89,7 +86,6 @@ class ClientManager {
 
     /**
      * Resolve a account instance.
-     *
      * @param  string  $name
      *
      * @return Client
@@ -124,7 +120,6 @@ class ClientManager {
 
     /**
      * Get the account configuration.
-     *
      * @param  string  $name
      *
      * @return array
@@ -148,7 +143,6 @@ class ClientManager {
 
     /**
      * Set the name of the default account.
-     *
      * @param  string  $name
      *
      * @return void

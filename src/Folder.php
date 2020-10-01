@@ -172,7 +172,6 @@ class Folder {
 
     /**
      * Set children.
-     *
      * @param FolderCollection|array $children
      *
      * @return self
@@ -186,7 +185,6 @@ class Folder {
     /**
      * Decode name.
      * It converts UTF7-IMAP encoding to UTF-8.
-     *
      * @param $name
      *
      * @return mixed|string
@@ -197,7 +195,6 @@ class Folder {
 
     /**
      * Get simple name (without parent folders).
-     *
      * @param $delimiter
      * @param $full_name
      *
@@ -211,7 +208,6 @@ class Folder {
 
     /**
      * Parse attributes and set it to object properties.
-     *
      * @param $attributes
      */
     protected function parseAttributes($attributes) {
@@ -224,7 +220,6 @@ class Folder {
 
     /**
      * Move or rename the current folder
-     *
      * @param string $new_name
      * @param boolean $expunge
      *
@@ -248,7 +243,6 @@ class Folder {
 
     /**
      * Append a string message to the current mailbox
-     *
      * @param string $message
      * @param string $options
      * @param string $internal_date
@@ -293,7 +287,6 @@ class Folder {
      * @param boolean $expunge
      *
      * @return bool
-     *
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\RuntimeException
      * @throws Exceptions\EventNotFoundException
@@ -312,7 +305,6 @@ class Folder {
      * Subscribe the current folder
      *
      * @return bool
-     *
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\RuntimeException
      */
@@ -325,7 +317,6 @@ class Folder {
      * Unsubscribe the current folder
      *
      * @return bool
-     *
      * @throws Exceptions\ConnectionFailedException
      */
     public function unsubscribe() {
@@ -396,7 +387,6 @@ class Folder {
      * Examine the current folder
      *
      * @return array
-     *
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\RuntimeException
      */
@@ -414,6 +404,7 @@ class Folder {
     }
 
     /**
+     * Set the delimiter
      * @param $delimiter
      */
     public function setDelimiter($delimiter){

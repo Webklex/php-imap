@@ -25,22 +25,29 @@ use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
 class Header {
 
     /**
+     * Raw header
+     *
      * @var string $raw
      */
     public $raw = "";
 
     /**
+     * Attribute holder
+     *
      * @var array $attributes
      */
     protected $attributes = [];
 
     /**
+     * Config holder
+     *
      * @var array $config
      */
     protected $config = [];
 
     /**
      * Fallback Encoding
+     *
      * @var string
      */
     public $fallback_encoding = 'UTF-8';
@@ -48,6 +55,7 @@ class Header {
     /**
      * Header constructor.
      * @param $raw_header
+     *
      * @throws InvalidMessageDateException
      */
     public function __construct($raw_header) {
@@ -78,6 +86,7 @@ class Header {
     }
 
     /**
+     * Magic getter
      * @param $name
      *
      * @return mixed|null
@@ -87,6 +96,7 @@ class Header {
     }
 
     /**
+     * Get a specific header attribute
      * @param $name
      *
      * @return mixed|null
@@ -100,6 +110,7 @@ class Header {
     }
 
     /**
+     * Perform a regex match all on the raw header and return the first result
      * @param $pattern
      *
      * @return mixed|null
@@ -117,6 +128,7 @@ class Header {
 
     /**
      * Parse the raw headers
+     *
      * @throws InvalidMessageDateException
      */
     protected function parse(){
@@ -205,6 +217,7 @@ class Header {
      * Decode MIME header elements
      * @link https://php.net/manual/en/function.imap-mime-header-decode.php
      * @param string $text The MIME text
+     *
      * @return array The decoded elements are returned in an array of objects, where each
      * object has two properties, charset and text.
      */
@@ -223,6 +236,7 @@ class Header {
      * Check if a given pair of strings has ben decoded
      * @param $encoded
      * @param $decoded
+     *
      * @return bool
      */
     private function notDecoded($encoded, $decoded) {
@@ -233,7 +247,6 @@ class Header {
 
     /**
      * Convert the encoding
-     *
      * @param $str
      * @param string $from
      * @param string $to
@@ -285,7 +298,6 @@ class Header {
 
     /**
      * Get the encoding of a given abject
-     *
      * @param object|string $structure
      *
      * @return string
@@ -456,6 +468,9 @@ class Header {
         return $addresses;
     }
 
+    /**
+     * Search and extract potential header extensions
+     */
     private function extractHeaderExtensions(){
         foreach ($this->attributes as $key => $value) {
             if (is_string($value) === true) {

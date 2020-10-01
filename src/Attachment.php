@@ -52,16 +52,26 @@ use Webklex\PHPIMAP\Support\Masks\AttachmentMask;
  */
 class Attachment {
 
-    /** @var Message $oMessage */
+    /**
+     * @var Message $oMessage
+     */
     protected $oMessage;
 
-    /** @var array $config */
+    /**
+     * Used config
+     *
+     * @var array $config
+     */
     protected $config = [];
 
     /** @var Part $part */
     protected $part;
 
-    /** @var array $attributes */
+    /**
+     * Attribute holder
+     *
+     * @var array $attributes
+     */
     protected $attributes = [
         'content' => null,
         'type' => null,
@@ -76,13 +86,13 @@ class Attachment {
 
     /**
      * Default mask
+     *
      * @var string $mask
      */
     protected $mask = AttachmentMask::class;
 
     /**
      * Attachment constructor.
-     *
      * @param Message   $oMessage
      * @param Part      $part
      */
@@ -131,6 +141,7 @@ class Attachment {
     }
 
     /**
+     * Magic setter
      * @param $name
      * @param $value
      *
@@ -143,6 +154,7 @@ class Attachment {
     }
 
     /**
+     * magic getter
      * @param $name
      *
      * @return mixed|null
@@ -225,7 +237,6 @@ class Attachment {
 
     /**
      * Save the attachment content to your filesystem
-     *
      * @param string $path
      * @param string|null $filename
      *
@@ -238,6 +249,7 @@ class Attachment {
     }
 
     /**
+     * Set the attachment name and try to decode it
      * @param $name
      */
     public function setName($name) {
@@ -252,6 +264,8 @@ class Attachment {
     }
 
     /**
+     * Get the attachment mime type
+     *
      * @return string|null
      */
     public function getMimeType(){
@@ -259,6 +273,8 @@ class Attachment {
     }
 
     /**
+     * Try to guess the attachment file extension
+     *
      * @return string|null
      */
     public function getExtension(){
@@ -272,6 +288,8 @@ class Attachment {
     }
 
     /**
+     * Get all attributes
+     *
      * @return array
      */
     public function getAttributes(){
@@ -286,7 +304,9 @@ class Attachment {
     }
 
     /**
+     * Set the default mask
      * @param $mask
+     *
      * @return $this
      */
     public function setMask($mask){
@@ -298,6 +318,8 @@ class Attachment {
     }
 
     /**
+     * Get the used default mask
+     *
      * @return string
      */
     public function getMask(){

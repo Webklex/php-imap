@@ -23,12 +23,15 @@ use Illuminate\Pagination\Paginator;
  */
 class PaginatedCollection extends Collection {
 
-    /** @var int $total */
+    /**
+     * Number of total entries
+     *
+     * @var int $total
+     */
     protected $total;
 
     /**
      * Paginate the current collection.
-     *
      * @param int      $per_page
      * @param int|null $page
      * @param string   $page_name
@@ -50,7 +53,6 @@ class PaginatedCollection extends Collection {
 
     /**
      * Create a new length-aware paginator instance.
-     *
      * @param  array    $items
      * @param  int      $total
      * @param  int      $per_page
@@ -64,6 +66,7 @@ class PaginatedCollection extends Collection {
     }
 
     /**
+     * Get and set the total amount
      * @param null $total
      *
      * @return int|null

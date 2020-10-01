@@ -90,14 +90,23 @@ class Message {
 
     /**
      * Default mask
+     *
      * @var string $mask
      */
     protected $mask = MessageMask::class;
 
-    /** @var array $config */
+    /**
+     * Used config
+     *
+     * @var array $config
+     */
     protected $config = [];
 
-    /** @var array $attributes */
+    /**
+     * Attribute holder
+     *
+     * @var array $attributes
+     */
     protected $attributes = [
         'message_no' => null,
     ];
@@ -135,10 +144,18 @@ class Message {
      */
     public $header = null;
 
-    /** @var null|string $raw_body */
+    /**
+     * Raw message body
+     *
+     * @var null|string $raw_body
+     */
     public $raw_body = null;
 
-    /** @var Structure $structure */
+    /**
+     * Message structure
+     *
+     * @var Structure $structure
+     */
     protected $structure = null;
 
     /**
@@ -161,7 +178,6 @@ class Message {
 
     /**
      * Message constructor.
-     *
      * @param integer $msgn
      * @param integer|null $msglist
      * @param Client $client
@@ -241,6 +257,7 @@ class Message {
     }
 
     /**
+     * Magic setter
      * @param $name
      * @param $value
      *
@@ -253,6 +270,7 @@ class Message {
     }
 
     /**
+     * Magic getter
      * @param $name
      *
      * @return mixed|null
@@ -262,6 +280,7 @@ class Message {
     }
 
     /**
+     * Get an available message or message header attribute
      * @param $name
      *
      * @return mixed|null
@@ -388,7 +407,6 @@ class Message {
 
     /**
      * Fetch the Message structure
-     *
      * @param $structure
      *
      * @throws Exceptions\ConnectionFailedException
@@ -402,6 +420,7 @@ class Message {
     }
 
     /**
+     * Fetch a given part
      * @param Part $part
      */
     private function fetchPart(Part $part) {
@@ -783,7 +802,9 @@ class Message {
     }
 
     /**
-     * @return null|object|string
+     * Get the raw body
+     *
+     * @return string
      * @throws Exceptions\ConnectionFailedException
      */
     public function getRawBody() {
@@ -797,6 +818,8 @@ class Message {
     }
 
     /**
+     * Get the message header
+     *
      * @return Header
      */
     public function getHeader() {
@@ -804,6 +827,8 @@ class Message {
     }
 
     /**
+     * Get the current client
+     *
      * @return Client
      */
     public function getClient() {
@@ -811,6 +836,8 @@ class Message {
     }
 
     /**
+     * Get the used fetch option
+     *
      * @return integer
      */
     public function getFetchOptions() {
@@ -818,6 +845,8 @@ class Message {
     }
 
     /**
+     * Get the used fetch body option
+     *
      * @return boolean
      */
     public function getFetchBodyOption() {
@@ -825,6 +854,8 @@ class Message {
     }
 
     /**
+     * Get the used fetch flags option
+     *
      * @return boolean
      */
     public function getFetchFlagsOption() {
@@ -832,13 +863,17 @@ class Message {
     }
 
     /**
-     * @return mixed
+     * Get all available bodies
+     *
+     * @return array
      */
     public function getBodies() {
         return $this->bodies;
     }
 
     /**
+     * Get all set flags
+     *
      * @return FlagCollection
      */
     public function getFlags() {
@@ -846,6 +881,8 @@ class Message {
     }
 
     /**
+     * Get the fetched structure
+     *
      * @return object|null
      */
     public function getStructure(){
@@ -853,9 +890,7 @@ class Message {
     }
 
     /**
-     * Does this message match another one?
-     *
-     * A match means same uid, message id, subject and date/time.
+     * Check if a message matches an other by comparing basic attributes
      *
      * @param  null|Message $message
      * @return boolean
@@ -872,6 +907,8 @@ class Message {
     }
 
     /**
+     * Get all message attributes
+     *
      * @return array
      */
     public function getAttributes(){
@@ -879,7 +916,9 @@ class Message {
     }
 
     /**
+     * Set the message mask
      * @param $mask
+     *
      * @return $this
      */
     public function setMask($mask){
@@ -891,6 +930,8 @@ class Message {
     }
 
     /**
+     * Get the used message mask
+     *
      * @return string
      */
     public function getMask(){

@@ -34,6 +34,8 @@ class Client {
     use HasEvents;
 
     /**
+     * Connection resource
+     *
      * @var boolean|Protocol
      */
     public $connection = false;
@@ -103,16 +105,22 @@ class Client {
     protected $active_folder = false;
 
     /**
+     * Default message mask
+     *
      * @var string $default_message_mask
      */
     protected $default_message_mask = MessageMask::class;
 
     /**
+     * Default attachment mask
+     *
      * @var string $default_attachment_mask
      */
     protected $default_attachment_mask = AttachmentMask::class;
 
     /**
+     * Used default account values
+     *
      * @var array $default_account_config
      */
     protected $default_account_config = [
@@ -147,7 +155,6 @@ class Client {
 
     /**
      * Set the Client configuration
-     *
      * @param array $config
      *
      * @return self
@@ -164,6 +171,7 @@ class Client {
     }
 
     /**
+     * Set a specific account config
      * @param string $key
      * @param array $config
      * @param array $default_config
@@ -352,6 +360,7 @@ class Client {
     /**
      * Get a folder instance by a folder name
      * @param $folder_name
+     *
      * @return mixed
      * @throws ConnectionFailedException
      * @throws FolderFetchingException
@@ -400,8 +409,8 @@ class Client {
 
     /**
      * Open folder.
-     *
      * @param string $folder
+     *
      * @return mixed
      * @throws ConnectionFailedException
      */
@@ -441,6 +450,7 @@ class Client {
     /**
      * Check a given folder
      * @param $folder
+     *
      * @return false|object
      * @throws ConnectionFailedException
      */
@@ -471,7 +481,6 @@ class Client {
 
     /**
      * Retrieve the quota settings per user
-     *
      * @param string $quota_root
      *
      * @return array
@@ -514,6 +523,8 @@ class Client {
     }
 
     /**
+     * Get the default message mask
+     *
      * @return string
      */
     public function getDefaultMessageMask(){
@@ -521,7 +532,9 @@ class Client {
     }
 
     /**
+     * Get the default events for a given section
      * @param $section
+     *
      * @return array
      */
     public function getDefaultEvents($section){
@@ -529,6 +542,7 @@ class Client {
     }
 
     /**
+     * Set the default message mask
      * @param $mask
      *
      * @return $this
@@ -545,6 +559,8 @@ class Client {
     }
 
     /**
+     * Get the default attachment mask
+     *
      * @return string
      */
     public function getDefaultAttachmentMask(){
@@ -552,6 +568,7 @@ class Client {
     }
 
     /**
+     * Set the default attachment mask
      * @param $mask
      *
      * @return $this

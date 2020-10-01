@@ -13,11 +13,8 @@
 namespace Webklex\PHPIMAP;
 
 
-use Carbon\Carbon;
-use Illuminate\Support\Str;
 use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
 use Webklex\PHPIMAP\Exceptions\MessageContentFetchingException;
-use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
 
 /**
  * Class Structure
@@ -27,6 +24,8 @@ use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
 class Structure {
 
     /**
+     * Raw structure
+     *
      * @var string $raw
      */
     public $raw = "";
@@ -37,16 +36,22 @@ class Structure {
     private $header = null;
 
     /**
+     * Message type (if multipart or not)
+     *
      * @var int $type
      */
     public $type = IMAP::MESSAGE_TYPE_TEXT;
 
     /**
+     * All available parts
+     *
      * @var Part[] $parts
      */
     public $parts = [];
 
     /**
+     * Config holder
+     *
      * @var array $config
      */
     protected $config = [];
@@ -55,6 +60,7 @@ class Structure {
      * Structure constructor.
      * @param $raw_structure
      * @param Header $header
+     *
      * @throws MessageContentFetchingException
      * @throws InvalidMessageDateException
      */
@@ -66,6 +72,8 @@ class Structure {
     }
 
     /**
+     * Parse the given raw structure
+     *
      * @throws MessageContentFetchingException
      * @throws InvalidMessageDateException
      */
@@ -93,6 +101,8 @@ class Structure {
     }
 
     /**
+     * Find all available parts
+     *
      * @return array
      * @throws MessageContentFetchingException
      * @throws InvalidMessageDateException

@@ -27,6 +27,7 @@ class MessageMask extends Mask {
 
     /**
      * Get the message html body
+     *
      * @return null
      */
     public function getHtmlBody(){

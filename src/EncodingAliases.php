@@ -22,6 +22,7 @@ class EncodingAliases {
    
     /**
      * Contains email encoding mappings
+     *
      * @var array
      */
     private static $aliases = [

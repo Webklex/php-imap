@@ -23,11 +23,15 @@ use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
 class Mask {
 
     /**
+     * Available attributes
+     *
      * @var array $attributes
      */
     protected $attributes = [];
 
     /**
+     * Parent instance
+     *
      * @var object $parent
      */
     protected $parent;
@@ -86,6 +90,7 @@ class Mask {
     }
 
     /**
+     * Magic setter
      * @param $name
      * @param $value
      *
@@ -98,6 +103,7 @@ class Mask {
     }
 
     /**
+     * Magic getter
      * @param $name
      *
      * @return mixed|null
@@ -111,6 +117,8 @@ class Mask {
     }
 
     /**
+     * Get the parent instance
+     *
      * @return mixed
      */
     public function getParent(){
@@ -118,6 +126,8 @@ class Mask {
     }
 
     /**
+     * Get all available attributes
+     *
      * @return array
      */
     public function getAttributes(){

@@ -23,7 +23,11 @@ use Webklex\PHPIMAP\Exceptions\EventNotFoundException;
  */
 trait HasEvents {
 
-    /** @var array $events */
+    /**
+     * Event holder
+     *
+     * @var array $events
+     */
     protected $events = [];
 
     /**

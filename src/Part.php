@@ -13,10 +13,7 @@
 namespace Webklex\PHPIMAP;
 
 
-use Carbon\Carbon;
-use Illuminate\Support\Str;
 use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
-use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
 
 /**
  * Class Part
@@ -26,76 +23,106 @@ use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
 class Part {
 
     /**
+     * Raw part
+     *
      * @var string $raw
      */
     public $raw = "";
 
     /**
+     * Part type
+     *
      * @var int $type
      */
     public $type = IMAP::MESSAGE_TYPE_TEXT;
 
     /**
+     * Part content
+     *
      * @var string $content
      */
     public $content = "";
 
     /**
+     * Part subtype
+     *
      * @var string $subtype
      */
     public $subtype = null;
 
     /**
+     * Part charset - if available
+     *
      * @var string $charset
      */
     public $charset = "utf-8";
 
     /**
+     * Part encoding method
+     *
      * @var int $encoding
      */
     public $encoding = IMAP::MESSAGE_ENC_OTHER;
 
     /**
+     * Alias to check if the part is an attachment
+     *
      * @var boolean $ifdisposition
      */
     public $ifdisposition = false;
 
     /**
+     * Indicates if the part is an attachment
+     *
      * @var string $disposition
      */
     public $disposition = null;
 
     /**
+     * Alias to check if the part has a description
+     *
      * @var boolean $ifdescription
      */
     public $ifdescription = false;
 
     /**
+     * Part description if available
+     *
      * @var string $description
      */
     public $description = null;
 
     /**
+     * Part filename if available
+     *
      * @var string $filename
      */
     public $filename = null;
 
     /**
+     * Part name if available
+     *
      * @var string $name
      */
     public $name = null;
 
     /**
+     * Part id if available
+     *
      * @var string $id
      */
     public $id = null;
 
     /**
+     * The part number of the current part
+     *
      * @var integer $part_number
      */
     public $part_number = 0;
 
     /**
+     * Part length in bytes
+     *
      * @var integer $bytes
      */
     public $bytes = null;
@@ -165,6 +192,9 @@ class Part {
         return (string) $body;
     }
 
+    /**
+     * Try to parse the subtype if any is present
+     */
     private function parseSubtype(){
         $content_type = $this->header->get("content-type");
         if (($pos = strpos($content_type, "/")) !== false){
@@ -172,6 +202,9 @@ class Part {
         }
     }
 
+    /**
+     * Try to parse the disposition if any is present
+     */
     private function parseDisposition(){
         $content_disposition = $this->header->get("content-disposition");
         if($content_disposition !== null) {
@@ -180,6 +213,9 @@ class Part {
         }
     }
 
+    /**
+     * Try to parse the description if any is present
+     */
     private function parseDescription(){
         $content_description = $this->header->get("content-description");
         if($content_description !== null) {
@@ -188,6 +224,9 @@ class Part {
         }
     }
 
+    /**
+     * Try to parse the encoding if any is present
+     */
     private function parseEncoding(){
         $encoding = $this->header->get("content-transfer-encoding");
         if($encoding !== null) {
