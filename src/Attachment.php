@@ -65,6 +65,7 @@ class Attachment {
     protected $attributes = [
         'content' => null,
         'type' => null,
+        'part_number' => 0,
         'content_type' => null,
         'id' => null,
         'name' => null,
@@ -90,6 +91,7 @@ class Attachment {
 
         $this->oMessage = $oMessage;
         $this->part = $part;
+        $this->part_number = $part->part_number;
 
         $default_mask = $this->oMessage->getClient()->getDefaultAttachmentMask();
         if($default_mask != null) {

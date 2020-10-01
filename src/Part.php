@@ -91,6 +91,11 @@ class Part {
     public $id = null;
 
     /**
+     * @var integer $part_number
+     */
+    public $part_number = 0;
+
+    /**
      * @var integer $bytes
      */
     public $bytes = null;
@@ -104,12 +109,14 @@ class Part {
      * Part constructor.
      * @param $raw_part
      * @param Header $header
+     * @param integer $part_number
      *
      * @throws InvalidMessageDateException
      */
-    public function __construct($raw_part, $header = null) {
+    public function __construct($raw_part, $header = null, $part_number = 0) {
         $this->raw = $raw_part;
         $this->header = $header;
+        $this->part_number = $part_number;
         $this->parse();
     }
 

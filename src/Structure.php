@@ -105,10 +105,12 @@ class Structure {
 
             $raw_parts = explode($boundary, $this->raw);
             $parts = [];
+            $part_number = 0;
             foreach($raw_parts as $part) {
                 $part = trim(rtrim($part));
                 if ($part !== "--") {
-                    $parts[] = new Part($part);
+                    $parts[] = new Part($part, null, $part_number);
+                    $part_number++;
                 }
             }
             return $parts;
