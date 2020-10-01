@@ -912,7 +912,7 @@ class Message {
      * @return array
      */
     public function getAttributes(){
-        return $this->attributes;
+        return array_merge($this->attributes, $this->header->getAttributes());
     }
 
     /**

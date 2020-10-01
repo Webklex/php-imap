@@ -550,4 +550,13 @@ class Header {
         }
     }
 
+    /**
+     * Get all available attributes
+     *
+     * @return array
+     */
+    public function getAttributes() {
+        return $this->attributes;
+    }
+
 }

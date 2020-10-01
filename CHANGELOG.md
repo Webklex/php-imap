@@ -6,7 +6,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
+- `Message::getAttributes()` hasn't returned all parameters
 
 ### Added
 - Part number added to attachment
