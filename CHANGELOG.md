@@ -14,6 +14,10 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Affected Classes
 - NaN
 
+## [2.1.7] - 2020-10-03
+### Fixed
+- Fixed `Query::paginate()` (#13 #14 by [@Max13](https://github.com/Max13))
+
 ## [2.1.6] - 2020-10-02
 ### Fixed
 - `Message::getAttributes()` hasn't returned all parameters
