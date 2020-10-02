@@ -370,6 +370,18 @@ class Client {
     }
 
     /**
+     * Get a folder instance by a folder path
+     * @param $folder_path
+     *
+     * @return mixed
+     * @throws ConnectionFailedException
+     * @throws FolderFetchingException
+     */
+    public function getFolderByPath($folder_path) {
+        return $this->getFolders(false)->where("path", $folder_path)->first();
+    }
+
+    /**
      * Get folders list.
      * If hierarchical order is set to true, it will make a tree of folders, otherwise it will return flat array.
      *
