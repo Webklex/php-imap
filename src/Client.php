@@ -366,7 +366,31 @@ class Client {
      * @throws FolderFetchingException
      */
     public function getFolder($folder_name) {
+        return $this->getFolderByName($folder_name);
+    }
+
+    /**
+     * Get a folder instance by a folder name
+     * @param $folder_name
+     *
+     * @return mixed
+     * @throws ConnectionFailedException
+     * @throws FolderFetchingException
+     */
+    public function getFolderByName($folder_name) {
         return $this->getFolders(false)->where("name", $folder_name)->first();
+    }
+
+    /**
+     * Get a folder instance by a folder path
+     * @param $folder_path
+     *
+     * @return mixed
+     * @throws ConnectionFailedException
+     * @throws FolderFetchingException
+     */
+    public function getFolderByPath($folder_path) {
+        return $this->getFolders(false)->where("path", $folder_path)->first();
     }
 
     /**
