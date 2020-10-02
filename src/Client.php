@@ -16,6 +16,7 @@ use Webklex\PHPIMAP\Connection\Protocols\ImapProtocol;
 use Webklex\PHPIMAP\Connection\Protocols\LegacyProtocol;
 use Webklex\PHPIMAP\Connection\Protocols\Protocol;
 use Webklex\PHPIMAP\Connection\Protocols\ProtocolInterface;
+use Webklex\PHPIMAP\Exceptions\AuthFailedException;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
 use Webklex\PHPIMAP\Exceptions\FolderFetchingException;
 use Webklex\PHPIMAP\Exceptions\MaskNotFoundException;
@@ -335,9 +336,11 @@ class Client {
     protected function authenticate() {
         try {
             if ($this->authentication == "oauth") {
-                $this->connection->authenticate($this->username, $this->password);
+                if (!$this->connection->authenticate($this->username, $this->password)) {
+                    throw new AuthFailedException();
+                }
             } elseif (!$this->connection->login($this->username, $this->password)) {
-                throw new \Exception;
+                throw new AuthFailedException();
             }
         } catch (\Exception $e) {
             throw new ConnectionFailedException("connection setup failed", 0, $e);
