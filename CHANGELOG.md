@@ -10,9 +10,12 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Added
 - Part number added to attachment
+- `Client::getFolderByPath()` added (#12 by [@Max13](https://github.com/Max13))
+- `Client::getFolderByName()` added (#12 by [@Max13](https://github.com/Max13))
+- Throws exceptions if the authentication fails  (#11 by [@Max13](https://github.com/Max13))
 
 ### Affected Classes
-- NaN
+- [Client::class](src/Client.php)
 
 ## [2.1.5] - 2020-09-30
 ### Fixed
