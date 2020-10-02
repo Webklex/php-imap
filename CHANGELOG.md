@@ -6,6 +6,16 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
+- NaN
+
+### Added
+- NaN
+
+### Affected Classes
+- NaN
+
+## [2.1.6] - 2020-10-02
+### Fixed
 - `Message::getAttributes()` hasn't returned all parameters
 
 ### Added
