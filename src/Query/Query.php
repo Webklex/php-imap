@@ -251,21 +251,19 @@ class Query {
      * @throws GetMessagesFailedException
      */
     public function paginate($per_page = 5, $page = null, $page_name = 'imap_page'){
-        $this->page = $page > $this->page ? $page : $this->page;
-        $this->limit = $per_page;
-
-        $messages = $this->get();
-        if (($count = $messages->count()) > 0) {
-            $limit = $this->limit > $count ? $count : $this->limit;
-            $collection = array_fill(0, $messages->total() - $limit, true);
-            $messages->each(function($message) use(&$collection){
-                $collection[] = $message;
-            });
-        }else{
-            $collection = array_fill(0, $messages->total(), true);
+        if (
+               $page === null
+            && isset($_GET[$page_name])
+            && $_GET[$page_name] > 0
+        ) {
+            $this->page = intval($_GET[$page_name]);
+        } elseif ($page > 0) {
+            $this->page = $page;
         }
 
-        return MessageCollection::make($collection)->paginate($per_page, $this->page, $page_name);
+        $this->limit = $per_page;
+
+        return $this->get()->paginate($per_page, $this->page, $page_name);
     }
 
     /**
