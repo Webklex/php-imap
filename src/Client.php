@@ -336,8 +336,8 @@ class Client {
         try {
             if ($this->authentication == "oauth") {
                 $this->connection->authenticate($this->username, $this->password);
-            }else{
-                $this->connection->login($this->username, $this->password);
+            } elseif (!$this->connection->login($this->username, $this->password)) {
+                throw new \Exception;
             }
         } catch (\Exception $e) {
             throw new ConnectionFailedException("connection setup failed", 0, $e);
