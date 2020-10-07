@@ -479,7 +479,7 @@ class Message {
 
         $oAttachment = new Attachment($this, $part);
 
-        if ($oAttachment->getName() !== null) {
+        if (str_replace(' ', '_', $oAttachment->getName()) !== null) {
             if ($oAttachment->getId() !== null) {
                 $this->attachments->put($oAttachment->getId(), $oAttachment);
             } else {
