@@ -217,13 +217,14 @@ class Attachment {
         }
 
         $this->size = $this->part->bytes;
+        $this->disposition = $this->part->disposition;
 
         if (($name = $this->part->name) !== null) {
             $this->setName($name);
-            $this->disposition = $this->part->disposition;
         }elseif (($filename = $this->part->filename) !== null) {
             $this->setName($filename);
-            $this->disposition = $this->part->disposition;
+        } else {
+            $this->setName("undefined");
         }
 
         if (IMAP::ATTACHMENT_TYPE_MESSAGE == $this->part->type) {
