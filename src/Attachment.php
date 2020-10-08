@@ -209,7 +209,7 @@ class Attachment {
 
         $content = $this->part->content;
 
-        $this->content_type = $this->type.'/'.strtolower($this->part->subtype);
+        $this->content_type = $this->part->content_type;
         $this->content = $this->oMessage->decodeString($content, $this->part->encoding);
 
         if (($id = $this->part->id) !== null) {
