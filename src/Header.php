@@ -405,7 +405,7 @@ class Header {
             )){
                 $name = trim(rtrim($matches["name"]));
                 $email = trim(rtrim($matches["email"]));
-                list($mailbox, $host) = explode("@", $email);
+                list($mailbox, $host) = array_pad(explode("@", $email), 2, null);
                 $addresses[] = (object) [
                     "personal" => $name,
                     "mailbox" => $mailbox,
