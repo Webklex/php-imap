@@ -236,6 +236,7 @@ class Query {
      * @throws InvalidMessageDateException
      * @throws MessageContentFetchingException
      * @throws MessageHeaderFetchingException
+     * @throws \Webklex\PHPIMAP\Exceptions\EventNotFoundException
      */
     public function getMessage($msgno, $msglist = null){
         return new Message($msgno, $msglist, $this->getClient(), $this->getFetchOptions(), $this->getFetchBody(), $this->getFetchFlags());

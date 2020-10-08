@@ -109,6 +109,7 @@ Detailed [config/imap.php](src/config/imap.php) configuration:
  - `date_format` &mdash; The default date format is used to convert any given Carbon::class object into a valid date string. (`d-M-Y`, `d-M-y`, `d M y`)
  - `options` &mdash; additional fetch options
    - `delimiter` &mdash; you can use any supported char such as ".", "/", etc
+   - `fetch` &mdash; `IMAP::FT_UID` (message marked as read by fetching the message body) or `IMAP::FT_PEEK` (fetch the message without setting the "seen" flag)
    - `fetch_body` &mdash; If set to `false` all messages will be fetched without the body and any potential attachments
    - `fetch_flags` &mdash;  If set to `false` all messages will be fetched without any flags
    - `message_key` &mdash; Message key identifier option
@@ -436,6 +437,20 @@ Flag or "unflag" a message:
 /** @var \Webklex\PHPIMAP\Message $message */
 $message->setFlag(['Seen', 'Spam']);
 $message->unsetFlag('Spam');
+```
+
+Mark all messages as "read" while fetching:
+```php
+/** @var \Webklex\PHPIMAP\Folder $oFolder */
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
+$aMessage = $oFolder->query()->text('Hello world')->markAsRead()->get();
+```
+
+Don't mark all messages as "read" while fetching:
+```php
+/** @var \Webklex\PHPIMAP\Folder $oFolder */
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $aMessage */
+$aMessage = $oFolder->query()->text('Hello world')->leaveUnread()->get();
 ```
 
 

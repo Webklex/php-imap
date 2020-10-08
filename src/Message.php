@@ -190,6 +190,7 @@ class Message {
      * @throws Exceptions\RuntimeException
      * @throws MessageHeaderFetchingException
      * @throws MessageContentFetchingException
+     * @throws Exceptions\EventNotFoundException
      */
     public function __construct($msgn, $msglist, Client $client, $fetch_options = null, $fetch_body = false, $fetch_flags = false) {
 
@@ -221,12 +222,12 @@ class Message {
 
         $this->parseHeader();
 
-        if ($this->getFetchFlagsOption() === true) {
-            $this->parseFlags();
-        }
-
         if ($this->getFetchBodyOption() === true) {
             $this->parseBody();
+        }
+
+        if ($this->getFetchFlagsOption() === true && $this->flags->count() == 0) {
+            $this->parseFlags();
         }
     }
 
@@ -388,6 +389,7 @@ class Message {
      * @throws Exceptions\MessageContentFetchingException
      * @throws InvalidMessageDateException
      * @throws Exceptions\RuntimeException
+     * @throws Exceptions\EventNotFoundException
      */
     public function parseBody() {
         $this->client->openFolder($this->folder_path);
@@ -401,6 +403,13 @@ class Message {
         $this->structure = new Structure($content, $this->header);
 
         $this->fetchStructure($this->structure);
+
+        if ($this->fetch_options == IMAP::FT_PEEK) {
+            $this->parseFlags();
+            if ($this->getFlags()->get("seen") !== null) {
+                $this->unsetFlag("Seen");
+            }
+        }
 
         return $this;
     }

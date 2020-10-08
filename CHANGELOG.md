@@ -6,15 +6,27 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
+- NaN
+
+### Added
+- NaN
+
+### Affected Classes
+- NaN
+
+## [2.1.9] - 2020-10-08
+### Fixed
 - Fix inline attachments and embedded images (#22 [@dwalczyk](https://github.com/dwalczyk))
 
 ### Added
 - Alternative attachment names support added (#20 [@oneFoldSoftware](https://github.com/oneFoldSoftware))
+- Fetch message content without leaving a "Seen" flag behind
 
 ### Affected Classes
 - [Attachment::class](src/Attachment.php)
 - [Message::class](src/Message.php)
 - [Part::class](src/Part.php)
+- [Query::class](src/Query/Query.php)
 
 ## [2.1.8] - 2020-10-08
 ### Fixed
