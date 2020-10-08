@@ -756,7 +756,7 @@ class Message {
         $this->parseFlags();
 
         $event = $this->getEvent("flag", "new");
-        $event::dispatch($this);
+        $event::dispatch($this, $flag);
 
         return $status;
     }
@@ -778,7 +778,7 @@ class Message {
         $this->parseFlags();
 
         $event = $this->getEvent("flag", "deleted");
-        $event::dispatch($this);
+        $event::dispatch($this, $flag);
 
         return $status;
     }
