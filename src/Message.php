@@ -425,11 +425,8 @@ class Message {
      */
     private function fetchPart(Part $part) {
 
-        if ($part->type == IMAP::MESSAGE_TYPE_TEXT &&
-            ($part->ifdisposition == 0 ||
-                (empty($part->disposition) || strtolower($part->disposition) != 'attachment')
-            )
-        ) {
+        if ($part->type == IMAP::MESSAGE_TYPE_TEXT && ($part->ifdisposition == 0 || (empty($part->disposition) || !in_array(strtolower($part->disposition), ['attachment', 'inline'])) ) ) {
+
             if (strtolower($part->subtype) == "plain" || strtolower($part->subtype) == "csv") {
                 $encoding = $this->getEncoding($part);
 

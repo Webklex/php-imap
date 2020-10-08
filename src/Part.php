@@ -128,6 +128,13 @@ class Part {
     public $bytes = null;
 
     /**
+     * Part content type
+     *
+     * @var string|null $content_type
+     */
+    public $content_type = null;
+
+    /**
      * @var Header $header
      */
     private $header = null;
@@ -167,7 +174,24 @@ class Part {
         $this->charset = $this->header->get("charset");
         $this->name = $this->header->get("name");
         $this->filename = $this->header->get("filename");
-        $this->id = $this->header->get("id");
+
+        if(!empty($this->header->get("id"))) {
+            $this->id = $this->header->get("id");
+        } else if(!empty($this->header->get("x-attachment-id"))){
+            $this->id = $this->header->get("x-attachment-id");
+        } else if(!empty($this->header->get("content-id"))){
+            $this->id = strtr($this->header->get("content-id"), [
+                '<' => '',
+                '>' => ''
+            ]);
+        }
+
+        if(!empty($this->header->get("content-type"))){
+            $rawContentType = $this->header->get("content-type");
+            $contentTypeArray = explode(';', $rawContentType);
+            $this->content_type = trim($contentTypeArray[0]);
+        }
+
 
         $this->content = trim(rtrim($body));
         $this->bytes = strlen($this->content);

@@ -36,7 +36,10 @@ class MessageMask extends Mask {
             return null;
         }
 
-        return $bodies['html']->content;
+        if(is_object($bodies['html']) && property_exists($bodies['html'], 'content')) {
+            return $bodies['html']->content;
+        }
+        return $bodies['html'];
     }
 
     /**
@@ -73,8 +76,8 @@ class MessageMask extends Mask {
     public function getHTMLBodyWithEmbeddedBase64Images() {
         return $this->getCustomHTMLBody(function($body, $oAttachment){
             /** @var \Webklex\PHPIMAP\Attachment $oAttachment */
-            if ($oAttachment->id && $oAttachment->getImgSrc() != null) {
-                $body = str_replace('cid:'.$oAttachment->id, $oAttachment->getImgSrc(), $body);
+            if ($oAttachment->id) {
+                $body = str_replace('cid:'.$oAttachment->id, 'data:'.$oAttachment->getContentType().';base64, '.base64_encode($oAttachment->getContent()), $body);
             }
 
             return $body;
