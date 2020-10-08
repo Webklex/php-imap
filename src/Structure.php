@@ -113,7 +113,23 @@ class Structure {
                 throw new MessageContentFetchingException("no content found", 0);
             }
 
-            $raw_parts = explode($boundary, $this->raw);
+            $boundaries = [
+                $boundary
+            ];
+
+            if (preg_match("/boundary\=\"(.*)\"/", $this->raw, $match) == 1) {
+                if(is_array($match[1])){
+                    foreach($match[1] as $matched){
+                        $boundaries[] = $matched;
+                    }
+                }else{
+                    if(!empty($match[1])) {
+                        $boundaries[] = $match[1];
+                    }
+                }
+            }
+
+            $raw_parts = explode( $boundaries[0], str_replace($boundaries, $boundaries[0], $this->raw) );
             $parts = [];
             $part_number = 0;
             foreach($raw_parts as $part) {
