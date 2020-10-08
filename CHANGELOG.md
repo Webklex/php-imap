@@ -14,13 +14,30 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Affected Classes
 - NaN
 
+## [2.1.8] - 2020-10-08
+### Fixed
+- Possible error during address decoding fixed (#16 [@Slauta](https://github.com/Slauta))
+- Flag event dispatching fixed #15
+
+### Added
+- Support multiple boundaries (#17, #19 [@dwalczyk](https://github.com/dwalczyk))
+
+### Affected Classes
+- [Structure::class](src/Structure.php)
+
 ## [2.1.7] - 2020-10-03
 ### Fixed
 - Fixed `Query::paginate()` (#13 #14 by [@Max13](https://github.com/Max13))
 
+### Affected Classes
+- [Query::class](src/Query/Query.php)
+
 ## [2.1.6] - 2020-10-02
 ### Fixed
 - `Message::getAttributes()` hasn't returned all parameters
+
+### Affected Classes
+- [Message::class](src/Message.php)
 
 ### Added
 - Part number added to attachment
