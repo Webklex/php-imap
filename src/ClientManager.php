@@ -56,6 +56,17 @@ class ClientManager {
     }
 
     /**
+     * Safely create a new client instance which is not listed in accounts
+     * @param array $config
+     *
+     * @return Client
+     * @throws Exceptions\MaskNotFoundException
+     */
+    public function make($config) {
+        return new Client($config);
+    }
+
+    /**
      * Get a dotted config parameter
      * @param string $key
      * @param null   $default

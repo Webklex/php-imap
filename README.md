@@ -142,7 +142,7 @@ $cm = new ClientManager($options = []);
 $client = $cm->account('account_identifier');
 
 // or create a new instance manually        
-$client = new Client([
+$client = $cm->make([
     'host'          => 'somehost.com',
     'port'          => 993,
     'encryption'    => 'ssl',
@@ -205,10 +205,12 @@ $folder = $client->getFolder('INBOX.name');
 #### oAuth
 If you are using google mail or something similar, you might want to use oauth instead:
 ```php
-use Webklex\PHPIMAP\Client;
+use Webklex\PHPIMAP\Clientmanager;
+
+$cm = new Clientmanager();
 
 /** @var \Webklex\PHPIMAP\Client $client */
-$client = new Client([
+$client = $cm->make([
     'host' => 'imap.gmail.com',
     'port' => 993,
     'encryption' => 'ssl',
