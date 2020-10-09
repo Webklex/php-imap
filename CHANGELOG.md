@@ -6,13 +6,20 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- `ClientManager::make()` method added to support undefined accounts
+- NaN
 
 ### Added
 - NaN
 
 ### Affected Classes
 - NaN
+
+## [2.1.10] - 2020-10-09
+### Added
+- `ClientManager::make()` method added to support undefined accounts
+
+### Affected Classes
+- [ClientManager::class](src/ClientManager.php)
 
 ## [2.1.9] - 2020-10-08
 ### Fixed
