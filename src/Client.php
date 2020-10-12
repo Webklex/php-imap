@@ -362,13 +362,22 @@ class Client {
 
     /**
      * Get a folder instance by a folder name
-     * @param $folder_name
+     * @param string $folder_name
+     * @param string|bool $delimiter
      *
      * @return mixed
      * @throws ConnectionFailedException
      * @throws FolderFetchingException
      */
-    public function getFolder($folder_name) {
+    public function getFolder($folder_name, $delimiter = null) {
+        // Set delimiter to false to force selection via getFolderByName (maybe useful for uncommon folder names)
+        if ($delimiter !== false) {
+            $delimiter = (is_null($delimiter)) ? ClientManager::get('options.delimiter', "/") : $delimiter;
+            if (strpos($folder_name, $delimiter) !== false) {
+                return $this->getFolderByPath($folder_name);
+            }
+	}
+
         return $this->getFolderByName($folder_name);
     }
 
