@@ -372,7 +372,7 @@ class Client {
     public function getFolder($folder_name, $delimiter = null) {
         // Set delimiter to false to force selection via getFolderByName (maybe useful for uncommon folder names)
         if ($delimiter !== false) {
-            $delimiter = (is_null($delimiter)) ? $this->delimiter ?? '/' : $delimiter;
+            $delimiter = (is_null($delimiter)) ? ClientManager::get('options.delimiter', "/") : $delimiter;
             if (strpos($folder_name, $delimiter) !== false) {
                 return $this->getFolderByPath($folder_name);
             }
