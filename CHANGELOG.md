@@ -9,7 +9,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - NaN
 
 ### Added
-- NaN
+- Expended `Client::getFolder($name, $deleimiter = null)` to accept either a folder name or path
 
 ### Affected Classes
 - NaN
