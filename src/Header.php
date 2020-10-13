@@ -178,12 +178,25 @@ class Header {
             if (substr($line, 0, 1) === "\n") {
                 $line = substr($line, 1);
             }
+
             if (substr($line, 0, 1) === "\t") {
-                $line = substr($line, 2);
                 $line = substr($line, 1);
                 $line = trim(rtrim($line));
                 if ($prev_header !== null) {
                     $headers[$prev_header][] = $line;
+                }
+            }elseif (substr($line, 0, 1) === " ") {
+                $line = substr($line, 1);
+                $line = trim(rtrim($line));
+                if ($prev_header !== null) {
+                    if (!isset($headers[$prev_header])) {
+                        $headers[$prev_header] = "";
+                    }
+                    if (is_array($headers[$prev_header])) {
+                        $headers[$prev_header][] = $line;
+                    }else{
+                        $headers[$prev_header] .= $line;
+                    }
                 }
             }else{
                 if (($pos = strpos($line, ":")) > 0) {
@@ -208,8 +221,27 @@ class Header {
                     $value = $this->decodeAddresses($values);
                     $headers[$key."address"] = implode(", ", $values);
                     break;
+                case 'subject':
+                    $value = implode(" ", $values);
+                    break;
                 default:
-                    $value = isset($values[0]) ? $values[0] : $value;
+                    if (is_array($values)) {
+                        foreach($values as $k => $v) {
+                            if ($v == "") {
+                                unset($values[$k]);
+                            }
+                        }
+                        $available_values = count($values);
+                        if ($available_values === 1) {
+                            $value = array_pop($values);
+                        } elseif ($available_values === 2) {
+                            $value = implode(" ", $values);
+                        } elseif ($available_values > 2) {
+                            $value = array_values($values);
+                        } else {
+                            $value = "";
+                        }
+                    }
                     break;
             }
             $headers[$key] = $value;
@@ -478,10 +510,13 @@ class Header {
      */
     private function extractHeaderExtensions(){
         foreach ($this->attributes as $key => $value) {
-            if (is_string($value) === true) {
+            // Only parse strings and don't parse any attributes like the user-agent
+            if (is_string($value) === true && in_array($key, ["user-agent"]) === false) {
                 if (($pos = strpos($value, ";")) !== false){
                     $original = substr($value, 0, $pos);
                     $this->attributes[$key] = trim(rtrim($original));
+
+                    // Get all potential extensions
                     $extensions = explode(";", substr($value, $pos + 1));
                     foreach($extensions as $extension) {
                         if (($pos = strpos($extension, "=")) !== false){
