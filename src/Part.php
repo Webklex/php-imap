@@ -233,7 +233,7 @@ class Part {
         $content_disposition = $this->header->get("content-disposition");
         if($content_disposition !== null) {
             $this->ifdisposition = true;
-            $this->disposition = $content_disposition;
+            $this->disposition = (is_array($content_disposition)) ? implode(' ', $content_disposition) : $content_disposition;
         }
     }
 
