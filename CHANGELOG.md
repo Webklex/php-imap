@@ -14,6 +14,14 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Affected Classes
 - NaN
 
+## [2.1.13] - 2020-10-13
+### Fixed
+-  Boundary detection problem fixed (#28  [@DasTobbel](https://github.com/DasTobbel))
+-  Content-Type detection problem fixed (#28  [@DasTobbel](https://github.com/DasTobbel))
+
+### Affected Classes
+- [Structure::class](src/Structure.php)
+
 ## [2.1.12] - 2020-10-13
 ### Fixed
 - If content disposition is multiline, implode the array to a simple string (#25 [@DasTobbel](https://github.com/DasTobbel))
