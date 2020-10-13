@@ -14,12 +14,19 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Affected Classes
 - NaN
 
+## [2.1.12] - 2020-10-13
+### Fixed
+- If content disposition is multiline, implode the array to a simple string (#25 [@DasTobbel](https://github.com/DasTobbel))
+
+### Affected Classes
+- [Part::class](src/Part.php)
+
 ## [2.1.11] - 2020-10-13
 ### Fixed
 - Potential problematic prefixed white-spaces removed from header attributes
 
 ### Added
-- Expended `Client::getFolder($name, $deleimiter = null)` to accept either a folder name or path ([@Max13](https://github.com/Max13))
+- Expended `Client::getFolder($name, $deleimiter = null)` to accept either a folder name or path ([@DasTobbel](https://github.com/DasTobbel))
 - Special MS-Exchange header decoding support added
 
 ### Affected Classes
