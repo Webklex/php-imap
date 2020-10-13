@@ -9,10 +9,22 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - NaN
 
 ### Added
-- Expended `Client::getFolder($name, $deleimiter = null)` to accept either a folder name or path
+- NaN
 
 ### Affected Classes
 - NaN
+
+## [2.1.11] - 2020-10-13
+### Fixed
+- Potential problematic prefixed white-spaces removed from header attributes
+
+### Added
+- Expended `Client::getFolder($name, $deleimiter = null)` to accept either a folder name or path ([@Max13](https://github.com/Max13))
+- Special MS-Exchange header decoding support added
+
+### Affected Classes
+- [Client::class](src/Client.php)
+- [Header::class](src/Header.php)
 
 ## [2.1.10] - 2020-10-09
 ### Added
