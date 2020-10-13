@@ -86,7 +86,10 @@ class Structure {
      * Determine the message content type
      */
     public function findContentType(){
-        if(stripos($this->header->get("content-type"), 'multipart') === 0) {
+
+        $content_type = $this->header->get("content-type");
+        $content_type = (is_array($content_type)) ? implode(' ', $content_type) : $content_type;
+        if(stripos($content_type, 'multipart') === 0) {
             $this->type = IMAP::MESSAGE_TYPE_MULTIPART;
         }else{
             $this->type = IMAP::MESSAGE_TYPE_TEXT;
@@ -97,7 +100,8 @@ class Structure {
      * Determine the message content type
      */
     public function getBoundary(){
-        return $this->header->find("/boundary\=\"(.*)\"/");
+        $boundary = $this->header->find("/boundary\=\"?(.*)\"?/");
+        return str_replace('"', '', $boundary);
     }
 
     /**
@@ -117,14 +121,14 @@ class Structure {
                 $boundary
             ];
 
-            if (preg_match("/boundary\=\"(.*)\"/", $this->raw, $match) == 1) {
+            if (preg_match("/boundary\=\"?(.*)\"?/", $this->raw, $match) == 1) {
                 if(is_array($match[1])){
                     foreach($match[1] as $matched){
-                        $boundaries[] = $matched;
+                        $boundaries[] = str_replace('"', '', $matched);
                     }
                 }else{
                     if(!empty($match[1])) {
-                        $boundaries[] = $match[1];
+                        $boundaries[] = str_replace('"', '', $match[1]);
                     }
                 }
             }
