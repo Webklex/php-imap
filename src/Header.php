@@ -175,14 +175,19 @@ class Header {
         $lines = explode("\r\n", $raw_headers);
         $prev_header = null;
         foreach($lines as $line) {
+            if (substr($line, 0, 1) === "\n") {
+                $line = substr($line, 1);
+            }
             if (substr($line, 0, 1) === "\t") {
                 $line = substr($line, 2);
+                $line = substr($line, 1);
+                $line = trim(rtrim($line));
                 if ($prev_header !== null) {
                     $headers[$prev_header][] = $line;
                 }
             }else{
                 if (($pos = strpos($line, ":")) > 0) {
-                    $key = strtolower(substr($line, 0, $pos));
+                    $key = trim(rtrim(strtolower(substr($line, 0, $pos))));
                     $value = trim(rtrim(strtolower(substr($line, $pos + 1))));
                     $headers[$key] = [$value];
                     $prev_header = $key;
