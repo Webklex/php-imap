@@ -203,7 +203,9 @@ $folder = $client->getFolder('INBOX.name');
 
 
 #### oAuth
-If you are using google mail or something similar, you might want to use oauth instead:
+Please take a look at [the wiki article](https://github.com/Webklex/php-imap/wiki/Google-Mail---Gmail) for gmail / google mail setup.
+
+Basic oAuth example:
 ```php
 use Webklex\PHPIMAP\Clientmanager;
 
@@ -216,7 +218,7 @@ $client = $cm->make([
     'encryption' => 'ssl',
     'validate_cert' => true,
     'username' => 'example@gmail.com',
-    'password' => 'PASSWORD',
+    'password' => 'ACCESS-TOKEN',
     'authentication' => "oauth",
     'protocol' => 'imap'
 ]);
