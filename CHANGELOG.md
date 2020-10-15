@@ -6,13 +6,16 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
+- Prevent text bodies from being fetched as attachment #27
 
 ### Added
 - NaN
 
 ### Affected Classes
-- NaN
+- [Message::class](src/Message.php)
+
+### Breaking changes
+- Text bodies might no longer get fetched as attachment
 
 ## [2.1.13] - 2020-10-13
 ### Fixed

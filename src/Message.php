@@ -436,7 +436,7 @@ class Message {
 
         if ($part->type == IMAP::MESSAGE_TYPE_TEXT && ($part->ifdisposition == 0 || (empty($part->disposition) || !in_array(strtolower($part->disposition), ['attachment', 'inline'])) ) ) {
 
-            if (strtolower($part->subtype) == "plain" || strtolower($part->subtype) == "csv") {
+            if ( in_array(($subtype = strtolower($part->subtype)), ["plain", "csv", "html"]) && $part->filename == null && $part->name == null) {
                 $encoding = $this->getEncoding($part);
 
                 $content = $this->decodeString($part->content, $part->encoding);
@@ -456,20 +456,8 @@ class Message {
                     $content = $this->convertEncoding($content, $encoding);
                 }
 
-                $this->bodies['text'] = $content;
-
-                $this->fetchAttachment($part);
-
-            } elseif (strtolower($part->subtype) == "html") {
-                $encoding = $this->getEncoding($part);
-
-                $content = $this->decodeString($part->content, $part->encoding);
-                if ($encoding != 'us-ascii') {
-                    $content = $this->convertEncoding($content, $encoding);
-                }
-
-                $this->bodies['html'] = $content;
-            } elseif ($part->ifdisposition == 1 && strtolower($part->disposition) == 'attachment') {
+                $this->bodies[$subtype == "plain" ? "text" : $subtype] = $content;
+            } else {
                 $this->fetchAttachment($part);
             }
         } else {
