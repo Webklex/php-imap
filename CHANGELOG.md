@@ -7,12 +7,14 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ## [UNRELEASED]
 ### Fixed
 - Prevent text bodies from being fetched as attachment #27
+- Missing variable check added to prevent exception while parsing an address [webklex/laravel-imap #356](https://github.com/Webklex/laravel-imap/issues/356)
 
 ### Added
 - NaN
 
 ### Affected Classes
 - [Message::class](src/Message.php)
+- [Header::class](src/Header.php)
 
 ### Breaking changes
 - Text bodies might no longer get fetched as attachment

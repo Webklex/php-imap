@@ -474,6 +474,10 @@ class Header {
     private function parseAddresses($list) {
         $addresses = [];
 
+        if (is_array($list) === false) {
+            return $addresses;
+        }
+
         foreach ($list as $item) {
             $address = (object) $item;
 
