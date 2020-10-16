@@ -139,6 +139,9 @@ class Header {
         if (property_exists($header, 'subject')) {
             $this->attributes["subject"] = $this->decode($header->subject);
         }
+        if (property_exists($header, 'in_reply_to')) {
+            $this->attributes["in_reply_to"] = is_array($header->in_reply_to) ? $header->in_reply_to : [$header->in_reply_to];
+        }
         if (property_exists($header, 'references')) {
             $this->attributes["references"] = $this->decode($header->references);
         }
@@ -458,7 +461,7 @@ class Header {
      * @param object $header
      */
     private function extractAddresses($header) {
-        foreach(['from', 'to', 'cc', 'bcc', 'reply_to', 'sender', 'in_reply_to'] as $key){
+        foreach(['from', 'to', 'cc', 'bcc', 'reply_to', 'sender'] as $key){
             if (property_exists($header, $key)) {
                 $this->attributes[$key] = $this->parseAddresses($header->$key);
             }
