@@ -166,7 +166,7 @@ class Part {
             $body = $this->raw;
         }
 
-        $this->parseSubtype();
+        $this->subtype = $this->parseSubtype($this->header->get("content-type"));
         $this->parseDisposition();
         $this->parseDescription();
         $this->parseEncoding();
@@ -218,12 +218,23 @@ class Part {
 
     /**
      * Try to parse the subtype if any is present
+     * @param $content_type
+     *
+     * @return string
      */
-    private function parseSubtype(){
-        $content_type = $this->header->get("content-type");
-        if (($pos = strpos($content_type, "/")) !== false){
-            $this->subtype = substr($content_type, $pos + 1);
+    private function parseSubtype($content_type){
+        if (is_array($content_type)) {
+            foreach ($content_type as $part){
+                if ((strpos($part, "/")) !== false){
+                    return $this->parseSubtype($part);
+                }
+            }
+            return null;
         }
+        if (($pos = strpos($content_type, "/")) !== false){
+            return substr($content_type, $pos + 1);
+        }
+        return null;
     }
 
     /**
