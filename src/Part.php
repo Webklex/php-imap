@@ -166,7 +166,6 @@ class Part {
             $body = $this->raw;
         }
 
-        $this->subtype = $this->parseSubtype($this->header->get("content-type"));
         $this->parseDisposition();
         $this->parseDescription();
         $this->parseEncoding();
@@ -186,10 +185,15 @@ class Part {
             ]);
         }
 
-        if(!empty($this->header->get("content-type"))){
-            $rawContentType = $this->header->get("content-type");
-            $contentTypeArray = explode(';', $rawContentType);
-            $this->content_type = trim($contentTypeArray[0]);
+        $content_types = $this->header->get("content-type");
+        if(!empty($content_types)){
+            $this->subtype = $this->parseSubtype($content_types);
+            $content_type = $content_types;
+            if (is_array($content_types)) {
+                $content_type = $content_types[0];
+            }
+            $parts = explode(';', $content_type);
+            $this->content_type = trim($parts[0]);
         }
 
 
