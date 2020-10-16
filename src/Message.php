@@ -671,7 +671,7 @@ class Message {
 
     /**
      * Move the current Messages to a mailbox
-     * @param $folder
+     * @param string $folder_path
      * @param boolean $expunge
      *
      * @return Message|null
@@ -683,17 +683,32 @@ class Message {
      * @throws MessageHeaderFetchingException
      * @throws Exceptions\EventNotFoundException
      */
-    public function move($folder, $expunge = false) {
-        $message = $this->copy($folder);
-        if ($message !== null) {
-            $this->delete($expunge);
+    public function move($folder_path, $expunge = false) {
+        $this->client->openFolder($folder_path);
+        $status = $this->client->getConnection()->examineFolder($folder_path);
 
-            $event = $this->getEvent("message", "moved");
-            $event::dispatch($this, $message);
+        if (isset($status["uidnext"])) {
+            $next_uid = $status["uidnext"];
+
+            /** @var Folder $folder */
+            $folder = $this->client->getFolder($folder_path);
+
+            $this->client->openFolder($this->folder_path);
+            if ($this->client->getConnection()->moveMessage($folder->path, $this->msgn) == true) {
+                if($expunge) $this->client->expunge();
+
+                $this->client->openFolder($folder->path);
+                $message_num = $this->client->getConnection()->getMessageNumber($next_uid);
+
+                $message = $folder->query()->getMessage($message_num);
+                $event = $this->getEvent("message", "moved");
+                $event::dispatch($this, $message);
+
+                return $message;
+            }
         }
 
-
-        return $message;
+        return null;
     }
 
     /**
