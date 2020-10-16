@@ -11,6 +11,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Added
 - Search for messages by message-Id
 - Search for messages by In-Reply-To
+- Default folder locations added
 
 ### Affected Classes
 - [Query::class](src/Query/Query.php)
