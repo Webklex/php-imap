@@ -47,6 +47,8 @@ use Webklex\PHPIMAP\Exceptions\MessageSearchValidationException;
  * @method WhereQuery body($value)
  * @method WhereQuery before($date)
  * @method WhereQuery bcc($value)
+ * @method WhereQuery inReplyTo($value)
+ * @method WhereQuery messageId($value)
  *
  * @mixin Query
  */
