@@ -437,6 +437,17 @@ class WhereQuery extends Query {
     }
 
     /**
+     * Search for a specific message id
+     * @param $messageId
+     *
+     * @return WhereQuery
+     * @throws InvalidWhereQueryCriteriaException
+     */
+    public function whereInReplyTo($messageId){
+        return $this->whereHeader("In-Reply-To", $messageId);
+    }
+
+    /**
      * @param $country_code
      *
      * @return WhereQuery

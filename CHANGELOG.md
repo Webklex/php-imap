@@ -9,7 +9,8 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 -NaN
 
 ### Added
-- Search for messages by message id
+- Search for messages by message-Id
+- Search for messages by In-Reply-To
 
 ### Affected Classes
 - [Query::class](src/Query/Query.php)
