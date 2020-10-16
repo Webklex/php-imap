@@ -636,7 +636,8 @@ class Message {
 
     /**
      * Copy the current Messages to a mailbox
-     * @param string $folder
+     * @param string $folder_path
+     * @param boolean $expunge
      *
      * @return null|Message
      * @throws Exceptions\ConnectionFailedException
@@ -647,14 +648,20 @@ class Message {
      * @throws MessageHeaderFetchingException
      * @throws Exceptions\EventNotFoundException
      */
-    public function copy($folder) {
-        $this->client->openFolder($this->folder_path);
-        $status = $this->client->getConnection()->examineFolder($folder);
-        /** @var Folder $folder */
-        $folder = $this->client->getFolder($folder);
-        if (isset($status["uidnext"]) && $folder !== null) {
+    public function copy($folder_path, $expunge = false) {
+        $this->client->openFolder($folder_path);
+        $status = $this->client->getConnection()->examineFolder($folder_path);
+
+        if (isset($status["uidnext"])) {
             $next_uid = $status["uidnext"];
+
+            /** @var Folder $folder */
+            $folder = $this->client->getFolder($folder_path);
+
+            $this->client->openFolder($this->folder_path);
             if ($this->client->getConnection()->copyMessage($folder->path, $this->msgn) == true) {
+                if($expunge) $this->client->expunge();
+
                 $this->client->openFolder($folder->path);
                 $message_num = $this->client->getConnection()->getMessageNumber($next_uid);
 
