@@ -22,6 +22,7 @@ use Webklex\PHPIMAP\Support\AttachmentCollection;
 use Webklex\PHPIMAP\Support\FlagCollection;
 use Webklex\PHPIMAP\Support\Masks\MessageMask;
 use Illuminate\Support\Str;
+use Webklex\PHPIMAP\Support\MessageCollection;
 use Webklex\PHPIMAP\Traits\HasEvents;
 
 /**
@@ -632,6 +633,63 @@ class Message {
      */
     public function getFolder(){
         return $this->client->getFolder($this->folder_path);
+    }
+
+    /**
+     * Create a message thread based on the current message
+     * @param Folder|null $sent_folder
+     * @param MessageCollection|null $thread
+     * @param Folder|null $folder
+     *
+     * @return MessageCollection|null
+     * @throws Exceptions\ConnectionFailedException
+     * @throws Exceptions\FolderFetchingException
+     * @throws Exceptions\GetMessagesFailedException
+     */
+    public function thread($sent_folder = null, &$thread = null, $folder = null){
+        $thread = $thread ? $thread : MessageCollection::make([]);
+        $folder = $folder ? $folder :  $this->getFolder();
+        $sent_folder = $sent_folder ? $sent_folder : $this->client->getFolder(ClientManager::get("options.common_folders.sent", "INBOX/Sent"));
+
+        /** @var Message $message */
+        foreach($thread as $message) {
+            if ($message->message_id == $this->message_id) {
+                return $thread;
+            }
+        }
+        $thread->push($this);
+
+        $folder->query()->inReplyTo($this->message_id)
+            ->setFetchBody($this->getFetchBodyOption())
+            ->leaveUnread()->get()->each(function($message) use(&$thread, $folder, $sent_folder){
+            /** @var Message $message */
+            $message->thread($sent_folder, $thread, $folder);
+        });
+        $sent_folder->query()->inReplyTo($this->message_id)
+            ->setFetchBody($this->getFetchBodyOption())
+            ->leaveUnread()->get()->each(function($message) use(&$thread, $folder, $sent_folder){
+            /** @var Message $message */
+                $message->thread($sent_folder, $thread, $folder);
+        });
+
+        if (is_array($this->in_reply_to)) {
+            foreach($this->in_reply_to as $in_reply_to) {
+                $folder->query()->messageId($in_reply_to)
+                    ->setFetchBody($this->getFetchBodyOption())
+                    ->leaveUnread()->get()->each(function($message) use(&$thread, $folder, $sent_folder){
+                    /** @var Message $message */
+                        $message->thread($sent_folder, $thread, $folder);
+                });
+                $sent_folder->query()->messageId($in_reply_to)
+                    ->setFetchBody($this->getFetchBodyOption())
+                    ->leaveUnread()->get()->each(function($message) use(&$thread, $folder, $sent_folder){
+                    /** @var Message $message */
+                        $message->thread($sent_folder, $thread, $folder);
+                });
+            }
+        }
+
+        return $thread;
     }
 
     /**
