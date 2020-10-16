@@ -10,7 +10,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Missing variable check added to prevent exception while parsing an address [webklex/laravel-imap #356](https://github.com/Webklex/laravel-imap/issues/356)
 
 ### Added
-- NaN
+- `Protocol::moveMessage()` method added #29
 
 ### Affected Classes
 - [Message::class](src/Message.php)

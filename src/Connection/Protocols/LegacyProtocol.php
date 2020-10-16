@@ -358,6 +358,19 @@ class LegacyProtocol extends Protocol implements ProtocolInterface {
     }
 
     /**
+     * Move a message set from current folder to an other folder
+     * @param string $folder destination folder
+     * @param $from
+     * @param int|null $to if null only one message ($from) is fetched, else it's the
+     *                         last message, INF means last message available
+     *
+     * @return bool success
+     */
+    public function moveMessage($folder, $from, $to = null) {
+        return \imap_mail_move($this->stream, $from, $folder, IMAP::CP_UID);
+    }
+
+    /**
      * Create a new folder (and parent folders if needed)
      * @param string $folder folder name
      *

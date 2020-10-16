@@ -806,6 +806,25 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
     }
 
     /**
+     * Move a message set from current folder to an other folder
+     * @param string $folder destination folder
+     * @param $from
+     * @param int|null $to if null only one message ($from) is fetched, else it's the
+     *                         last message, INF means last message available
+     *
+     * @return bool success
+     * @throws RuntimeException
+     */
+    public function moveMessage($folder, $from, $to = null) {
+        $set = (int)$from;
+        if ($to !== null) {
+            $set .= ':' . ($to == INF ? '*' : (int)$to);
+        }
+
+        return $this->requestAndResponse('MOVE', [$set, $this->escapeString($folder)], true);
+    }
+
+    /**
      * Create a new folder (and parent folders if needed)
      * @param string $folder folder name
      *

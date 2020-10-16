@@ -185,6 +185,17 @@ interface ProtocolInterface {
     public function copyMessage($folder, $from, $to = null);
 
     /**
+     * Move a message set from current folder to an other folder
+     * @param string $folder destination folder
+     * @param $from
+     * @param int|null $to if null only one message ($from) is fetched, else it's the
+     *                         last message, INF means last message available
+     *
+     * @return bool success
+     */
+    public function moveMessage($folder, $from, $to = null);
+
+    /**
      * Create a new folder
      *
      * @param string $folder folder name
