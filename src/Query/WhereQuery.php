@@ -414,6 +414,29 @@ class WhereQuery extends Query {
     }
 
     /**
+     * Search for a specific header value
+     * @param $header
+     * @param $value
+     *
+     * @return WhereQuery
+     * @throws InvalidWhereQueryCriteriaException
+     */
+    public function whereHeader($header, $value){
+        return $this->where("CUSTOM HEADER $header $value");
+    }
+
+    /**
+     * Search for a specific message id
+     * @param $messageId
+     *
+     * @return WhereQuery
+     * @throws InvalidWhereQueryCriteriaException
+     */
+    public function whereMessageId($messageId){
+        return $this->whereHeader("Message-ID", $messageId);
+    }
+
+    /**
      * @param $country_code
      *
      * @return WhereQuery

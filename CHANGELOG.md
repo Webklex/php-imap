@@ -9,10 +9,10 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 -NaN
 
 ### Added
--NaN
+- Search for messages by message id
 
 ### Affected Classes
--NaN
+- [Query::class](src/Query/Query.php)
 
 ### Breaking changes
 -NaN
