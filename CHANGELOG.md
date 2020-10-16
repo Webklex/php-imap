@@ -8,6 +8,11 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Fixed
 - Prevent text bodies from being fetched as attachment #27
 - Missing variable check added to prevent exception while parsing an address [webklex/laravel-imap #356](https://github.com/Webklex/laravel-imap/issues/356)
+- Missing variable check added to prevent exception while parsing a part subtype #27
+- Missing variable check added to prevent exception while parsing a part content-type [webklex/laravel-imap #356](https://github.com/Webklex/laravel-imap/issues/356)
+- Mixed message header attribute `in_reply_to` "unified" to be always an array  #26
+- Potential message moving / copying problem fixed #29
+- Move messages by using `Protocol::moveMessage()` instead of `Protocol::copyMessage()` and `Message::delete()` #29
 
 ### Added
 - `Protocol::moveMessage()` method added #29
@@ -18,6 +23,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Breaking changes
 - Text bodies might no longer get fetched as attachment
+- `Message::$in_reply_to` type changed from mixed to array
 
 ## [2.1.13] - 2020-10-13
 ### Fixed
