@@ -252,7 +252,7 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
         }
 
         if ($dontParse) {
-            // last to chars are still needed for response code
+            // First two chars are still needed for the response code
             $tokens = [substr($tokens, 0, 2)];
         }
         if (is_array($lines)){
@@ -260,12 +260,14 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
         }else{
             if ($this->debug) echo "<< ".$lines."\n";
         }
+
         // last line has response code
         if ($tokens[0] == 'OK') {
             return $lines ? $lines : true;
         } elseif ($tokens[0] == 'NO') {
             return false;
         }
+
         return;
     }
 
@@ -787,7 +789,7 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
     }
 
     /**
-     * Copy message set from current folder to other folder
+     * Copy a message set from current folder to an other folder
      * @param string $folder destination folder
      * @param $from
      * @param int|null $to if null only one message ($from) is fetched, else it's the
