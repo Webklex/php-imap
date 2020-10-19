@@ -6,7 +6,20 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
--NaN
+- NaN
+
+### Added
+- NaN
+
+### Affected Classes
+- NaN
+
+### Breaking changes
+- NaN
+
+## [2.2.1] - 2020-10-19
+### Fixed
+- Header decoding problem fixed #31
 
 ### Added
 - Search for messages by message-Id
@@ -17,9 +30,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Affected Classes
 - [Query::class](src/Query/Query.php)
 - [Message::class](src/Message.php)
-
-### Breaking changes
--NaN
+- [Header::class](src/Header.php)
 
 
 ## [2.2.0] - 2020-10-16
