@@ -204,7 +204,7 @@ class Header {
             }else{
                 if (($pos = strpos($line, ":")) > 0) {
                     $key = trim(rtrim(strtolower(substr($line, 0, $pos))));
-                    $value = trim(rtrim(strtolower(substr($line, $pos + 1))));
+                    $value = trim(rtrim(substr($line, $pos + 1)));
                     $headers[$key] = [$value];
                     $prev_header = $key;
                 }
