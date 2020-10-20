@@ -17,6 +17,13 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Breaking changes
 - NaN
 
+## [2.2.2] - 2020-10-20
+### Fixed
+- IMAP::FT_PEEK removing "Seen" flag issue fixed #33
+
+### Affected Classes
+- [Message::class](src/Message.php)
+
 ## [2.2.1] - 2020-10-19
 ### Fixed
 - Header decoding problem fixed #31

@@ -227,7 +227,7 @@ class Message {
             $this->parseBody();
         }
 
-        if ($this->getFetchFlagsOption() === true && $this->flags->count() == 0) {
+        if ($this->getFetchFlagsOption() === true) {
             $this->parseFlags();
         }
     }
@@ -395,6 +395,10 @@ class Message {
     public function parseBody() {
         $this->client->openFolder($this->folder_path);
 
+        if ($this->fetch_options == IMAP::FT_PEEK && $this->flags->count() == 0) {
+            $this->parseFlags();
+        }
+
         $contents = $this->client->getConnection()->content([$this->msgn]);
         if (!isset($contents[$this->msgn])) {
             throw new MessageContentFetchingException("no content found", 0);
@@ -406,8 +410,7 @@ class Message {
         $this->fetchStructure($this->structure);
 
         if ($this->fetch_options == IMAP::FT_PEEK) {
-            $this->parseFlags();
-            if ($this->getFlags()->get("seen") !== null) {
+            if ($this->getFlags()->get("seen") == null) {
                 $this->unsetFlag("Seen");
             }
         }
