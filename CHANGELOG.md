@@ -7,6 +7,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ## [UNRELEASED]
 ### Fixed
 - Text/Html body fetched as attachment if subtype is null #34
+- Potential header overwriting through header extensions #35
 
 ### Added
 - NaN
@@ -14,6 +15,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Affected Classes
 - [Message::class](src/Message.php)
 - [Part::class](src/Part.php)
+- [Header::class](src/Header.php)
 
 ### Breaking changes
 - NaN

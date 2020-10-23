@@ -528,9 +528,15 @@ class Header {
                     foreach($extensions as $extension) {
                         if (($pos = strpos($extension, "=")) !== false){
                             $key = substr($extension, 0, $pos);
-                            $value = substr($extension, $pos + 1);
-                            $value = str_replace('"', "", $value);
-                            $this->attributes[trim(rtrim(strtolower($key)))] = trim(rtrim($value));
+                            $key = trim(rtrim(strtolower($key)));
+
+                            if (isset($this->attributes[$key]) === false) {
+                                $value = substr($extension, $pos + 1);
+                                $value = str_replace('"', "", $value);
+                                $value = trim(rtrim($value));
+
+                                $this->attributes[$key] = $value;
+                            }
                         }
                     }
                 }
