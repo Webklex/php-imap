@@ -6,13 +6,14 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
+- Text/Html body fetched as attachment if subtype is null #34
 
 ### Added
 - NaN
 
 ### Affected Classes
-- NaN
+- [Message::class](src/Message.php)
+- [Part::class](src/Part.php)
 
 ### Breaking changes
 - NaN

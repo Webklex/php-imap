@@ -438,34 +438,32 @@ class Message {
      */
     private function fetchPart(Part $part) {
 
-        if ($part->type == IMAP::MESSAGE_TYPE_TEXT && ($part->ifdisposition == 0 || (empty($part->disposition) || !in_array(strtolower($part->disposition), ['attachment', 'inline'])) ) ) {
-
-            if ( in_array(($subtype = strtolower($part->subtype)), ["plain", "csv", "html"]) && $part->filename == null && $part->name == null) {
-                $encoding = $this->getEncoding($part);
-
-                $content = $this->decodeString($part->content, $part->encoding);
-
-                // We don't need to do convertEncoding() if charset is ASCII (us-ascii):
-                //     ASCII is a subset of UTF-8, so all ASCII files are already UTF-8 encoded
-                //     https://stackoverflow.com/a/11303410
-                //
-                // us-ascii is the same as ASCII:
-                //     ASCII is the traditional name for the encoding system; the Internet Assigned Numbers Authority (IANA)
-                //     prefers the updated name US-ASCII, which clarifies that this system was developed in the US and
-                //     based on the typographical symbols predominantly in use there.
-                //     https://en.wikipedia.org/wiki/ASCII
-                //
-                // convertEncoding() function basically means convertToUtf8(), so when we convert ASCII string into UTF-8 it gets broken.
-                if ($encoding != 'us-ascii') {
-                    $content = $this->convertEncoding($content, $encoding);
-                }
-
-                $this->bodies[$subtype == "plain" ? "text" : $subtype] = $content;
-            } else {
-                $this->fetchAttachment($part);
-            }
-        } else {
+        if ($part->isAttachment()) {
             $this->fetchAttachment($part);
+        }else{
+            $encoding = $this->getEncoding($part);
+
+            $content = $this->decodeString($part->content, $part->encoding);
+
+            // We don't need to do convertEncoding() if charset is ASCII (us-ascii):
+            //     ASCII is a subset of UTF-8, so all ASCII files are already UTF-8 encoded
+            //     https://stackoverflow.com/a/11303410
+            //
+            // us-ascii is the same as ASCII:
+            //     ASCII is the traditional name for the encoding system; the Internet Assigned Numbers Authority (IANA)
+            //     prefers the updated name US-ASCII, which clarifies that this system was developed in the US and
+            //     based on the typographical symbols predominantly in use there.
+            //     https://en.wikipedia.org/wiki/ASCII
+            //
+            // convertEncoding() function basically means convertToUtf8(), so when we convert ASCII string into UTF-8 it gets broken.
+            if ($encoding != 'us-ascii') {
+                $content = $this->convertEncoding($content, $encoding);
+            }
+
+            $subtype = strtolower($part->subtype);
+            $subtype = $subtype == "plain" || $subtype == "" ? "text" : $subtype;
+
+            $this->bodies[$subtype] = $content;
         }
     }
 
