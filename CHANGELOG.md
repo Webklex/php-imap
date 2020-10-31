@@ -8,6 +8,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Fixed
 - Text/Html body fetched as attachment if subtype is null #34
 - Potential header overwriting through header extensions #35
+- Prevent empty attachments #37
 
 ### Added
 - NaN
