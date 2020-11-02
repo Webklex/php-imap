@@ -62,6 +62,9 @@ class Query {
     /** @var int $fetch_flags */
     protected $fetch_flags = true;
 
+    /** @var int $fetch_order */
+    protected $fetch_order;
+
     /** @var string $date_format */
     protected $date_format;
 
@@ -74,6 +77,12 @@ class Query {
         $this->setClient($client);
 
         if(ClientManager::get('options.fetch') === IMAP::FT_PEEK) $this->leaveUnread();
+
+        if (ClientManager::get('options.fetch_order') === 'desc') {
+            $this->fetch_order = 'desc';
+        } else {
+            $this->fetch_order = 'asc';
+        }
 
         $this->date_format = ClientManager::get('date_format', 'd M y');
 
@@ -193,17 +202,16 @@ class Query {
 
                 $messages->total($available_messages_count);
 
-                $options = ClientManager::get('options');
-
-                if(strtolower($options['fetch_order']) === 'desc'){
+                if ($this->fetch_order === 'desc') {
                     $available_messages = $available_messages->reverse();
                 }
 
+                $message_key = ClientManager::get('options.message_key');
                 $query =& $this;
 
-                $available_messages->forPage($this->page, $this->limit)->each(function($msgno, $msglist) use(&$messages, $options, $query) {
+                $available_messages->forPage($this->page, $this->limit)->each(function($msgno, $msglist) use(&$messages, $message_key, $query) {
                     $message = $query->getMessage($msgno, $msglist);
-                    switch ($options['message_key']){
+                    switch ($message_key){
                         case 'number':
                             $message_key = $message->getMessageNo();
                             break;
@@ -467,5 +475,62 @@ class Query {
     public function setFetchFlags($fetch_flags) {
         $this->fetch_flags = $fetch_flags;
         return $this;
+    }
+
+    /**
+     * @param string $fetch_order
+     * @return Query
+     */
+    public function setFetchOrder($fetch_order) {
+        $fetch_order = strtolower($fetch_order);
+
+        if (in_array($fetch_order, ['asc', 'desc'])) {
+            $this->fetch_order = $fetch_order;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $fetch_order
+     * @return Query
+     */
+    public function fetchOrder($fetch_order) {
+        return $this->setFetchOrder($fetch_order);
+    }
+
+    /**
+     * @return string
+     */
+    public function getFetchOrder() {
+        return $this->fetch_order;
+    }
+
+    /**
+     * @return Query
+     */
+    public function setFetchOrderAsc() {
+        return $this->setFetchOrder('asc');
+    }
+
+    /**
+     * @return Query
+     */
+    public function fetchOrderAsc($fetch_order) {
+        return $this->setFetchOrderAsc();
+    }
+
+    /**
+     * @return Query
+     */
+    public function setFetchOrderDesc() {
+        return $this->setFetchOrder('desc');
+    }
+
+    /**
+     * @return Query
+     */
+    public function fetchOrderDesc($fetch_order) {
+        return $this->setFetchOrderDesc();
     }
 }
