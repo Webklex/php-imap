@@ -1,3 +1,4 @@
+
 # IMAP Library for PHP
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
@@ -503,6 +504,41 @@ $messages = $folder->query()->whereAll()
 ->get();
 ```
 
+Change messages fetch order:
+```php
+/** @var \Webklex\PHPIMAP\Folder $folder */
+
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $messages */
+$messages = $folder->query()->whereText('Hello world')
+->setFetchOrder('asc')
+->get();
+
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $messages */
+$messages = $folder->query()->whereAll()
+->setFetchOrderAsc()
+->get();
+
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $messages */
+$messages = $folder->query()->whereAll()
+->fetchOrderAsc()
+->get();
+
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $messages */
+$messages = $folder->query()->whereText('Hello world')
+->setFetchOrder('desc')
+->get();
+
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $messages */
+$messages = $folder->query()->whereAll()
+->setFetchOrderDesc()
+->get();
+
+/** @var \Webklex\PHPIMAP\Support\MessageCollection $messages */
+$messages = $folder->query()->whereAll()
+->fetchOrderDesc()
+->get();
+```
+
 
 #### Events
 The following events are available:
@@ -774,6 +810,9 @@ if you're just wishing a feature ;)
 | setFetchOptions    | boolean $fetch_options            | WhereQuery        | Set the fetch options |
 | setFetchBody       | boolean $fetch_body               | WhereQuery        | Set the fetch body option |
 | setFetchFlags      | boolean $fetch_flags              | WhereQuery        | Set the fetch flags option |
+| setFetchOrder      | string $fetch_order               | WhereQuery        | Change the fetch ordering (`asc` is "oldest first", `desc` is "newest first") |
+| setFetchOrderAsc   |                                   | WhereQuery        | Change the fetch ordering to ascending |
+| setFetchOrderDesc  |                                   | WhereQuery        | Change the fetch ordering to descending |
 | leaveUnread        |                                   | WhereQuery        | Don't mark all messages as "read" while fetching:  |
 | markAsRead         |                                   | WhereQuery        | Mark all messages as "read" while fetching |  
 | paginate           | int $perPage = 5, $page = null, $pageName = 'imap_page' | LengthAwarePaginator | Paginate the current query. |
