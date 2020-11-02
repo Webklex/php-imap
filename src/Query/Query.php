@@ -206,11 +206,12 @@ class Query {
                     $available_messages = $available_messages->reverse();
                 }
 
+                $message_key = ClientManager::get('options.message_key');
                 $query =& $this;
 
-                $available_messages->forPage($this->page, $this->limit)->each(function($msgno, $msglist) use(&$messages, $options, $query) {
+                $available_messages->forPage($this->page, $this->limit)->each(function($msgno, $msglist) use(&$messages, $message_key, $query) {
                     $message = $query->getMessage($msgno, $msglist);
-                    switch ($options['message_key']){
+                    switch ($message_key){
                         case 'number':
                             $message_key = $message->getMessageNo();
                             break;
