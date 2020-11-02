@@ -62,7 +62,7 @@ class Query {
     /** @var int $fetch_flags */
     protected $fetch_flags = true;
 
-    /** @var int $fetch_order */
+    /** @var string $fetch_order */
     protected $fetch_order;
 
     /** @var string $date_format */
