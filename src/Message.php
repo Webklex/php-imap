@@ -1028,4 +1028,84 @@ class Message {
 
         throw new MaskNotFoundException("Unknown mask provided: ".$mask);
     }
+
+    /**
+     * Set the message path aka folder path
+     * @param $folder_path
+     *
+     * @return $this
+     */
+    public function setFolderPath($folder_path){
+        $this->folder_path = $folder_path;
+
+        return $this;
+    }
+
+    /**
+     * Set the config
+     * @param $config
+     *
+     * @return $this
+     */
+    public function setConfig($config){
+        $this->config = $config;
+
+        return $this;
+    }
+
+    /**
+     * Set the attachment collection
+     * @param $attachments
+     *
+     * @return $this
+     */
+    public function setAttachments($attachments){
+        $this->attachments = $attachments;
+
+        return $this;
+    }
+
+    /**
+     * Set the flag collection
+     * @param $flags
+     *
+     * @return $this
+     */
+    public function setFlags($flags){
+        $this->flags = $flags;
+
+        return $this;
+    }
+
+    /**
+     * Set the client
+     * @param $client
+     *
+     * @throws Exceptions\ConnectionFailedException
+     * @return $this
+     */
+    public function setClient($client){
+        $this->client = $client;
+        $this->client->openFolder($this->folder_path);
+
+        return $this;
+    }
+
+    /**
+     * Set the message number
+     * @param $msgn
+     * @param null $msglist
+     *
+     * @throws Exceptions\ConnectionFailedException
+     * @throws Exceptions\RuntimeException
+     * @return $this
+     */
+    public function setMsgn($msgn, $msglist = null){
+        $this->msgn = $msgn;
+        $this->msglist = $msglist;
+
+        $this->uid = $this->client->getConnection()->getUid($this->msgn);
+
+        return $this;
+    }
 }
