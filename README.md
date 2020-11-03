@@ -176,7 +176,7 @@ foreach($folders as $folder){
         echo $message->getHTMLBody();
         
         //Move the current Message to 'INBOX.read'
-        if($message->moveToFolder('INBOX.read') == true){
+        if($message->move('INBOX.read') == true){
             echo 'Message has ben moved';
         }else{
             echo 'Message could not be moved';
