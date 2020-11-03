@@ -6,13 +6,17 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
+- Search performance increased by fetching all headers, bodies and flags at once #42
+- Legacy protocol support updated
 
 ### Added
-- NaN
+- Missing message setter methods added
+- `Folder::overview()` method added to fetch all headers of all messages in the current folder
 
 ### Affected Classes
-- NaN
+- [Message::class](src/Message.php)
+- [Folder::class](src/Folder.php)
+- [Query::class](src/Query/Query.php)
 
 ### Breaking changes
 - NaN
