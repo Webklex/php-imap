@@ -51,7 +51,6 @@ use Webklex\PHPIMAP\Traits\HasEvents;
  * @method integer getUid()
  * @method integer setUid(integer $uid)
  * @method integer getMsgn()
- * @method integer setMsgn(integer $msgn)
  * @method integer getPriority()
  * @method integer setPriority(integer $priority)
  * @method string getSubject()
@@ -233,6 +232,53 @@ class Message {
     }
 
     /**
+     * Create a new instance without fetching the message header and providing them raw instead
+     * @param int $msgn
+     * @param int|null $msglist
+     * @param Client $client
+     * @param string $raw_header
+     * @param string $raw_body
+     * @param string $raw_flags
+     * @param null $fetch_options
+     *
+     * @return Message
+     * @throws Exceptions\ConnectionFailedException
+     * @throws Exceptions\EventNotFoundException
+     * @throws Exceptions\RuntimeException
+     * @throws InvalidMessageDateException
+     * @throws MessageContentFetchingException
+     * @throws \ReflectionException
+     */
+    public static function make($msgn, $msglist, Client $client, $raw_header, $raw_body, $raw_flags, $fetch_options = null){
+        $reflection = new \ReflectionClass(self::class);
+        /** @var self $instance */
+        $instance = $reflection->newInstanceWithoutConstructor();
+
+        $default_mask = $client->getDefaultMessageMask();
+        if($default_mask != null) {
+            $instance->setMask($default_mask);
+        }
+        $instance->setEvents([
+            "message" => $client->getDefaultEvents("message"),
+            "flag" => $client->getDefaultEvents("flag"),
+        ]);
+        $instance->setFolderPath($client->getFolderPath());
+        $instance->setConfig(ClientManager::get('options'));
+        $instance->setFetchOption($fetch_options);
+
+        $instance->setAttachments(AttachmentCollection::make([]));
+
+        $instance->setClient($client);
+        $instance->setMsgn($msgn, $msglist);
+
+        $instance->parseRawHeader($raw_header);
+        $instance->parseRawFlags($raw_flags);
+        $instance->parseRawBody($raw_body);
+
+        return $instance;
+    }
+
+    /**
      * Call dynamic attribute setter and getter methods
      * @param string $method
      * @param array $arguments
@@ -353,7 +399,34 @@ class Message {
             throw new MessageHeaderFetchingException("no headers found", 0);
         }
 
-        $this->header = new Header($headers[$this->msgn]);
+        $this->parseRawHeader($headers[$this->msgn]);
+    }
+
+    /**
+     * @param string $raw_header
+     *
+     * @throws InvalidMessageDateException
+     */
+    public function parseRawHeader($raw_header){
+        $this->header = new Header($raw_header);
+    }
+
+    /**
+     * Parse additional raw flags
+     * @param $raw_flags
+     */
+    public function parseRawFlags($raw_flags) {
+        $this->flags = FlagCollection::make([]);
+
+        foreach($raw_flags as $flag) {
+            if (strpos($flag, "\\") === 0){
+                $flag = substr($flag, 1);
+            }
+            $flag_key = strtolower($flag);
+            if (in_array($flag_key, $this->available_flags)) {
+                $this->flags->put($flag_key, $flag);
+            }
+        }
     }
 
     /**
@@ -370,15 +443,7 @@ class Message {
         $flags = $this->client->getConnection()->flags([$this->msgn]);
 
         if (isset($flags[$this->msgn])) {
-            foreach($flags[$this->msgn] as $flag) {
-                if (strpos($flag, "\\") === 0){
-                    $flag = substr($flag, 1);
-                }
-                $flag_key = strtolower($flag);
-                if (in_array($flag_key, $this->available_flags)) {
-                    $this->flags->put($flag_key, $flag);
-                }
-            }
+            $this->parseRawFlags($flags[$this->msgn]);
         }
     }
 
@@ -405,7 +470,22 @@ class Message {
         }
         $content = $contents[$this->msgn];
 
-        $this->structure = new Structure($content, $this->header);
+        return $this->parseRawBody($content);
+    }
+
+    /**
+     * Parse a given message body
+     * @param string $raw_body
+     *
+     * @return $this
+     * @throws Exceptions\ConnectionFailedException
+     * @throws Exceptions\EventNotFoundException
+     * @throws Exceptions\RuntimeException
+     * @throws InvalidMessageDateException
+     * @throws MessageContentFetchingException
+     */
+    public function parseRawBody($raw_body) {
+        $this->structure = new Structure($raw_body, $this->header);
 
         $this->fetchStructure($this->structure);
 

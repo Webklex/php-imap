@@ -207,10 +207,26 @@ class Query {
                 }
 
                 $message_key = ClientManager::get('options.message_key');
-                $query =& $this;
 
-                $available_messages->forPage($this->page, $this->limit)->each(function($msgno, $msglist) use(&$messages, $message_key, $query) {
-                    $message = $query->getMessage($msgno, $msglist);
+                $msgnos = $available_messages->forPage($this->page, $this->limit)->toArray();
+
+                $raw_headers = $this->client->getConnection()->headers($msgnos);
+                $raw_contents = [];
+                $raw_flags = [];
+
+                if ($this->getFetchBody()) {
+                    $raw_contents = $this->client->getConnection()->content($msgnos);
+                }
+                if ($this->getFetchFlags()) {
+                    $raw_flags = $this->client->getConnection()->flags($msgnos);
+                }
+
+                $msglist = 0;
+                foreach ($raw_headers as $msgno => $raw_header) {
+                    $raw_content = isset($raw_contents[$msgno]) ? $raw_contents[$msgno] : "";
+                    $raw_flag = isset($raw_flags[$msgno]) ? $raw_flags[$msgno] : [];
+
+                    $message = Message::make($msgno, $msglist, $this->getClient(), $raw_header, $raw_content, $raw_flag, $this->getFetchOptions());
                     switch ($message_key){
                         case 'number':
                             $message_key = $message->getMessageNo();
@@ -224,7 +240,8 @@ class Query {
 
                     }
                     $messages->put($message_key, $message);
-                });
+                    $msglist++;
+                }
             }
 
             return $messages;
