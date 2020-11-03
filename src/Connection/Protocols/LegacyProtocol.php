@@ -91,7 +91,7 @@ class LegacyProtocol extends Protocol implements ProtocolInterface {
             throw new AuthFailedException($message);
         }
 
-        return !$this->stream;
+        return $this->stream;
     }
 
     /**
@@ -199,8 +199,12 @@ class LegacyProtocol extends Protocol implements ProtocolInterface {
      * @return array
      */
     public function content($uids, $rfc = "RFC822") {
-        $content = \imap_fetchbody($this->stream, $uids[0], "", IMAP::FT_UID);
-        return [$uids[0] => $content];
+        $result = [];
+        $uids = is_array($uids) ? $uids : [$uids];
+        foreach ($uids as $uid) {
+            $result[$uid] = \imap_fetchbody($this->stream, $uid, "", IMAP::NIL);
+        }
+        return $result;
     }
 
     /**
@@ -211,8 +215,12 @@ class LegacyProtocol extends Protocol implements ProtocolInterface {
      * @return array
      */
     public function headers($uids, $rfc = "RFC822"){
-        $headers = \imap_fetchheader($this->stream, $uids[0], IMAP::FT_UID);
-        return [$uids[0] => $headers];
+        $result = [];
+        $uids = is_array($uids) ? $uids : [$uids];
+        foreach ($uids as $uid) {
+            $result[$uid] = \imap_fetchheader($this->stream, $uid, IMAP::NIL);
+        }
+        return $result;
     }
 
     /**
@@ -222,17 +230,23 @@ class LegacyProtocol extends Protocol implements ProtocolInterface {
      * @return array
      */
     public function flags($uids){
-        $flags = \imap_fetch_overview($this->stream, $uids[0], IMAP::FT_UID);
         $result = [];
-        if (is_array($flags) && isset($flags[0])) {
-            $flags = (array) $flags[0];
-            foreach($flags as $flag => $value) {
-                if ($value === 1 && in_array($flag, ["size", "uid", "msgno", "update"]) === false){
-                    $result[] = "\\".ucfirst($flag);
+        $uids = is_array($uids) ? $uids : [$uids];
+        foreach ($uids as $uid) {
+            $raw_flags = \imap_fetch_overview($this->stream, $uid, IMAP::NIL);
+            $flags = [];
+            if (is_array($raw_flags) && isset($raw_flags[0])) {
+                $raw_flags = (array) $raw_flags[0];
+                foreach($raw_flags as $flag => $value) {
+                    if ($value === 1 && in_array($flag, ["size", "uid", "msgno", "update"]) === false){
+                        $flags[] = "\\".ucfirst($flag);
+                    }
                 }
             }
+            $result[$uid] = $flags;
         }
-        return [$uids[0] => $result];
+
+        return $result;
     }
 
     /**
@@ -309,12 +323,12 @@ class LegacyProtocol extends Protocol implements ProtocolInterface {
      * @return bool|array new flags if $silent is false, else true or false depending on success
      */
     public function store(array $flags, $from, $to = null, $mode = null, $silent = true) {
-        $flag = "\\".trim(is_array($flags) ? implode(" \\", $flags) : $flags);
+        $flag = trim(is_array($flags) ? implode(" ", $flags) : $flags);
 
         if ($mode == "+"){
-            $status = \imap_setflag_full($this->stream, $from, $flag, IMAP::SE_UID);
+            $status = \imap_setflag_full($this->stream, $from, $flag, IMAP::NIL);
         }else{
-            $status = \imap_clearflag_full($this->stream, $from, $flag, IMAP::SE_UID);
+            $status = \imap_clearflag_full($this->stream, $from, $flag, IMAP::NIL);
         }
 
         if ($silent === true) {
@@ -464,7 +478,7 @@ class LegacyProtocol extends Protocol implements ProtocolInterface {
      * @return array message ids
      */
     public function search(array $params) {
-        return \imap_search($this->stream, $params[0], IMAP::SE_UID);
+        return \imap_search($this->stream, $params[0], IMAP::NIL);
     }
 
     /**
