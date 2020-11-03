@@ -278,7 +278,7 @@ class LegacyProtocol extends Protocol implements ProtocolInterface {
     }
 
     /**
-     * Get a message number for a uid
+     * Get a message overview
      * @param string $sequence uid sequence
      *
      * @return array

@@ -277,6 +277,14 @@ interface ProtocolInterface {
     public function search(array $params);
 
     /**
+     * Get a message overview
+     * @param string $sequence uid sequence
+     *
+     * @return array
+     */
+    public function overview($sequence);
+
+    /**
      * Enable the debug mode
      */
     public function enableDebug();

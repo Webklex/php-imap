@@ -242,6 +242,19 @@ class Folder {
     }
 
     /**
+     * Get a message overview
+     * @param string|null $sequence uid sequence
+     *
+     * @return array
+     * @throws ConnectionFailedException
+     */
+    public function overview($sequence = null){
+        $this->client->openFolder($this->path);
+        $sequence = $sequence === null ? "1:*" : $sequence;
+        return $this->client->getConnection()->overview($sequence);
+    }
+
+    /**
      * Append a string message to the current mailbox
      * @param string $message
      * @param string $options

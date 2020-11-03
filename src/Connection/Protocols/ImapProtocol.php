@@ -15,6 +15,7 @@ namespace Webklex\PHPIMAP\Connection\Protocols;
 use Webklex\PHPIMAP\Exceptions\AuthFailedException;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
 use Webklex\PHPIMAP\Exceptions\RuntimeException;
+use Webklex\PHPIMAP\Header;
 
 /**
  * Class ImapProtocol
@@ -966,6 +967,32 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
             }
         }
         return [];
+    }
+
+    /**
+     * Get a message overview
+     * @param string $sequence
+     * @return array
+     *
+     * @throws RuntimeException
+     * @throws \Webklex\PHPIMAP\Exceptions\InvalidMessageDateException
+     */
+    public function overview($sequence) {
+        $result = [];
+        list($from, $to) = explode(":", $sequence);
+
+        $uids = $this->getUid();
+        $ids = [];
+        foreach ($uids as $msgn => $v) {
+            if ( ($to >= $msgn && $from <= $msgn) || ($to === "*" && $from <= $msgn) ){
+                $ids[] = $msgn;
+            }
+        }
+        $headers = $this->headers($ids);
+        foreach ($headers as $msgn => $raw_header) {
+            $result[$msgn] = (new Header($raw_header))->getAttributes();
+        }
+        return $result;
     }
 
     /**
