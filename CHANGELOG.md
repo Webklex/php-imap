@@ -6,8 +6,22 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
+- NaN
+
+### Added
+- NaN
+
+### Affected Classes
+- NaN
+
+### Breaking changes
+- NaN
+
+## [2.2.4] - 2020-12-08
+### Fixed
 - Search performance increased by fetching all headers, bodies and flags at once #42
 - Legacy protocol support updated
+- Fix Query pagination. (#52 [@mikemiller891](https://github.com/mikemiller891))
 
 ### Added
 - Missing message setter methods added
@@ -17,10 +31,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - [Message::class](src/Message.php)
 - [Folder::class](src/Folder.php)
 - [Query::class](src/Query/Query.php)
-
-### Breaking changes
-- NaN
-
+- [PaginatedCollection::class](src/Support/PaginatedCollection.php)
 
 ## [2.2.3] - 2020-11-02
 ### Fixed
