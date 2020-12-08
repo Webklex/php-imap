@@ -289,7 +289,7 @@ class Query {
 
         $this->limit = $per_page;
 
-        return $this->get()->paginate($per_page, $this->page, $page_name);
+        return $this->get()->paginate($per_page, $this->page, $page_name, true);
     }
 
     /**
