@@ -38,12 +38,12 @@ class PaginatedCollection extends Collection {
      *
      * @return LengthAwarePaginator
      */
-    public function paginate($per_page = 15, $page = null, $page_name = 'page') {
+    public function paginate($per_page = 15, $page = null, $page_name = 'page', $prepaginated = false) {
         $page = $page ?: Paginator::resolveCurrentPage($page_name);
 
         $total = $this->total ? $this->total : $this->count();
 
-        $results = $total ? $this->forPage($page, $per_page) : $this->all();
+        $results = !$prepaginated && $total ? $this->forPage($page, $per_page) : $this->all();
 
         return $this->paginator($results, $total, $per_page, $page, [
             'path'      => Paginator::resolveCurrentPath(),
