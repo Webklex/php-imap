@@ -6,13 +6,13 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
+- Missing array decoder method added #51 (thanks [@lutchin](https://github.com/lutchin))
 
 ### Added
 - NaN
 
 ### Affected Classes
-- NaN
+- [Header::class](src/Header.php)
 
 ### Breaking changes
 - NaN

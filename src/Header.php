@@ -360,11 +360,14 @@ class Header {
 
     /**
      * Try to decode a specific header
-     * @param $value
+     * @param mixed $value
      *
-     * @return string|null
+     * @return mixed
      */
     private function decode($value) {
+        if (is_array($value)) {
+            return $this->decodeArray($value);
+        }
         $original_value = $value;
         $decoder = $this->config['decoder']['message'];
 
@@ -398,6 +401,19 @@ class Header {
         }
 
         return $value;
+    }
+
+    /**
+     * Decode a given array
+     * @param array $values
+     *
+     * @return array
+     */
+    private function decodeArray($values) {
+        foreach($values as $key => $value) {
+            $values[$key] = $this->decode($value);
+        }
+        return $values;
     }
 
     /**
