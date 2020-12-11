@@ -356,6 +356,7 @@ class Client {
         if ($this->isConnected() && $this->connection !== false) {
             $this->connection->logout();
         }
+        $this->active_folder = false;
 
         return $this;
     }
@@ -376,7 +377,7 @@ class Client {
             if (strpos($folder_name, $delimiter) !== false) {
                 return $this->getFolderByPath($folder_name);
             }
-	}
+	    }
 
         return $this->getFolderByName($folder_name);
     }
@@ -446,12 +447,13 @@ class Client {
     /**
      * Open folder.
      * @param string $folder
+     * @param boolean $force_select
      *
      * @return mixed
      * @throws ConnectionFailedException
      */
-    public function openFolder($folder) {
-        if ($this->active_folder == $folder && $this->isConnected()) {
+    public function openFolder($folder, $force_select = false) {
+        if ($this->active_folder == $folder && $this->isConnected() && $force_select === false) {
             return true;
         }
         $this->checkConnection();
@@ -472,6 +474,7 @@ class Client {
     public function createFolder($folder, $expunge = true) {
         $this->checkConnection();
         $status = $this->connection->createFolder($folder);
+
         if($expunge) $this->expunge();
 
         $folder = $this->getFolder($folder);

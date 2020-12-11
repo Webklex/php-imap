@@ -9,10 +9,11 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Missing array decoder method added #51 (thanks [@lutchin](https://github.com/lutchin))
 
 ### Added
-- NaN
+- Force a folder to be opened
 
 ### Affected Classes
 - [Header::class](src/Header.php)
+- [Folder::class](src/Folder.php)
 
 ### Breaking changes
 - NaN
