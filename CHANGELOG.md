@@ -6,6 +6,19 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
+- NaN
+
+### Added
+- NaN
+
+### Affected Classes
+- NaN
+
+### Breaking changes
+- NaN
+
+## [2.2.5] - 2020-12-11
+### Fixed
 - Missing array decoder method added #51 (thanks [@lutchin](https://github.com/lutchin))
 - Additional checks added to prevent message from getting marked as seen #33
 - Boundary parsing improved #39 #36 (thanks [@AntonioDiPassio-AppSys](https://github.com/AntonioDiPassio-AppSys))
@@ -20,9 +33,6 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - [Query::class](src/Query/Query.php)
 - [Message::class](src/Message.php)
 - [Structure::class](src/Structure.php)
-
-### Breaking changes
-- NaN
 
 ## [2.2.4] - 2020-12-08
 ### Fixed
