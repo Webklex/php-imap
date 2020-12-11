@@ -353,17 +353,19 @@ class Folder {
         $this->client->getConnection()->setConnectionTimeout($timeout);
 
         $this->client->reconnect();
-        $this->client->openFolder($this->path);
+        $this->client->openFolder($this->path, true);
         $connection = $this->client->getConnection();
         $connection->idle();
 
         while (true) {
             try {
                 $line = $connection->nextLine();
+                var_dump($line);
                 if (($pos = strpos($line, "EXISTS")) !== false) {
                     $msgn = (int) substr($line, 2, $pos -2);
                     $connection->done();
 
+                    $this->client->openFolder($this->path, true);
                     $message = $this->query()->getMessage($msgn);
                     $callback($message);
 
@@ -375,11 +377,6 @@ class Folder {
             }catch (Exceptions\RuntimeException $e) {
                 if(strpos($e->getMessage(), "connection closed") === false) {
                     throw $e;
-                }else{
-                    $this->client->connect();
-                    $this->client->openFolder($this->path);
-                    $connection = $this->client->getConnection();
-                    $connection->idle();
                 }
             }
         }

@@ -9,6 +9,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Missing array decoder method added #51 (thanks [@lutchin](https://github.com/lutchin))
 - Additional checks added to prevent message from getting marked as seen #33
 - Boundary parsing improved #39 #36 (thanks [@AntonioDiPassio-AppSys](https://github.com/AntonioDiPassio-AppSys))
+- Idle operation updated #44
 
 ### Added
 - Force a folder to be opened
