@@ -360,7 +360,6 @@ class Folder {
         while (true) {
             try {
                 $line = $connection->nextLine();
-                var_dump($line);
                 if (($pos = strpos($line, "EXISTS")) !== false) {
                     $msgn = (int) substr($line, 2, $pos -2);
                     $connection->done();
