@@ -238,6 +238,8 @@ $folder->idle(function($message){
     echo $message->subject."\n";
 });
 ```
+**Attention!** Every received message will be flagged as "Seen". Update your config `options.fetch` from 
+`\Webklex\PHPIMAP\IMAP::FT_UID` to `\Webklex\PHPIMAP\IMAP::FT_PEEK` to prevent this behavior.
 
 
 #### Search for messages
