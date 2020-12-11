@@ -7,12 +7,14 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ## [UNRELEASED]
 ### Fixed
 - Cert validation issue fixed
+- Allow boundaries ending with a space or semicolon (thanks [@smartilabs](https://github.com/smartilabs))
 
 ### Added
 - Proxy support added 
 
 ### Affected Classes
 - [Client::class](src/Client.php)
+- [Structure::class](src/Structure.php)
 
 ### Breaking changes
 - Depending on your configuration, your certificates actually get checked. Which can cause an aborted connection if the certificate can not be validated.
