@@ -107,6 +107,11 @@ Detailed [config/imap.php](src/config/imap.php) configuration:
      - `username` &mdash; imap account username
      - `password` &mdash; imap account password
      - `authentication` &mdash; imap authentication method. Use `oauth` to use oAuth for Google, etc.
+     - `proxy` &mdash; Optional proxy settings
+       - `socket` &mdash; Proxy host including the port e.g. example.com:123
+       - `request_fulluri` &mdash; When set to TRUE, the entire URI will be used when constructing the request. While this is a non-standard request format, some proxy servers require it.
+       - `username` &mdash; Optional username if required
+       - `password` &mdash; Optional password if required
  - `date_format` &mdash; The default date format is used to convert any given Carbon::class object into a valid date string. (`d-M-Y`, `d-M-y`, `d M y`)
  - `options` &mdash; additional fetch options
    - `delimiter` &mdash; you can use any supported char such as ".", "/", etc

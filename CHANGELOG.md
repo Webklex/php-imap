@@ -6,16 +6,16 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
+- Cert validation issue fixed
 
 ### Added
-- NaN
+- Proxy support added 
 
 ### Affected Classes
-- NaN
+- [Client::class](src/Client.php)
 
 ### Breaking changes
-- NaN
+- Depending on your configuration, your certificates actually get checked. Which can cause an aborted connection if the certificate can not be validated.
 
 ## [2.2.5] - 2020-12-11
 ### Fixed

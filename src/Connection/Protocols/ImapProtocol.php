@@ -33,9 +33,11 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
     /**
      * Imap constructor.
      * @param bool $cert_validation set to false to skip SSL certificate validation
+     * @param mixed $encryption Connection encryption method
      */
-    public function __construct($cert_validation = true) {
+    public function __construct($cert_validation = true, $encryption = false) {
         $this->setCertValidation($cert_validation);
+        $this->encryption = $encryption;
     }
 
     /**
@@ -49,15 +51,14 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
      * Open connection to IMAP server
      * @param string $host hostname or IP address of IMAP server
      * @param int|null $port of IMAP server, default is 143 and 993 for ssl
-     * @param string|bool $encryption use 'SSL', 'TLS' or false
      *
      * @throws ConnectionFailedException
      */
-    public function connect($host, $port = null, $encryption = false) {
+    public function connect($host, $port = null) {
         $transport = 'tcp';
 
-        if ($encryption) {
-            $encryption = strtolower($encryption);
+        if ($this->encryption) {
+            $encryption = strtolower($this->encryption);
             if ($encryption == "ssl") {
                 $transport = 'ssl';
                 $port = $port === null ? 993 : $port;

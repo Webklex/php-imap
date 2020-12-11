@@ -55,6 +55,12 @@ return [
             'username' => 'root@example.com',
             'password' => '',
             'authentication' => null,
+            'proxy' => [
+                'socket' => null,
+                'request_fulluri' => false,
+                'username' => null,
+                'password' => null,
+            ]
         ],
 
         /*

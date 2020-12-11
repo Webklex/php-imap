@@ -37,10 +37,27 @@ abstract class Protocol {
     public $stream = false;
 
     /**
+     * Connection encryption method
+     * @var mixed $encryption
+     */
+    protected $encryption = false;
+
+    /**
      * Set to false to ignore SSL certificate validation
      * @var bool
      */
     protected $cert_validation = true;
+
+    /**
+     * Proxy settings
+     * @var array
+     */
+    protected $proxy = [
+        'socket' => null,
+        'request_fulluri' => false,
+        'username' => null,
+        'password' => null,
+    ];
 
     /**
      * Get an available cryptographic method
@@ -102,19 +119,58 @@ abstract class Protocol {
     }
 
     /**
+     * Set connection proxy settings
+     * @var array $options
+     *
+     * @return $this
+     */
+    public function setProxy($options) {
+        foreach ($this->proxy as $key => $val) {
+            if (isset($options[$key])) {
+                $this->proxy[$key] = $options[$key];
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get the current proxy settings
+     *
+     * @return array
+     */
+    public function getProxy() {
+        return $this->proxy;
+    }
+
+    /**
      * Prepare socket options
      *
      * @return array
      */
     private function defaultSocketOptions() {
-        return $this->getCertValidation()
-            ? [
-                'ssl' => [
-                    'verify_peer_name' => false,
-                    'verify_peer'      => false,
-                ]
-            ]
-            : [];
+        $options = [];
+        if ($this->encryption != false) {
+            $options["ssl"] = [
+                'verify_peer_name' => $this->getCertValidation(),
+                'verify_peer'      => $this->getCertValidation(),
+            ];
+        }
+
+        if ($this->proxy["socket"] != null) {
+            $options["proxy"] = $this->proxy["socket"];
+            $options["request_fulluri"] = $this->proxy["request_fulluri"];
+
+            if ($this->proxy["username"] != null) {
+                $auth = base64_encode($this->proxy["username"].':'.$this->proxy["password"]);
+
+                $options["header"] = [
+                    "Proxy-Authorization: Basic $auth"
+                ];
+            }
+        }
+
+        return $options;
     }
 
     /**

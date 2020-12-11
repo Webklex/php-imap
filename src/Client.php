@@ -73,9 +73,20 @@ class Client {
     /**
      * If server has to validate cert.
      *
-     * @var mixed
+     * @var bool
      */
-    public $validate_cert;
+    public $validate_cert = true;
+
+    /**
+     * Proxy settings
+     * @var array
+     */
+    protected $proxy = [
+        'socket' => null,
+        'request_fulluri' => false,
+        'username' => null,
+        'password' => null,
+    ];
 
     /**
      * Account username/
@@ -133,6 +144,12 @@ class Client {
         'username' => '',
         'password' => '',
         'authentication' => null,
+        'proxy' => [
+            'socket' => null,
+            'request_fulluri' => false,
+            'username' => null,
+            'password' => null,
+        ]
     ];
 
     /**
@@ -309,20 +326,21 @@ class Client {
 
         if ($protocol == "imap") {
             $timeout = $this->connection !== false ? $this->connection->getConnectionTimeout() : null;
-            $this->connection = new ImapProtocol($this->validate_cert);
+            $this->connection = new ImapProtocol($this->validate_cert, $this->encryption);
             $this->connection->setConnectionTimeout($timeout);
+            $this->connection->setProxy($this->proxy);
         }else{
             if (extension_loaded('imap') === false) {
                 throw new ConnectionFailedException("connection setup failed", 0, new ProtocolNotSupportedException($protocol." is an unsupported protocol"));
             }
-            $this->connection = new LegacyProtocol($this->validate_cert);
+            $this->connection = new LegacyProtocol($this->validate_cert, $this->encryption);
             if (strpos($protocol, "legacy-") === 0) {
                 $protocol = substr($protocol, 7);
             }
             $this->connection->setProtocol($protocol);
         }
 
-        $this->connection->connect($this->host, $this->port, $this->encryption);
+        $this->connection->connect($this->host, $this->port);
         $this->authenticate();
 
         return $this;

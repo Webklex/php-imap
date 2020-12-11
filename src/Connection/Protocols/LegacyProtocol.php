@@ -33,9 +33,11 @@ class LegacyProtocol extends Protocol implements ProtocolInterface {
     /**
      * Imap constructor.
      * @param bool $cert_validation set to false to skip SSL certificate validation
+     * @param mixed $encryption Connection encryption method
      */
-    public function __construct($cert_validation = true) {
+    public function __construct($cert_validation = true, $encryption = false) {
         $this->setCertValidation($cert_validation);
+        $this->encryption = $encryption;
     }
 
     /**

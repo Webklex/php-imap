@@ -38,13 +38,12 @@ interface ProtocolInterface {
      * Open a new connection / session
      * @param string $host hostname or IP address of IMAP server
      * @param int|null $port of service server
-     * @param string|bool $encryption use 'SSL', 'TLS' or false
      *
      * @throws \ErrorException
      * @throws ConnectionFailedException
      * @throws RuntimeException
      */
-    public function connect($host, $port = null, $encryption = false);
+    public function connect($host, $port = null);
 
     /**
      * Login to a new session.
