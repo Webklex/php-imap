@@ -7,6 +7,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ## [UNRELEASED]
 ### Fixed
 - Missing array decoder method added #51 (thanks [@lutchin](https://github.com/lutchin))
+- Additional checks added to prevent message from getting marked as seen #33
 
 ### Added
 - Force a folder to be opened
@@ -14,6 +15,8 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Affected Classes
 - [Header::class](src/Header.php)
 - [Folder::class](src/Folder.php)
+- [Query::class](src/Query/Query.php)
+- [Message::class](src/Message.php)
 
 ### Breaking changes
 - NaN

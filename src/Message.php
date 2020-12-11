@@ -273,7 +273,21 @@ class Message {
 
         $instance->parseRawHeader($raw_header);
         $instance->parseRawFlags($raw_flags);
+
+
+        if ($fetch_options == IMAP::FT_PEEK && $instance->getFlags()->count() == 0) {
+            $instance->parseFlags();
+        }
+
         $instance->parseRawBody($raw_body);
+
+        if ($fetch_options == IMAP::FT_PEEK) {
+            if ($instance->getFlags()->get("seen") == null) {
+                $instance->unsetFlag("Seen");
+            }
+        } elseif ($instance->getFlags()->get("seen") == null) {
+            $instance->setFlag("Seen");
+        }
 
         return $instance;
     }
@@ -470,7 +484,15 @@ class Message {
         }
         $content = $contents[$this->msgn];
 
-        return $this->parseRawBody($content);
+        $body = $this->parseRawBody($content);
+
+        if ($this->fetch_options == IMAP::FT_PEEK) {
+            if ($this->getFlags()->get("seen") == null) {
+                $this->unsetFlag("Seen");
+            }
+        }
+
+        return $body;
     }
 
     /**
@@ -488,12 +510,6 @@ class Message {
         $this->structure = new Structure($raw_body, $this->header);
 
         $this->fetchStructure($this->structure);
-
-        if ($this->fetch_options == IMAP::FT_PEEK) {
-            if ($this->getFlags()->get("seen") == null) {
-                $this->unsetFlag("Seen");
-            }
-        }
 
         return $this;
     }
@@ -1038,7 +1054,7 @@ class Message {
     /**
      * Get the fetched structure
      *
-     * @return object|null
+     * @return Structure|null
      */
     public function getStructure(){
         return $this->structure;
@@ -1183,7 +1199,6 @@ class Message {
     public function setMsgn($msgn, $msglist = null){
         $this->msgn = $msgn;
         $this->msglist = $msglist;
-
         $this->uid = $this->client->getConnection()->getUid($this->msgn);
 
         return $this;

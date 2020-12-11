@@ -214,11 +214,11 @@ class Query {
                 $raw_contents = [];
                 $raw_flags = [];
 
-                if ($this->getFetchBody()) {
-                    $raw_contents = $this->client->getConnection()->content($msgnos);
-                }
                 if ($this->getFetchFlags()) {
                     $raw_flags = $this->client->getConnection()->flags($msgnos);
+                }
+                if ($this->getFetchBody()) {
+                    $raw_contents = $this->client->getConnection()->content($msgnos);
                 }
 
                 $msglist = 0;
