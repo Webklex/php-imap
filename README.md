@@ -905,7 +905,7 @@ Extends [Illuminate\Support\Collection::class](https://laravel.com/api/5.4/Illum
 ### Known issues
 | Error                                                                     | Solution                                                   |
 | ------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| Kerberos error: No credentials cache file found (try running kinit) (...) | Uncomment "DISABLE_AUTHENTICATOR" inside and use the `legacy-imap` protocol |
+| Kerberos error: No credentials cache file found (try running kinit) (...) | Uncomment "DISABLE_AUTHENTICATOR" inside your config and use the `legacy-imap` protocol |
 
 
 ## Change log
