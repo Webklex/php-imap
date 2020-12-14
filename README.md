@@ -448,8 +448,8 @@ $message = $folder->query()->getMessage($msgn = 1);
 Flag or "unflag" a message:
 ```php
 /** @var \Webklex\PHPIMAP\Message $message */
-$message->setFlag(['Seen', 'Spam']);
-$message->unsetFlag('Spam');
+$message->setFlag(['Seen', 'Flagged']);
+$message->unsetFlag('Flagged');
 ```
 
 Mark all messages as "read" while fetching:
