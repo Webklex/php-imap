@@ -27,6 +27,7 @@ Laravel wrapper: [webklex/laravel-imap](https://github.com/Webklex/laravel-imap)
     - [Basic usage example](#basic-usage-example)
     - [Folder / Mailbox](#folder--mailbox)
     - [oAuth](#oauth)
+    - [Proxy](#proxy)
     - [Idle](#idle)
     - [Search](#search-for-messages)
     - [Counting messages](#counting-messages)
@@ -228,6 +229,32 @@ $client = $cm->make([
     'password' => 'ACCESS-TOKEN',
     'authentication' => "oauth",
     'protocol' => 'imap'
+]);
+
+//Connect to the IMAP Server
+$client->connect();
+```
+
+
+#### Proxy
+Basic proxy example with authorization:
+```php
+/** @var \Webklex\PHPIMAP\Clientmanager $cm */
+/** @var \Webklex\PHPIMAP\Client $client */
+$client = $cm->make([
+    'host' => 'imap.somehost.com',
+    'port' => 993,
+    'encryption' => 'ssl',
+    'validate_cert' => true,
+    'username' => 'example@somehost.com',
+    'password' => 'Password',
+    'protocol' => 'imap',
+    'proxy' => [
+        'socket' => "tcp://proxy.com:3444",
+        'request_fulluri' => false,
+        'username' => "my_username",
+        'password' => "secret_password",
+    ]
 ]);
 
 //Connect to the IMAP Server
