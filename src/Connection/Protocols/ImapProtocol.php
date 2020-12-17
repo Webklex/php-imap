@@ -945,7 +945,7 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
         if (fwrite($this->stream, "DONE\r\n") === false) {
             throw new RuntimeException('failed to write - connection closed?');
         }
-        return $this->readResponse("*", false);
+        return true;
     }
 
     /**
