@@ -121,6 +121,7 @@ Detailed [config/imap.php](src/config/imap.php) configuration:
    - `fetch_flags` &mdash;  If set to `false` all messages will be fetched without any flags
    - `message_key` &mdash; Message key identifier option
    - `fetch_order` &mdash; Message fetch order
+   - `dispositions` &mdash; All disposition types potentially considered an attachment
    - `common_folders` &mdash; Default folder locations and paths assumed if none is provided
    - `open` &mdash; special configuration for imap_open()
      - `DISABLE_AUTHENTICATOR` &mdash; disable authentication properties.

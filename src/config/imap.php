@@ -110,6 +110,8 @@ return [
     |   -Fetch order
     |       'asc'  - Order all messages ascending (probably results in oldest first)
     |       'desc' - Order all messages descending (probably results in newest first)
+    |   -Disposition types potentially considered an attachment
+    |       Default ['attachment', 'inline']
     |   -Common folders
     |       Default folder locations and paths assumed if none is provided
     |   -Open IMAP options:
@@ -130,6 +132,7 @@ return [
         'fetch_flags' => true,
         'message_key' => 'list',
         'fetch_order' => 'asc',
+        'dispositions' => ['attachment', 'inline'],
         'common_folders' => [
             "root" => "INBOX",
             "junk" => "INBOX/Junk",
