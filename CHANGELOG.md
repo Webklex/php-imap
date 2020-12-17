@@ -8,6 +8,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Fixed
 - Cert validation issue fixed
 - Allow boundaries ending with a space or semicolon (thanks [@smartilabs](https://github.com/smartilabs))
+- Ignore IMAP DONE command response #57
 
 ### Added
 - Proxy support added 
