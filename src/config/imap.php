@@ -125,7 +125,7 @@ return [
     */
     'options' => [
         'delimiter' => '/',
-        'fetch' => \Webklex\PHPIMAP\IMAP::FT_UID,
+        'fetch' => \Webklex\PHPIMAP\IMAP::FT_PEEK,
         'fetch_body' => true,
         'fetch_flags' => true,
         'message_key' => 'list',
