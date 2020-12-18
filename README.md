@@ -117,6 +117,7 @@ Detailed [config/imap.php](src/config/imap.php) configuration:
  - `options` &mdash; additional fetch options
    - `delimiter` &mdash; you can use any supported char such as ".", "/", etc
    - `fetch` &mdash; `IMAP::FT_UID` (message marked as read by fetching the message body) or `IMAP::FT_PEEK` (fetch the message without setting the "seen" flag)
+   - `sequence` &mdash; `IMAP::ST_UID` (fetch message components using the message uid) or `IMAP::ST_MSGN` (Fetch message components using the message number)
    - `fetch_body` &mdash; If set to `false` all messages will be fetched without the body and any potential attachments
    - `fetch_flags` &mdash;  If set to `false` all messages will be fetched without any flags
    - `message_key` &mdash; Message key identifier option

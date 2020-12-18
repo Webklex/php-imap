@@ -223,6 +223,7 @@ class IMAP {
      */
     const ST_UID = 1;
     const ST_SILENT = 2;
+    const ST_MSGN = 3;
     const ST_SET = 4;
 
     /**

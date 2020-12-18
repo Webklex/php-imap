@@ -98,6 +98,9 @@ return [
     |   -Fetch option:
     |       IMAP::FT_UID  - Message marked as read by fetching the body message
     |       IMAP::FT_PEEK - Fetch the message without setting the "seen" flag
+    |   -Fetch sequence id:
+    |       IMAP::ST_UID  - Fetch message components using the message uid
+    |       IMAP::ST_MSGN - Fetch message components using the message number
     |   -Body download option
     |       Default TRUE
     |   -Flag download option
@@ -129,6 +132,7 @@ return [
     'options' => [
         'delimiter' => '/',
         'fetch' => \Webklex\PHPIMAP\IMAP::FT_PEEK,
+        'sequence' => \Webklex\PHPIMAP\IMAP::ST_MSGN,
         'fetch_body' => true,
         'fetch_flags' => true,
         'message_key' => 'list',

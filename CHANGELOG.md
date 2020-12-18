@@ -16,9 +16,13 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Added
 - Proxy support added 
 - Flexible disposition support added #58
+- New `options.message_key` option `uid` added
+- Protocol UID support added
+- Flexible sequence type support added
 
 ### Affected Classes
 - [Structure::class](src/Structure.php)
+- [Query::class](src/Query/Query.php)
 - [Client::class](src/Client.php)
 - [Header::class](src/Header.php)
 - [Part::class](src/Part.php)

@@ -62,6 +62,9 @@ class Query {
     /** @var int $fetch_flags */
     protected $fetch_flags = true;
 
+    /** @var int $sequence */
+    protected $sequence = IMAP::NIL;
+
     /** @var string $fetch_order */
     protected $fetch_order;
 
@@ -76,6 +79,7 @@ class Query {
     public function __construct(Client $client, $charset = 'UTF-8') {
         $this->setClient($client);
 
+        $this->sequence = ClientManager::get('options.sequence', IMAP::ST_MSGN);
         if(ClientManager::get('options.fetch') === IMAP::FT_PEEK) $this->leaveUnread();
 
         if (ClientManager::get('options.fetch_order') === 'desc') {
@@ -154,6 +158,18 @@ class Query {
     }
 
     /**
+     * Set the sequence type
+     * @param int $sequence
+     *
+     * @return $this
+     */
+    public function setSequence($sequence) {
+        $this->sequence = $sequence != IMAP::ST_MSGN ? IMAP::ST_UID : $sequence;
+
+        return $this;
+    }
+
+    /**
      * Perform an imap search request
      *
      * @return Collection
@@ -163,7 +179,7 @@ class Query {
         $this->generate_query();
 
         try {
-            $available_messages = $this->client->getConnection()->search([$this->getRawQuery()]);
+            $available_messages = $this->client->getConnection()->search([$this->getRawQuery()], $this->sequence == IMAP::ST_UID);
         } catch (RuntimeException $e) {
             $available_messages = false;
         } catch (ConnectionFailedException $e) {
@@ -208,25 +224,22 @@ class Query {
 
                 $message_key = ClientManager::get('options.message_key');
 
-                $msgnos = $available_messages->forPage($this->page, $this->limit)->toArray();
+                $uids = $available_messages->forPage($this->page, $this->limit)->toArray();
 
-                $raw_headers = $this->client->getConnection()->headers($msgnos);
+                $raw_flags = $this->client->getConnection()->flags($uids, $this->sequence == IMAP::ST_UID);
+                $raw_headers = $this->client->getConnection()->headers($uids, "RFC822", $this->sequence == IMAP::ST_UID);
+
                 $raw_contents = [];
-                $raw_flags = [];
-
-                if ($this->getFetchFlags()) {
-                    $raw_flags = $this->client->getConnection()->flags($msgnos);
-                }
                 if ($this->getFetchBody()) {
-                    $raw_contents = $this->client->getConnection()->content($msgnos);
+                    $raw_contents = $this->client->getConnection()->content($uids, "RFC822", $this->sequence == IMAP::ST_UID);
                 }
 
                 $msglist = 0;
-                foreach ($raw_headers as $msgno => $raw_header) {
-                    $raw_content = isset($raw_contents[$msgno]) ? $raw_contents[$msgno] : "";
-                    $raw_flag = isset($raw_flags[$msgno]) ? $raw_flags[$msgno] : [];
+                foreach ($raw_headers as $uid => $raw_header) {
+                    $raw_content = isset($raw_contents[$uid]) ? $raw_contents[$uid] : "";
+                    $raw_flag = isset($raw_flags[$uid]) ? $raw_flags[$uid] : [];
 
-                    $message = Message::make($msgno, $msglist, $this->getClient(), $raw_header, $raw_content, $raw_flag, $this->getFetchOptions());
+                    $message = Message::make($uid, $msglist, $this->getClient(), $raw_header, $raw_content, $raw_flag, $this->getFetchOptions(), $this->sequence);
                     switch ($message_key){
                         case 'number':
                             $message_key = $message->getMessageNo();
@@ -255,8 +268,9 @@ class Query {
 
     /**
      * Get a new Message instance
-     * @param $msgno
+     * @param int $uid
      * @param null $msglist
+     * @param null $sequence
      *
      * @return Message
      * @throws ConnectionFailedException
@@ -266,8 +280,8 @@ class Query {
      * @throws MessageHeaderFetchingException
      * @throws \Webklex\PHPIMAP\Exceptions\EventNotFoundException
      */
-    public function getMessage($msgno, $msglist = null){
-        return new Message($msgno, $msglist, $this->getClient(), $this->getFetchOptions(), $this->getFetchBody(), $this->getFetchFlags());
+    public function getMessage($uid, $msglist = null, $sequence = null){
+        return new Message($uid, $msglist, $this->getClient(), $this->getFetchOptions(), $this->getFetchBody(), $this->getFetchFlags(), $sequence ? $sequence : $this->sequence);
     }
 
     /**
@@ -536,7 +550,7 @@ class Query {
     /**
      * @return Query
      */
-    public function fetchOrderAsc($fetch_order) {
+    public function fetchOrderAsc() {
         return $this->setFetchOrderAsc();
     }
 
@@ -550,7 +564,7 @@ class Query {
     /**
      * @return Query
      */
-    public function fetchOrderDesc($fetch_order) {
+    public function fetchOrderDesc() {
         return $this->setFetchOrderDesc();
     }
 }
