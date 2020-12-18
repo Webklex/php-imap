@@ -568,6 +568,8 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
                 $count = count($tokens[2]);
                 if ($tokens[2][$count - 2] == 'UID') {
                     $uidKey = $count - 1;
+                } else if ($tokens[2][0] == 'UID') {
+                    $uidKey = 1;
                 } else {
                     $uidKey = array_search('UID', $tokens[2]) + 1;
                 }
@@ -611,7 +613,11 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
 
                     return $data;
             }
-            $result[$tokens[0]] = $data;
+            if ($uid) {
+                $result[$tokens[2][$uidKey]] = $data;
+            }else{
+                $result[$tokens[0]] = $data;
+            }
         }
 
         if ($to === null && !is_array($from)) {
@@ -625,35 +631,38 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
      * Fetch message headers
      * @param array|int $uids
      * @param string $rfc
+     * @param bool $uid set to true if passing a unique id
      *
      * @return array
      * @throws RuntimeException
      */
-    public function content($uids, $rfc = "RFC822") {
-        return $this->fetch(["$rfc.TEXT"], $uids);
+    public function content($uids, $rfc = "RFC822", $uid = false) {
+        return $this->fetch(["$rfc.TEXT"], $uids, null, $uid);
     }
 
     /**
      * Fetch message headers
      * @param array|int $uids
      * @param string $rfc
+     * @param bool $uid set to true if passing a unique id
      *
      * @return array
      * @throws RuntimeException
      */
-    public function headers($uids, $rfc = "RFC822"){
-        return $this->fetch(["$rfc.HEADER"], $uids);
+    public function headers($uids, $rfc = "RFC822", $uid = false){
+        return $this->fetch(["$rfc.HEADER"], $uids, null, $uid);
     }
 
     /**
      * Fetch message flags
      * @param array|int $uids
+     * @param bool $uid set to true if passing a unique id
      *
      * @return array
      * @throws RuntimeException
      */
-    public function flags($uids){
-        return $this->fetch(["FLAGS"], $uids);
+    public function flags($uids, $uid = false){
+        return $this->fetch(["FLAGS"], $uids, null, $uid);
     }
 
     /**
@@ -693,7 +702,7 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
             }
         }
 
-        throw new RuntimeException('unique id not found');
+        throw new RuntimeException('message number not found');
     }
 
     /**
@@ -729,11 +738,12 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
      *                             last message, INF means last message available
      * @param string|null $mode '+' to add flags, '-' to remove flags, everything else sets the flags as given
      * @param bool $silent if false the return values are the new flags for the wanted messages
+     * @param bool $uid set to true if passing a unique id
      *
      * @return bool|array new flags if $silent is false, else true or false depending on success
      * @throws RuntimeException
      */
-    public function store(array $flags, $from, $to = null, $mode = null, $silent = true) {
+    public function store(array $flags, $from, $to = null, $mode = null, $silent = true, $uid = false) {
         $item = 'FLAGS';
         if ($mode == '+' || $mode == '-') {
             $item = $mode . $item;
@@ -796,11 +806,12 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
      * @param $from
      * @param int|null $to if null only one message ($from) is fetched, else it's the
      *                         last message, INF means last message available
+     * @param bool $uid set to true if passing a unique id
      *
      * @return bool success
      * @throws RuntimeException
      */
-    public function copyMessage($folder, $from, $to = null) {
+    public function copyMessage($folder, $from, $to = null, $uid = false) {
         $set = (int)$from;
         if ($to !== null) {
             $set .= ':' . ($to == INF ? '*' : (int)$to);
@@ -815,11 +826,12 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
      * @param $from
      * @param int|null $to if null only one message ($from) is fetched, else it's the
      *                         last message, INF means last message available
+     * @param bool $uid set to true if passing a unique id
      *
      * @return bool success
      * @throws RuntimeException
      */
-    public function moveMessage($folder, $from, $to = null) {
+    public function moveMessage($folder, $from, $to = null, $uid = false) {
         $set = (int)$from;
         if ($to !== null) {
             $set .= ':' . ($to == INF ? '*' : (int)$to);
@@ -928,9 +940,11 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
 
     /**
      * Send idle command
+     * @param bool $uid set to true if passing a unique id
+     *
      * @throws RuntimeException
      */
-    public function idle() {
+    public function idle($uid = false) {
         $this->sendRequest('IDLE');
         if (!$this->assumedNextLine('+ ')) {
             throw new RuntimeException('idle failed');
@@ -950,13 +964,15 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
 
     /**
      * Search for matching messages
-     *
      * @param array $params
+     * @param bool $uid set to true if passing a unique id
+     *
      * @return array message ids
      * @throws RuntimeException
      */
-    public function search(array $params) {
-        $response = $this->requestAndResponse('SEARCH', $params);
+    public function search(array $params, $uid = false) {
+        $token = $uid == true ? "UID SEARCH" : "SEARCH";
+        $response = $this->requestAndResponse($token, $params);
         if (!$response) {
             return $response;
         }
@@ -973,12 +989,13 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
     /**
      * Get a message overview
      * @param string $sequence
-     * @return array
+     * @param bool $uid set to true if passing a unique id
      *
+     * @return array
      * @throws RuntimeException
      * @throws \Webklex\PHPIMAP\Exceptions\InvalidMessageDateException
      */
-    public function overview($sequence) {
+    public function overview($sequence, $uid = false) {
         $result = [];
         list($from, $to) = explode(":", $sequence);
 
@@ -989,7 +1006,7 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
                 $ids[] = $msgn;
             }
         }
-        $headers = $this->headers($ids);
+        $headers = $this->headers($ids, $uid);
         foreach ($headers as $msgn => $raw_header) {
             $result[$msgn] = (new Header($raw_header))->getAttributes();
         }

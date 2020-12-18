@@ -92,30 +92,33 @@ interface ProtocolInterface {
      * Fetch message headers
      * @param array|int $uids
      * @param string $rfc
+     * @param bool $uid set to true if passing a unique id
      *
      * @return array
      * @throws RuntimeException
      */
-    public function content($uids, $rfc = "RFC822");
+    public function content($uids, $rfc = "RFC822", $uid = false);
 
     /**
      * Fetch message headers
      * @param array|int $uids
      * @param string $rfc
+     * @param bool $uid set to true if passing a unique id
      *
      * @return array
      * @throws RuntimeException
      */
-    public function headers($uids, $rfc = "RFC822");
+    public function headers($uids, $rfc = "RFC822", $uid = false);
 
     /**
      * Fetch message flags
      * @param array|int $uids
+     * @param bool $uid set to true if passing a unique id
      *
      * @return array
      * @throws RuntimeException
      */
-    public function flags($uids);
+    public function flags($uids, $uid = false);
 
     /**
      * Get uid for a given id
@@ -154,10 +157,12 @@ interface ProtocolInterface {
      *                             last message, INF means last message available
      * @param string|null $mode '+' to add flags, '-' to remove flags, everything else sets the flags as given
      * @param bool $silent if false the return values are the new flags for the wanted messages
+     * @param bool $uid set to true if passing a unique id
+     *
      * @return bool|array new flags if $silent is false, else true or false depending on success
      * @throws RuntimeException
      */
-    public function store(array $flags, $from, $to = null, $mode = null, $silent = true);
+    public function store(array $flags, $from, $to = null, $mode = null, $silent = true, $uid = false);
 
     /**
      * Append a new message to given folder
@@ -178,10 +183,12 @@ interface ProtocolInterface {
      * @param $from
      * @param int|null $to if null only one message ($from) is fetched, else it's the
      *                         last message, INF means last message available
+     * @param bool $uid set to true if passing a unique id
+     *
      * @return bool success
      * @throws RuntimeException
      */
-    public function copyMessage($folder, $from, $to = null);
+    public function copyMessage($folder, $from, $to = null, $uid = false);
 
     /**
      * Move a message set from current folder to an other folder
@@ -189,10 +196,11 @@ interface ProtocolInterface {
      * @param $from
      * @param int|null $to if null only one message ($from) is fetched, else it's the
      *                         last message, INF means last message available
+     * @param bool $uid set to true if passing a unique id
      *
      * @return bool success
      */
-    public function moveMessage($folder, $from, $to = null);
+    public function moveMessage($folder, $from, $to = null, $uid = false);
 
     /**
      * Create a new folder
@@ -270,18 +278,21 @@ interface ProtocolInterface {
      * Do a search request
      *
      * @param array $params
+     * @param bool $uid set to true if passing a unique id
+     *
      * @return array message ids
      * @throws RuntimeException
      */
-    public function search(array $params);
+    public function search(array $params, $uid = false);
 
     /**
      * Get a message overview
      * @param string $sequence uid sequence
+     * @param bool $uid set to true if passing a unique id
      *
      * @return array
      */
-    public function overview($sequence);
+    public function overview($sequence, $uid = false);
 
     /**
      * Enable the debug mode

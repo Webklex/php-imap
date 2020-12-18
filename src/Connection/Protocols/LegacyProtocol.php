@@ -197,14 +197,15 @@ class LegacyProtocol extends Protocol implements ProtocolInterface {
      * Fetch message content
      * @param array|int $uids
      * @param string $rfc
+     * @param bool $uid set to true if passing a unique id
      *
      * @return array
      */
-    public function content($uids, $rfc = "RFC822") {
+    public function content($uids, $rfc = "RFC822", $uid = false) {
         $result = [];
         $uids = is_array($uids) ? $uids : [$uids];
         foreach ($uids as $uid) {
-            $result[$uid] = \imap_fetchbody($this->stream, $uid, "", IMAP::NIL);
+            $result[$uid] = \imap_fetchbody($this->stream, $uid, "", $uid ? IMAP::FT_UID : IMAP::NIL);
         }
         return $result;
     }
@@ -213,14 +214,15 @@ class LegacyProtocol extends Protocol implements ProtocolInterface {
      * Fetch message headers
      * @param array|int $uids
      * @param string $rfc
+     * @param bool $uid set to true if passing a unique id
      *
      * @return array
      */
-    public function headers($uids, $rfc = "RFC822"){
+    public function headers($uids, $rfc = "RFC822", $uid = false){
         $result = [];
         $uids = is_array($uids) ? $uids : [$uids];
         foreach ($uids as $uid) {
-            $result[$uid] = \imap_fetchheader($this->stream, $uid, IMAP::NIL);
+            $result[$uid] = \imap_fetchheader($this->stream, $uid, $uid ? IMAP::FT_UID : IMAP::NIL);
         }
         return $result;
     }
@@ -228,14 +230,15 @@ class LegacyProtocol extends Protocol implements ProtocolInterface {
     /**
      * Fetch message flags
      * @param array|int $uids
+     * @param bool $uid set to true if passing a unique id
      *
      * @return array
      */
-    public function flags($uids){
+    public function flags($uids, $uid = false){
         $result = [];
         $uids = is_array($uids) ? $uids : [$uids];
         foreach ($uids as $uid) {
-            $raw_flags = \imap_fetch_overview($this->stream, $uid, IMAP::NIL);
+            $raw_flags = \imap_fetch_overview($this->stream, $uid, $uid ? IMAP::FT_UID : IMAP::NIL);
             $flags = [];
             if (is_array($raw_flags) && isset($raw_flags[0])) {
                 $raw_flags = (array) $raw_flags[0];
@@ -282,11 +285,12 @@ class LegacyProtocol extends Protocol implements ProtocolInterface {
     /**
      * Get a message overview
      * @param string $sequence uid sequence
+     * @param bool $uid set to true if passing a unique id
      *
      * @return array
      */
-    public function overview($sequence) {
-        return \imap_fetch_overview($this->stream, $sequence);
+    public function overview($sequence, $uid = false) {
+        return \imap_fetch_overview($this->stream, $sequence,$uid ? IMAP::FT_UID : IMAP::NIL);
     }
 
     /**
@@ -321,16 +325,17 @@ class LegacyProtocol extends Protocol implements ProtocolInterface {
      *                             last message, INF means last message available
      * @param string|null $mode '+' to add flags, '-' to remove flags, everything else sets the flags as given
      * @param bool $silent if false the return values are the new flags for the wanted messages
+     * @param bool $uid set to true if passing a unique id
      *
      * @return bool|array new flags if $silent is false, else true or false depending on success
      */
-    public function store(array $flags, $from, $to = null, $mode = null, $silent = true) {
+    public function store(array $flags, $from, $to = null, $mode = null, $silent = true, $uid = false) {
         $flag = trim(is_array($flags) ? implode(" ", $flags) : $flags);
 
         if ($mode == "+"){
-            $status = \imap_setflag_full($this->stream, $from, $flag, IMAP::NIL);
+            $status = \imap_setflag_full($this->stream, $from, $flag, $uid ? IMAP::FT_UID : IMAP::NIL);
         }else{
-            $status = \imap_clearflag_full($this->stream, $from, $flag, IMAP::NIL);
+            $status = \imap_clearflag_full($this->stream, $from, $flag, $uid ? IMAP::FT_UID : IMAP::NIL);
         }
 
         if ($silent === true) {
@@ -366,11 +371,12 @@ class LegacyProtocol extends Protocol implements ProtocolInterface {
      * @param $from
      * @param int|null $to if null only one message ($from) is fetched, else it's the
      *                         last message, INF means last message available
+     * @param bool $uid set to true if passing a unique id
      *
      * @return bool success
      */
-    public function copyMessage($folder, $from, $to = null) {
-        return \imap_mail_copy($this->stream, $from, $folder, IMAP::CP_UID);
+    public function copyMessage($folder, $from, $to = null, $uid = false) {
+        return \imap_mail_copy($this->stream, $from, $folder, $uid ? IMAP::FT_UID : IMAP::NIL);
     }
 
     /**
@@ -379,11 +385,12 @@ class LegacyProtocol extends Protocol implements ProtocolInterface {
      * @param $from
      * @param int|null $to if null only one message ($from) is fetched, else it's the
      *                         last message, INF means last message available
+     * @param bool $uid set to true if passing a unique id
      *
      * @return bool success
      */
-    public function moveMessage($folder, $from, $to = null) {
-        return \imap_mail_move($this->stream, $from, $folder, IMAP::CP_UID);
+    public function moveMessage($folder, $from, $to = null, $uid = false) {
+        return \imap_mail_move($this->stream, $from, $folder, $uid ? IMAP::FT_UID : IMAP::NIL);
     }
 
     /**
@@ -479,8 +486,8 @@ class LegacyProtocol extends Protocol implements ProtocolInterface {
      * @param array $params
      * @return array message ids
      */
-    public function search(array $params) {
-        return \imap_search($this->stream, $params[0], IMAP::NIL);
+    public function search(array $params, $uid = false) {
+        return \imap_search($this->stream, $params[0], $uid ? IMAP::FT_UID : IMAP::NIL);
     }
 
     /**
