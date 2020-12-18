@@ -9,16 +9,24 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Cert validation issue fixed
 - Allow boundaries ending with a space or semicolon (thanks [@smartilabs](https://github.com/smartilabs))
 - Ignore IMAP DONE command response #57
+- Default `options.fetch` set to `IMAP::FT_PEEK`
+- Address parsing fixed #60
+- Alternative rfc822 header parsing fixed #60
 
 ### Added
 - Proxy support added 
+- Flexible disposition support added #58
 
 ### Affected Classes
-- [Client::class](src/Client.php)
 - [Structure::class](src/Structure.php)
+- [Client::class](src/Client.php)
+- [Header::class](src/Header.php)
+- [Part::class](src/Part.php)
 
 ### Breaking changes
 - Depending on your configuration, your certificates actually get checked. Which can cause an aborted connection if the certificate can not be validated.
+- Messages don't get flagged as read unless you are using your own custom config.
+- All `Header::class` attribute keys are now in a snake_format and no longer minus-separated.
 
 ## [2.2.5] - 2020-12-11
 ### Fixed
