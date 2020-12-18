@@ -107,6 +107,7 @@ return [
     |       'id'     - Use the MessageID as array key (default, might cause hickups with yahoo mail)
     |       'number' - Use the message number as array key (isn't always unique and can cause some interesting behavior)
     |       'list'   - Use the message list number as array key (incrementing integer (does not always start at 0 or 1)
+    |       'uid'    - Use the message uid as array key (isn't always unique and can cause some interesting behavior)
     |   -Fetch order
     |       'asc'  - Order all messages ascending (probably results in oldest first)
     |       'desc' - Order all messages descending (probably results in newest first)

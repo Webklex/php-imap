@@ -234,6 +234,9 @@ class Query {
                         case 'list':
                             $message_key = $msglist;
                             break;
+                        case 'uid':
+                            $message_key = $message->getUid();
+                            break;
                         default:
                             $message_key = $message->getMessageId();
                             break;
