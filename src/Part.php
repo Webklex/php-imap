@@ -176,16 +176,16 @@ class Part {
 
         if(!empty($this->header->get("id"))) {
             $this->id = $this->header->get("id");
-        } else if(!empty($this->header->get("x-attachment-id"))){
-            $this->id = $this->header->get("x-attachment-id");
-        } else if(!empty($this->header->get("content-id"))){
-            $this->id = strtr($this->header->get("content-id"), [
+        } else if(!empty($this->header->get("x_attachment_id"))){
+            $this->id = $this->header->get("x_attachment_id");
+        } else if(!empty($this->header->get("content_id"))){
+            $this->id = strtr($this->header->get("content_id"), [
                 '<' => '',
                 '>' => ''
             ]);
         }
 
-        $content_types = $this->header->get("content-type");
+        $content_types = $this->header->get("content_type");
         if(!empty($content_types)){
             $this->subtype = $this->parseSubtype($content_types);
             $content_type = $content_types;
@@ -245,7 +245,7 @@ class Part {
      * Try to parse the disposition if any is present
      */
     private function parseDisposition(){
-        $content_disposition = $this->header->get("content-disposition");
+        $content_disposition = $this->header->get("content_disposition");
         if($content_disposition !== null) {
             $this->ifdisposition = true;
             $this->disposition = (is_array($content_disposition)) ? implode(' ', $content_disposition) : $content_disposition;
@@ -256,7 +256,7 @@ class Part {
      * Try to parse the description if any is present
      */
     private function parseDescription(){
-        $content_description = $this->header->get("content-description");
+        $content_description = $this->header->get("content_description");
         if($content_description !== null) {
             $this->ifdescription = true;
             $this->description = $content_description;
@@ -267,7 +267,7 @@ class Part {
      * Try to parse the encoding if any is present
      */
     private function parseEncoding(){
-        $encoding = $this->header->get("content-transfer-encoding");
+        $encoding = $this->header->get("content_transfer_encoding");
         if($encoding !== null) {
             switch (strtolower($encoding)) {
                 case "quoted-printable":

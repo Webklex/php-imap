@@ -172,7 +172,11 @@ class Header {
         $headers = [];
         $imap_headers = [];
         if (extension_loaded('imap')) {
-            $imap_headers = (array) \imap_rfc822_parse_headers($this->raw);
+            $raw_imap_headers = (array) \imap_rfc822_parse_headers($this->raw);
+            foreach($raw_imap_headers as $key => $values) {
+                $key = str_replace("-", "_", $key);
+                $imap_headers[$key] = $values;
+            }
         }
 
         $lines = explode("\r\n", $raw_headers);
@@ -204,6 +208,8 @@ class Header {
             }else{
                 if (($pos = strpos($line, ":")) > 0) {
                     $key = trim(rtrim(strtolower(substr($line, 0, $pos))));
+                    $key = str_replace("-", "_", $key);
+
                     $value = trim(rtrim(substr($line, $pos + 1)));
                     $headers[$key] = [$value];
                     $prev_header = $key;
@@ -420,7 +426,7 @@ class Header {
      * Try to extract the priority from a given raw header string
      */
     private function findPriority() {
-        if(($priority = $this->get("x-priority")) === null) return;
+        if(($priority = $this->get("x_priority")) === null) return;
         switch($priority){
             case IMAP::MESSAGE_PRIORITY_HIGHEST;
                 $priority = IMAP::MESSAGE_PRIORITY_HIGHEST;
@@ -538,7 +544,7 @@ class Header {
     private function extractHeaderExtensions(){
         foreach ($this->attributes as $key => $value) {
             // Only parse strings and don't parse any attributes like the user-agent
-            if (is_string($value) === true && in_array($key, ["user-agent"]) === false) {
+            if (is_string($value) === true && in_array($key, ["user_agent"]) === false) {
                 if (($pos = strpos($value, ";")) !== false){
                     $original = substr($value, 0, $pos);
                     $this->attributes[$key] = trim(rtrim($original));
