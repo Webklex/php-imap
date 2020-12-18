@@ -454,6 +454,10 @@ class Header {
     private function decodeAddresses($values) {
         $addresses = [];
         foreach($values as $address) {
+            $address = trim(rtrim($address));
+            if (strpos($address, ",") == strlen($address) - 1) {
+                $address = substr($address, 0, -1);
+            }
             if (preg_match(
                 '/^(?:(?P<name>.+)\s)?(?(name)<|<?)(?P<email>[^\s]+?)(?(name)>|>?)$/',
                 $address,
