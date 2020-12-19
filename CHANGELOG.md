@@ -12,6 +12,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Default `options.fetch` set to `IMAP::FT_PEEK`
 - Address parsing fixed #60
 - Alternative rfc822 header parsing fixed #60
+- Parse more than one Received: header #61
 
 ### Added
 - Proxy support added 

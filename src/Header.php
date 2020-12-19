@@ -211,7 +211,11 @@ class Header {
                     $key = str_replace("-", "_", $key);
 
                     $value = trim(rtrim(substr($line, $pos + 1)));
-                    $headers[$key] = [$value];
+                    if (isset($headers[$key])) {
+                        $headers[$key][]  = $value;
+                    }else{
+                        $headers[$key] = [$value];
+                    }
                     $prev_header = $key;
                 }
             }
