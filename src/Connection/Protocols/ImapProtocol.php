@@ -1003,10 +1003,10 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
         $ids = [];
         foreach ($uids as $msgn => $v) {
             if ( ($to >= $msgn && $from <= $msgn) || ($to === "*" && $from <= $msgn) ){
-                $ids[] = $msgn;
+                $ids[] = $uid ? $v : $msgn;
             }
         }
-        $headers = $this->headers($ids, $uid);
+        $headers = $this->headers($ids, $rfc = "RFC822", $uid);
         foreach ($headers as $msgn => $raw_header) {
             $result[$msgn] = (new Header($raw_header))->getAttributes();
         }
