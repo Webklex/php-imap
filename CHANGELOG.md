@@ -13,6 +13,8 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Address parsing fixed #60
 - Alternative rfc822 header parsing fixed #60
 - Parse more than one Received: header #61
+- Fetch folder overview fixed
+- `Message::getTextBody()` fallback value fixed
 
 ### Added
 - Proxy support added 
@@ -26,12 +28,14 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - [Query::class](src/Query/Query.php)
 - [Client::class](src/Client.php)
 - [Header::class](src/Header.php)
+- [Folder::class](src/Folder.php)
 - [Part::class](src/Part.php)
 
 ### Breaking changes
 - Depending on your configuration, your certificates actually get checked. Which can cause an aborted connection if the certificate can not be validated.
 - Messages don't get flagged as read unless you are using your own custom config.
 - All `Header::class` attribute keys are now in a snake_format and no longer minus-separated.
+- `Message::getTextBody()` no longer returns false if no text body is present. `null` is returned instead.
 
 ## [2.2.5] - 2020-12-11
 ### Fixed

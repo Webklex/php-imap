@@ -387,7 +387,7 @@ class Message {
      */
     public function getTextBody() {
         if (!isset($this->bodies['text'])) {
-            return false;
+            return null;
         }
 
         return $this->bodies['text'];
