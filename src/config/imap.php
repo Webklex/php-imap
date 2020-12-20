@@ -14,18 +14,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | IMAP default account
-    |--------------------------------------------------------------------------
-    |
-    | The default account identifier. It will be used as default for any missing account parameters.
-    | If however the default account is missing a parameter the package default will be used.
-    | Set to 'false' [boolean] to disable this functionality.
-    |
-    */
-    'default' => 'default',
-
-    /*
-    |--------------------------------------------------------------------------
     | Default date format
     |--------------------------------------------------------------------------
     |
@@ -37,7 +25,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Available IMAP accounts
+    | Default account
+    |--------------------------------------------------------------------------
+    |
+    | The default account identifier. It will be used as default for any missing account parameters.
+    | If however the default account is missing a parameter the package default will be used.
+    | Set to 'false' [boolean] to disable this functionality.
+    |
+    */
+    'default' => 'default',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Available accounts
     |--------------------------------------------------------------------------
     |
     | Please list all IMAP accounts which you are planning to use within the
@@ -106,7 +106,7 @@ return [
     |   -Flag download option
     |       Default TRUE
     |   -Message key identifier option
-    |       You can choose between 'id', 'number' or 'list'
+    |       You can choose between the following:
     |       'id'     - Use the MessageID as array key (default, might cause hickups with yahoo mail)
     |       'number' - Use the message number as array key (isn't always unique and can cause some interesting behavior)
     |       'list'   - Use the message list number as array key (incrementing integer (does not always start at 0 or 1)
@@ -145,12 +145,12 @@ return [
             "sent" => "INBOX/Sent",
             "trash" => "INBOX/Trash",
         ],
-        'open' => [
-            // 'DISABLE_AUTHENTICATOR' => 'GSSAPI'
-        ],
         'decoder' => [
             'message' => 'utf-8', // mimeheader
             'attachment' => 'utf-8' // mimeheader
+        ],
+        'open' => [
+            // 'DISABLE_AUTHENTICATOR' => 'GSSAPI'
         ]
     ],
 
