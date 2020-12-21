@@ -145,10 +145,11 @@ abstract class Protocol {
 
     /**
      * Prepare socket options
+     * @var string $transport
      *
      * @return array
      */
-    private function defaultSocketOptions() {
+    private function defaultSocketOptions($transport) {
         $options = [];
         if ($this->encryption != false) {
             $options["ssl"] = [
@@ -158,13 +159,13 @@ abstract class Protocol {
         }
 
         if ($this->proxy["socket"] != null) {
-            $options["proxy"] = $this->proxy["socket"];
-            $options["request_fulluri"] = $this->proxy["request_fulluri"];
+            $options[$transport]["proxy"] = $this->proxy["socket"];
+            $options[$transport]["request_fulluri"] = $this->proxy["request_fulluri"];
 
             if ($this->proxy["username"] != null) {
                 $auth = base64_encode($this->proxy["username"].':'.$this->proxy["password"]);
 
-                $options["header"] = [
+                $options[$transport]["header"] = [
                     "Proxy-Authorization: Basic $auth"
                 ];
             }
@@ -188,7 +189,7 @@ abstract class Protocol {
         $socket = "$transport://$host:$port";
         $stream = stream_socket_client($socket, $errno, $errstr, $timeout,
             STREAM_CLIENT_CONNECT,
-            stream_context_create($this->defaultSocketOptions())
+            stream_context_create($this->defaultSocketOptions($transport))
         );
 
         if (!$stream) {
