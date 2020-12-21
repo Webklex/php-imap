@@ -23,7 +23,6 @@ Laravel wrapper: [webklex/laravel-imap](https://github.com/Webklex/laravel-imap)
 ## Table of Contents
 - [Documentations](#documentations)
 - [Basic usage example](#basic-usage-example)
-- [Support](#support)
 - [Known issues](#known-issues)
 - [Support](#support)
 - [Features & pull requests](#features--pull-requests)
@@ -111,12 +110,13 @@ will turn into:
 echo 'your php code...'; 
 ``` 
  
- 
+  
 ## Features & pull requests 
 Everyone can contribute to this project. Every pull request will be considered but it can also happen to be declined.  
 To prevent unnecessary work, please consider to create a [feature issue](https://github.com/Webklex/php-imap/issues/new?template=feature_request.md)  
 first, if you're planning to do bigger changes. Of course you can also create a new [feature issue](https://github.com/Webklex/php-imap/issues/new?template=feature_request.md) 
 if you're just wishing a feature ;)   
+
 
 ## Change log
 Please see [CHANGELOG][link-changelog] for more information what has changed recently.
