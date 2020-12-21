@@ -6,6 +6,20 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
+- NaN 
+
+### Added
+- NaN 
+
+### Affected Classes
+- NaN 
+
+### Breaking changes
+- NaN 
+
+
+## [2.3.0] - 2020-12-21
+### Fixed
 - Cert validation issue fixed
 - Allow boundaries ending with a space or semicolon (thanks [@smartilabs](https://github.com/smartilabs))
 - Ignore IMAP DONE command response #57
