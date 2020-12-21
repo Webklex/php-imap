@@ -20,6 +20,23 @@ Official documentation: [php-imap.com](https://www.php-imap.com/)
 Laravel wrapper: [webklex/laravel-imap](https://github.com/Webklex/laravel-imap)
 
 
+## Table of Contents
+- [Documentations](#documentations)
+- [Basic usage example](#basic-usage-example)
+- [Support](#support)
+- [Known issues](#known-issues)
+- [Support](#support)
+- [Features & pull requests](#features--pull-requests)
+- [Security](#security)
+- [Credits](#credits)
+- [License](#license)
+
+
+## Documentations
+- Legacy (< v2.0.0): [legacy documentation](https://github.com/Webklex/php-imap/tree/1.4.5)
+- Core documentation: [php-imap.com](https://www.php-imap.com/)
+
+
 ## Basic usage example
 This is a basic example, which will echo out all Mails within all imap folders
 and will move every message into INBOX.read. Please be aware that this should not be
@@ -69,7 +86,37 @@ foreach($folders as $folder){
 | Error                                                                     | Solution                                                   | 
 | ------------------------------------------------------------------------- | ---------------------------------------------------------- | 
 | Kerberos error: No credentials cache file found (try running kinit) (...) | Uncomment "DISABLE_AUTHENTICATOR" inside your config and use the `legacy-imap` protocol | 
-  
+
+ 
+## Support 
+If you encounter any problems or if you find a bug, please don't hesitate to create a new [issue](https://github.com/Webklex/php-imap/issues). 
+However please be aware that it might take some time to get an answer. 
+Off topic, rude or abusive issues will be deleted without any notice. 
+ 
+If you need **commercial** support, feel free to send me a mail at github@webklex.com.  
+ 
+ 
+##### A little notice 
+If you write source code in your issue, please consider to format it correctly. This makes it so much nicer to read  
+and people are more likely to comment and help :) 
+ 
+&#96;&#96;&#96;php 
+
+echo 'your php code...'; 
+ 
+&#96;&#96;&#96; 
+ 
+will turn into: 
+```php 
+echo 'your php code...'; 
+``` 
+ 
+ 
+## Features & pull requests 
+Everyone can contribute to this project. Every pull request will be considered but it can also happen to be declined.  
+To prevent unnecessary work, please consider to create a [feature issue](https://github.com/Webklex/php-imap/issues/new?template=feature_request.md)  
+first, if you're planning to do bigger changes. Of course you can also create a new [feature issue](https://github.com/Webklex/php-imap/issues/new?template=feature_request.md) 
+if you're just wishing a feature ;)   
 
 ## Change log
 Please see [CHANGELOG][link-changelog] for more information what has changed recently.
