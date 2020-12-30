@@ -758,7 +758,8 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
             $set .= ':' . ($to == INF ? '*' : (int)$to);
         }
 
-        $result = $this->requestAndResponse('STORE', [$set, $item, $flags], $silent);
+        $command = ($uid ? "UID " : "")."STORE";
+        $result = $this->requestAndResponse($command, [$set, $item, $flags], $silent);
 
         if ($silent) {
             return (bool)$result;
@@ -816,8 +817,9 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
         if ($to !== null) {
             $set .= ':' . ($to == INF ? '*' : (int)$to);
         }
+        $command = ($uid ? "UID " : "")."COPY";
 
-        return $this->requestAndResponse('COPY', [$set, $this->escapeString($folder)], true);
+        return $this->requestAndResponse($command, [$set, $this->escapeString($folder)], true);
     }
 
     /**
@@ -836,8 +838,9 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
         if ($to !== null) {
             $set .= ':' . ($to == INF ? '*' : (int)$to);
         }
+        $command = ($uid ? "UID " : "")."MOVE";
 
-        return $this->requestAndResponse('MOVE', [$set, $this->escapeString($folder)], true);
+        return $this->requestAndResponse($command, [$set, $this->escapeString($folder)], true);
     }
 
     /**
@@ -940,12 +943,12 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
 
     /**
      * Send idle command
-     * @param bool $uid set to true if passing a unique id
+     * @param bool $uid set to true if passing a unique id (depreciated argument: will be removed. CMD UID IDLE is not supported)
      *
      * @throws RuntimeException
      */
     public function idle($uid = false) {
-        $this->sendRequest('IDLE');
+        $this->sendRequest("IDLE");
         if (!$this->assumedNextLine('+ ')) {
             throw new RuntimeException('idle failed');
         }

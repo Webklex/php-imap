@@ -8,6 +8,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Fixed
 - Missing RFC attributes added 
 - Set the message sequence when idling
+- Missing UID commands added #64
 
 ### Added
 - Get a message by its message number 
