@@ -6,6 +6,20 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
+- NaN 
+
+### Added
+- NaN 
+
+### Affected Classes
+- NaN 
+
+### Breaking changes
+- NaN 
+
+
+## [2.3.1] - 2020-12-30
+### Fixed
 - Missing RFC attributes added 
 - Set the message sequence when idling
 - Missing UID commands added #64
@@ -18,10 +32,6 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - [Message::class](src/Message.php)
 - [Folder::class](src/Folder.php)
 - [Query::class](src/Query/Query.php)
-
-### Breaking changes
-- NaN 
-
 
 ## [2.3.0] - 2020-12-21
 ### Fixed
