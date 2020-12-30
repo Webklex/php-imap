@@ -10,6 +10,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Added
 - Get a message by its message number 
+- Get a message by its uid #72 #66 #63
 
 ### Affected Classes
 - [Message::class](src/Message.php)

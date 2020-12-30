@@ -288,7 +288,7 @@ class Query {
      * Get a message by its message number
      * @param $msgn
      * @param null $msglist
-     * 
+     *
      * @return Message
      * @throws ConnectionFailedException
      * @throws InvalidMessageDateException
@@ -300,6 +300,24 @@ class Query {
     public function getMessageByMsgn($msgn, $msglist = null){
         return $this->getMessage($msgn, $msglist, IMAP::ST_MSGN);
     }
+
+    /**
+     * Get a message by its uid
+     * @param $uid
+     *
+     * @return Message
+     * @throws ConnectionFailedException
+     * @throws InvalidMessageDateException
+     * @throws MessageContentFetchingException
+     * @throws MessageHeaderFetchingException
+     * @throws RuntimeException
+     * @throws \Webklex\PHPIMAP\Exceptions\EventNotFoundException
+     */
+    public function getMessageByUid($uid){
+        return $this->getMessage($uid, null, IMAP::ST_UID);
+    }
+
+    /**
      * Paginate the current query
      * @param int $per_page
      * @param null $page
