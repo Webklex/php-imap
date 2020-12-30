@@ -356,6 +356,8 @@ class Folder {
         $this->client->reconnect();
         $this->client->openFolder($this->path, true);
         $connection = $this->client->getConnection();
+
+        $sequence = ClientManager::get('options.sequence', IMAP::ST_MSGN);
         $connection->idle();
 
         while (true) {
@@ -366,7 +368,8 @@ class Folder {
                     $connection->done();
 
                     $this->client->openFolder($this->path, true);
-                    $message = $this->query()->getMessage($msgn);
+                    $message = $this->query()->getMessageByMsgn($msgn);
+                    $message->setSequence($sequence);
                     $callback($message);
 
                     $event = $this->getEvent("message", "new");

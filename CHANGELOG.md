@@ -7,6 +7,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ## [UNRELEASED]
 ### Fixed
 - Missing RFC attributes added 
+- Set the message sequence when idling
 
 ### Added
 - Get a message by its message number 
@@ -14,6 +15,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Affected Classes
 - [Message::class](src/Message.php)
+- [Folder::class](src/Folder.php)
 - [Query::class](src/Query/Query.php)
 
 ### Breaking changes
