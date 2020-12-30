@@ -6,13 +6,13 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN 
+- Missing RFC attributes added 
 
 ### Added
 - NaN 
 
 ### Affected Classes
-- NaN 
+- [Message::class](src/Message.php)
 
 ### Breaking changes
 - NaN 

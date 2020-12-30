@@ -425,7 +425,7 @@ class Message {
      */
     private function parseHeader() {
         $sequence_id = $this->getSequenceId();
-        $headers = $this->client->getConnection()->headers([$sequence_id], $this->sequence === IMAP::ST_UID);
+        $headers = $this->client->getConnection()->headers([$sequence_id], "RFC822", $this->sequence === IMAP::ST_UID);
         if (!isset($headers[$sequence_id])) {
             throw new MessageHeaderFetchingException("no headers found", 0);
         }
@@ -493,7 +493,7 @@ class Message {
         $this->client->openFolder($this->folder_path);
 
         $sequence_id = $this->getSequenceId();
-        $contents = $this->client->getConnection()->content([$sequence_id], $this->sequence === IMAP::ST_UID);
+        $contents = $this->client->getConnection()->content([$sequence_id], "RFC822", $this->sequence === IMAP::ST_UID);
         if (!isset($contents[$sequence_id])) {
             throw new MessageContentFetchingException("no content found", 0);
         }
