@@ -9,10 +9,11 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Missing RFC attributes added 
 
 ### Added
-- NaN 
+- Get a message by its message number 
 
 ### Affected Classes
 - [Message::class](src/Message.php)
+- [Query::class](src/Query/Query.php)
 
 ### Breaking changes
 - NaN 
