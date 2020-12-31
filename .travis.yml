@@ -24,9 +24,6 @@ before-install:
 install:
   - COMPOSER_MEMORY_LIMIT=-1 composer install --no-interaction
 
-script:
-  - phpunit
-
 notifications:
   email:
     on_success: always
