@@ -555,7 +555,7 @@ class Header {
             $address->mail = ($address->mailbox && $address->host) ? $address->mailbox.'@'.$address->host : false;
             $address->full = ($address->personal) ? $address->personal.' <'.$address->mail.'>' : $address->mail;
 
-            $addresses[] = $address;
+            $addresses[] = new Address($address);
         }
 
         return $addresses;
