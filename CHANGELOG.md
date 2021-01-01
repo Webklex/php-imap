@@ -6,7 +6,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN 
+- Get partial overview when `IMAP::ST_UID` is set #74
 
 ### Added
 - NaN 
