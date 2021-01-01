@@ -7,6 +7,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ## [UNRELEASED]
 ### Fixed
 - Get partial overview when `IMAP::ST_UID` is set #74
+- Unnecessary "'" removed from address names
 
 ### Added
 - Configurable supported default flags added

@@ -531,6 +531,10 @@ class Header {
                         $address->personal .= $this->convertEncoding($p->text, $this->getEncoding($p));
                     }
                 }
+
+                if (strpos($address->personal, "'") === 0) {
+                    $address->personal = str_replace("'", "", $address->personal);
+                }
             }
 
             $address->mail = ($address->mailbox && $address->host) ? $address->mailbox.'@'.$address->host : false;
