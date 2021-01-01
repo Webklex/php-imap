@@ -9,10 +9,10 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Get partial overview when `IMAP::ST_UID` is set #74
 
 ### Added
-- NaN 
+- Configurable supported default flags added
 
 ### Affected Classes
-- NaN 
+- [Message::class](src/Message.php)
 
 ### Breaking changes
 - NaN 

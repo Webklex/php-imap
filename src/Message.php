@@ -178,7 +178,7 @@ class Message {
      *
      * @var array $available_flags
      */
-    private $available_flags = ['recent', 'flagged', 'answered', 'deleted', 'seen', 'draft'];
+    private $available_flags = null;
 
     /**
      * Message constructor.
@@ -209,6 +209,7 @@ class Message {
         $this->folder_path = $client->getFolderPath();
 
         $this->config = ClientManager::get('options');
+        $this->available_flags = ClientManager::get('flags');
 
         $this->setSequence($sequence);
         $this->setFetchOption($fetch_options);
@@ -279,6 +280,7 @@ class Message {
         ]);
         $instance->setFolderPath($client->getFolderPath());
         $instance->setConfig(ClientManager::get('options'));
+        $instance->setAvailableFlags(ClientManager::get('flags'));
         $instance->setSequence($sequence);
         $instance->setFetchOption($fetch_options);
 
@@ -454,7 +456,7 @@ class Message {
                 $flag = substr($flag, 1);
             }
             $flag_key = strtolower($flag);
-            if (in_array($flag_key, $this->available_flags)) {
+            if (in_array($flag_key, $this->available_flags) || $this->available_flags === null) {
                 $this->flags->put($flag_key, $flag);
             }
         }
@@ -1191,6 +1193,18 @@ class Message {
      */
     public function setConfig($config){
         $this->config = $config;
+
+        return $this;
+    }
+
+    /**
+     * Set the available flags
+     * @param $available_flags
+     *
+     * @return $this
+     */
+    public function setAvailableFlags($available_flags){
+        $this->available_flags = $available_flags;
 
         return $this;
     }
