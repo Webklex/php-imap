@@ -11,12 +11,16 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Added
 - Configurable supported default flags added
+- Message attribute class added to unify value handling
 
 ### Affected Classes
 - [Message::class](src/Message.php)
+- [Header::class](src/Header.php)
+- [Attribute::class](src/Attribute.php)
 
 ### Breaking changes
-- NaN 
+- Stringified message headers are now separated by ", " instead of " ". 
+- All message header values such as subject, message_id, from, to, etc now consists of an `Àttribute::class` instance 
 
 
 ## [2.3.1] - 2020-12-30

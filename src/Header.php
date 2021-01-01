@@ -34,7 +34,7 @@ class Header {
     /**
      * Attribute holder
      *
-     * @var array $attributes
+     * @var Attribute[] $attributes
      */
     protected $attributes = [];
 
@@ -69,7 +69,7 @@ class Header {
      * @param string $method
      * @param array $arguments
      *
-     * @return mixed
+     * @return Attribute
      * @throws MethodNotFoundException
      */
     public function __call($method, $arguments) {
@@ -89,7 +89,7 @@ class Header {
      * Magic getter
      * @param $name
      *
-     * @return mixed|null
+     * @return Attribute|null
      */
     public function __get($name) {
         return $this->get($name);
@@ -99,7 +99,7 @@ class Header {
      * Get a specific header attribute
      * @param $name
      *
-     * @return mixed|null
+     * @return Attribute|null
      */
     public function get($name) {
         if(isset($this->attributes[$name])) {
@@ -107,6 +107,24 @@ class Header {
         }
 
         return null;
+    }
+
+    /**
+     * Set a specific attribute
+     * @param string $name
+     * @param array|mixed $value
+     * @param boolean $strict
+     *
+     * @return Attribute
+     */
+    public function set($name, $value, $strict = false) {
+        if(isset($this->attributes[$name]) && $strict === false) {
+            $this->attributes[$name]->add($value, true);
+        }else{
+            $this->attributes[$name] = new Attribute($name, $value);
+        }
+
+        return $this->attributes[$name];
     }
 
     /**
@@ -137,23 +155,20 @@ class Header {
         $this->extractAddresses($header);
 
         if (property_exists($header, 'subject')) {
-            $this->attributes["subject"] = $this->decode($header->subject);
-        }
-        if (property_exists($header, 'in_reply_to')) {
-            $this->attributes["in_reply_to"] = is_array($header->in_reply_to) ? $header->in_reply_to : [$header->in_reply_to];
+            $this->set("subject", $this->decode($header->subject));
         }
         if (property_exists($header, 'references')) {
-            $this->attributes["references"] = $this->decode($header->references);
+            $this->set("references", $this->decode($header->references));
         }
         if (property_exists($header, 'message_id')) {
-            $this->attributes["message_id"] = str_replace(['<', '>'], '', $header->message_id);
+            $this->set("message_id", str_replace(['<', '>'], '', $header->message_id));
         }
 
         $this->parseDate($header);
         foreach ($header as $key => $value) {
             $key = trim(rtrim(strtolower($key)));
             if(!isset($this->attributes[$key])){
-                $this->attributes[$key] = $value;
+                $this->set($key, $value);
             }
         }
 
@@ -431,7 +446,7 @@ class Header {
      */
     private function findPriority() {
         if(($priority = $this->get("x_priority")) === null) return;
-        switch($priority){
+        switch((int)"$priority"){
             case IMAP::MESSAGE_PRIORITY_HIGHEST;
                 $priority = IMAP::MESSAGE_PRIORITY_HIGHEST;
                 break;
@@ -452,7 +467,7 @@ class Header {
                 break;
         }
 
-        $this->attributes["priority"] = $priority;
+        $this->set("priority", $priority);
     }
 
     /**
@@ -493,7 +508,7 @@ class Header {
     private function extractAddresses($header) {
         foreach(['from', 'to', 'cc', 'bcc', 'reply_to', 'sender'] as $key){
             if (property_exists($header, $key)) {
-                $this->attributes[$key] = $this->parseAddresses($header->$key);
+                $this->set($key, $this->parseAddresses($header->$key));
             }
         }
     }
@@ -551,11 +566,12 @@ class Header {
      */
     private function extractHeaderExtensions(){
         foreach ($this->attributes as $key => $value) {
+            $value = (string)$value;
             // Only parse strings and don't parse any attributes like the user-agent
-            if (is_string($value) === true && in_array($key, ["user_agent"]) === false) {
+            if (in_array($key, ["user_agent"]) === false) {
                 if (($pos = strpos($value, ";")) !== false){
                     $original = substr($value, 0, $pos);
-                    $this->attributes[$key] = trim(rtrim($original));
+                    $this->set($key, trim(rtrim($original)), true);
 
                     // Get all potential extensions
                     $extensions = explode(";", substr($value, $pos + 1));
@@ -569,7 +585,7 @@ class Header {
                                 $value = str_replace('"', "", $value);
                                 $value = trim(rtrim($value));
 
-                                $this->attributes[$key] = $value;
+                                $this->set($key, $value);
                             }
                         }
                     }
@@ -633,7 +649,7 @@ class Header {
                 }
             }
 
-            $this->attributes["date"] = $parsed_date;
+            $this->set("date", $parsed_date);
         }
     }
 
