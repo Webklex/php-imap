@@ -845,6 +845,7 @@ class Message {
      * @throws MessageContentFetchingException
      * @throws MessageHeaderFetchingException
      * @throws Exceptions\EventNotFoundException
+     * @throws MessageFlagException
      */
     public function copy($folder_path, $expunge = false) {
         $this->client->openFolder($folder_path);
@@ -858,21 +859,7 @@ class Message {
 
             $this->client->openFolder($this->folder_path);
             if ($this->client->getConnection()->copyMessage($folder->path, $this->getSequenceId(), null, $this->sequence === IMAP::ST_UID) == true) {
-                if($expunge) $this->client->expunge();
-
-                $this->client->openFolder($folder->path);
-
-                if ($this->sequence === IMAP::ST_UID) {
-                    $sequence_id = $next_uid;
-                }else{
-                    $sequence_id = $this->client->getConnection()->getMessageNumber($next_uid);
-                }
-
-                $message = $folder->query()->getMessage($sequence_id, null, $this->sequence);
-                $event = $this->getEvent("message", "copied");
-                $event::dispatch($this, $message);
-
-                return $message;
+                return $this->fetchNewMail($folder, $next_uid, "copied", $expunge);
             }
         }
 
@@ -892,6 +879,7 @@ class Message {
      * @throws MessageContentFetchingException
      * @throws MessageHeaderFetchingException
      * @throws Exceptions\EventNotFoundException
+     * @throws MessageFlagException
      */
     public function move($folder_path, $expunge = false) {
         $this->client->openFolder($folder_path);
@@ -905,25 +893,45 @@ class Message {
 
             $this->client->openFolder($this->folder_path);
             if ($this->client->getConnection()->moveMessage($folder->path, $this->getSequenceId(), null, $this->sequence === IMAP::ST_UID) == true) {
-                if($expunge) $this->client->expunge();
-
-                $this->client->openFolder($folder->path);
-
-                if ($this->sequence === IMAP::ST_UID) {
-                    $sequence_id = $next_uid;
-                }else{
-                    $sequence_id = $this->client->getConnection()->getMessageNumber($next_uid);
-                }
-
-                $message = $folder->query()->getMessage($sequence_id, null, $this->sequence);
-                $event = $this->getEvent("message", "moved");
-                $event::dispatch($this, $message);
-
-                return $message;
+                return $this->fetchNewMail($folder, $next_uid, "moved", $expunge);
             }
         }
 
         return null;
+    }
+
+    /**
+     * Fetch a new message and fire a given event
+     * @param Folder $folder
+     * @param int $next_uid
+     * @param string $event
+     * @param boolean $expunge
+     *
+     * @return mixed
+     * @throws Exceptions\ConnectionFailedException
+     * @throws Exceptions\EventNotFoundException
+     * @throws Exceptions\RuntimeException
+     * @throws InvalidMessageDateException
+     * @throws MessageContentFetchingException
+     * @throws MessageFlagException
+     * @throws MessageHeaderFetchingException
+     */
+    protected function fetchNewMail($folder, $next_uid, $event, $expunge){
+        if($expunge) $this->client->expunge();
+
+        $this->client->openFolder($folder->path);
+
+        if ($this->sequence === IMAP::ST_UID) {
+            $sequence_id = $next_uid;
+        }else{
+            $sequence_id = $this->client->getConnection()->getMessageNumber($next_uid);
+        }
+
+        $message = $folder->query()->getMessage($sequence_id, null, $this->sequence);
+        $event = $this->getEvent("message", $event);
+        $event::dispatch($this, $message);
+
+        return $message;
     }
 
     /**
