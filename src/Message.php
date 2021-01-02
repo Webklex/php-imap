@@ -1357,7 +1357,7 @@ class Message {
     /**
      * Set the message number
      * @param $msgn
-     * @param null $msglist
+     * @param int|null $msglist
      *
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\RuntimeException
@@ -1392,7 +1392,7 @@ class Message {
     /**
      * Set the sequence id
      * @param $uid
-     * @param null $msglist
+     * @param int|null $msglist
      *
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\RuntimeException
