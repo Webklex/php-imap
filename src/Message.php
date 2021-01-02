@@ -298,14 +298,7 @@ class Message {
         $instance->parseRawHeader($raw_header);
         $instance->parseRawFlags($raw_flags);
         $instance->parseRawBody($raw_body);
-
-        if ($fetch_options == IMAP::FT_PEEK) {
-            if ($instance->getFlags()->get("seen") == null) {
-                $instance->unsetFlag("Seen");
-            }
-        } elseif ($instance->getFlags()->get("seen") == null) {
-            $instance->setFlag("Seen");
-        }
+        $instance->peek();
 
         return $instance;
     }
@@ -502,7 +495,19 @@ class Message {
         $content = $contents[$sequence_id];
 
         $body = $this->parseRawBody($content);
+        $this->peek();
 
+        return $body;
+    }
+
+    /**
+     * Handle auto "Seen" flag handling
+     *
+     * @throws Exceptions\ConnectionFailedException
+     * @throws Exceptions\EventNotFoundException
+     * @throws MessageFlagException
+     */
+    public function peek(){
         if ($this->fetch_options == IMAP::FT_PEEK) {
             if ($this->getFlags()->get("seen") == null) {
                 $this->unsetFlag("Seen");
@@ -510,8 +515,6 @@ class Message {
         }elseif ($this->getFlags()->get("seen") != null) {
             $this->setFlag("Seen");
         }
-
-        return $body;
     }
 
     /**
