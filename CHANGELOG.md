@@ -16,6 +16,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Alias `Message::attachments()` for `Message::getAttachments()` added
 - Alias `Message::addFlag()` for `Message::setFlag()` added
 - Alias `Message::removeFlag()` for `Message::unsetFlag()` added
+- Alias `Message::flags()` for `Message::getFlags()` added
 
 ### Affected Classes
 - [Message::class](src/Message.php)

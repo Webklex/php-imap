@@ -1138,6 +1138,15 @@ class Message {
     }
 
     /**
+     * Get all set flags
+     *
+     * @return FlagCollection
+     */
+    public function flags(){
+        return $this->getFlags();
+    }
+
+    /**
      * Get the fetched structure
      *
      * @return Structure|null
