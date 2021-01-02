@@ -108,7 +108,7 @@ class Folder {
      *
      * @var boolean
      */
-    public $referal;
+    public $referral;
 
     /**
      * Folder constructor.
@@ -214,7 +214,7 @@ class Folder {
         $this->no_inferiors = in_array('\NoInferiors', $attributes) ? true : false;
         $this->no_select    = in_array('\NoSelect', $attributes) ? true : false;
         $this->marked       = in_array('\Marked', $attributes) ? true : false;
-        $this->referal      = in_array('\Referal', $attributes) ? true : false;
+        $this->referral     = in_array('\Referral', $attributes) ? true : false;
         $this->has_children = in_array('\HasChildren', $attributes) ? true : false;
     }
 

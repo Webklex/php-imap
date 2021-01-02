@@ -8,6 +8,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Fixed
 - Get partial overview when `IMAP::ST_UID` is set #74
 - Unnecessary "'" removed from address names
+- Folder referral typo fixed
 
 ### Added
 - Configurable supported default flags added
@@ -20,9 +21,11 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - New Exception `MessageFlagException::class` added
 
 ### Affected Classes
-- [Message::class](src/Message.php)
+- [Folder::class](src/Folder.php)
 - [Header::class](src/Header.php)
+- [Message::class](src/Message.php)
 - [Address::class](src/Address.php)
+- [Query::class](src/Query/Query.php)
 - [Attribute::class](src/Attribute.php)
 
 ### Breaking changes
@@ -30,6 +33,9 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - All message header values such as subject, message_id, from, to, etc now consists of an `Àttribute::class` instance (should behave the same way as before, but might cause some problem in certain edge cases)
 - The formal address object "from", "to", etc now consists of an `Address::class` instance  (should behave the same way as before, but might cause some problem in certain edge cases)
 - When fetching or manipulating message flags a `MessageFlagException::class` exception can be thrown if a runtime error occurs
+- Learn more about the new `Attribute` class here: [www.php-imap.com/api/attribute](https://www.php-imap.com/api/attribute)
+- Learn more about the new `Address` class here: [www.php-imap.com/api/address](https://www.php-imap.com/api/address)
+- Folder attribute "referal" is now "referral"
 
 ## [2.3.1] - 2020-12-30
 ### Fixed
