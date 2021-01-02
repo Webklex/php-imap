@@ -1018,6 +1018,20 @@ class Message {
         return $this->setFlag($flag);
     }
 
+    /**
+     * Unset a given flag
+     * @param string|array $flag
+     *
+     * @return bool
+     * @throws Exceptions\ConnectionFailedException
+     * @throws Exceptions\EventNotFoundException
+     * @throws MessageFlagException
+     */
+    public function removeFlag($flag) {
+        return $this->unsetFlag($flag);
+    }
+
+    /**
      * Get all message attachments.
      *
      * @return AttachmentCollection
