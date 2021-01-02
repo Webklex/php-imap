@@ -19,6 +19,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Alias `Message::removeFlag()` for `Message::unsetFlag()` added
 - Alias `Message::flags()` for `Message::getFlags()` added
 - New Exception `MessageFlagException::class` added
+- New method `Message::setSequenceId($id)` added 
 
 ### Affected Classes
 - [Folder::class](src/Folder.php)
@@ -35,7 +36,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - When fetching or manipulating message flags a `MessageFlagException::class` exception can be thrown if a runtime error occurs
 - Learn more about the new `Attribute` class here: [www.php-imap.com/api/attribute](https://www.php-imap.com/api/attribute)
 - Learn more about the new `Address` class here: [www.php-imap.com/api/address](https://www.php-imap.com/api/address)
-- Folder attribute "referal" is now "referral"
+- Folder attribute "referal" is now called "referral"
 
 ## [2.3.1] - 2020-12-30
 ### Fixed

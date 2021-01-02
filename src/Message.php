@@ -224,14 +224,7 @@ class Message {
         $this->client = $client;
         $this->client->openFolder($this->folder_path);
 
-        if ($this->sequence === IMAP::ST_UID) {
-            $this->uid = $uid;
-            $this->msgn = $this->client->getConnection()->getMessageNumber($this->uid);
-        }else{
-            $this->msgn = $uid;
-            $this->uid = $this->client->getConnection()->getUid($this->msgn);
-        }
-        $this->msglist = $msglist;
+        $this->setSequenceId($uid, $msglist);
 
         if ($this->fetch_options == IMAP::FT_PEEK) {
             $this->parseFlags();
@@ -290,13 +283,7 @@ class Message {
         $instance->setAttachments(AttachmentCollection::make([]));
 
         $instance->setClient($client);
-
-        if ($instance->getSequence() === IMAP::ST_UID) {
-            $instance->setUid($uid);
-            $instance->setMsglist($msglist);
-        }else{
-            $instance->setMsgn($uid, $msglist);
-        }
+        $instance->setSequenceId($uid, $msglist);
 
         $instance->parseRawHeader($raw_header);
         $instance->parseRawFlags($raw_flags);
@@ -1383,5 +1370,22 @@ class Message {
      */
     public function getSequenceId(){
         return $this->sequence === IMAP::ST_UID ? $this->uid : $this->msgn;
+    }
+
+    /**
+     * Set the sequence id
+     * @param $uid
+     * @param null $msglist
+     *
+     * @throws Exceptions\ConnectionFailedException
+     * @throws Exceptions\RuntimeException
+     */
+    public function setSequenceId($uid, $msglist = null){
+        if ($this->getSequence() === IMAP::ST_UID) {
+            $this->setUid($uid);
+            $this->setMsglist($msglist);
+        }else{
+            $this->setMsgn($uid, $msglist);
+        }
     }
 }
