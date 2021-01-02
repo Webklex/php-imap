@@ -1006,6 +1006,18 @@ class Message {
     }
 
     /**
+     * Set a given flag
+     * @param string|array $flag
+     *
+     * @return bool
+     * @throws Exceptions\ConnectionFailedException
+     * @throws MessageFlagException
+     * @throws Exceptions\EventNotFoundException
+     */
+    public function addFlag($flag) {
+        return $this->setFlag($flag);
+    }
+
      * Get all message attachments.
      *
      * @return AttachmentCollection
