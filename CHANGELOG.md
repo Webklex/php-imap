@@ -17,6 +17,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Alias `Message::addFlag()` for `Message::setFlag()` added
 - Alias `Message::removeFlag()` for `Message::unsetFlag()` added
 - Alias `Message::flags()` for `Message::getFlags()` added
+- New Exception `MessageFlagException::class` added
 
 ### Affected Classes
 - [Message::class](src/Message.php)
@@ -28,7 +29,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Stringified message headers are now separated by ", " instead of " ". 
 - All message header values such as subject, message_id, from, to, etc now consists of an `Àttribute::class` instance (should behave the same way as before, but might cause some problem in certain edge cases)
 - The formal address object "from", "to", etc now consists of an `Address::class` instance  (should behave the same way as before, but might cause some problem in certain edge cases)
-
+- When fetching or manipulating message flags a `MessageFlagException::class` exception can be thrown if a runtime error occurs
 
 ## [2.3.1] - 2020-12-30
 ### Fixed

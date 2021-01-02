@@ -349,6 +349,7 @@ class Folder {
      * @throws Exceptions\MessageHeaderFetchingException
      * @throws Exceptions\RuntimeException
      * @throws Exceptions\EventNotFoundException
+     * @throws Exceptions\MessageFlagException
      */
     public function idle(callable $callback, $timeout = 1200) {
         $this->client->getConnection()->setConnectionTimeout($timeout);

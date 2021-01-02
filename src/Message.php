@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
 use Webklex\PHPIMAP\Exceptions\MaskNotFoundException;
 use Webklex\PHPIMAP\Exceptions\MessageContentFetchingException;
+use Webklex\PHPIMAP\Exceptions\MessageFlagException;
 use Webklex\PHPIMAP\Exceptions\MessageHeaderFetchingException;
 use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
 use Webklex\PHPIMAP\Support\AttachmentCollection;
@@ -196,6 +197,7 @@ class Message {
      * @throws MessageHeaderFetchingException
      * @throws MessageContentFetchingException
      * @throws Exceptions\EventNotFoundException
+     * @throws MessageFlagException
      */
     public function __construct($uid, $msglist, Client $client, $fetch_options = null, $fetch_body = false, $fetch_flags = false, $sequence = null) {
 
@@ -260,10 +262,11 @@ class Message {
      * @return Message
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\EventNotFoundException
-     * @throws Exceptions\RuntimeException
      * @throws InvalidMessageDateException
      * @throws MessageContentFetchingException
      * @throws \ReflectionException
+     * @throws MessageFlagException
+     * @throws Exceptions\RuntimeException
      */
     public static function make($uid, $msglist, Client $client, $raw_header, $raw_body, $raw_flags, $fetch_options = null, $sequence = null){
         $reflection = new \ReflectionClass(self::class);
@@ -319,9 +322,7 @@ class Message {
             $name = Str::snake(substr($method, 3));
 
             if(in_array($name, array_keys($this->attributes))) {
-                $this->attributes[$name] = array_pop($arguments);
-
-                return $this->attributes[$name];
+                return $this->__set($name, array_pop($arguments));
             }
 
         }
@@ -460,14 +461,18 @@ class Message {
      *
      * @return void
      * @throws Exceptions\ConnectionFailedException
-     * @throws Exceptions\RuntimeException
+     * @throws MessageFlagException
      */
     private function parseFlags() {
         $this->client->openFolder($this->folder_path);
         $this->flags = FlagCollection::make([]);
 
         $sequence_id = $this->getSequenceId();
-        $flags = $this->client->getConnection()->flags([$sequence_id], $this->sequence === IMAP::ST_UID);
+        try {
+            $flags = $this->client->getConnection()->flags([$sequence_id], $this->sequence === IMAP::ST_UID);
+        } catch (Exceptions\RuntimeException $e) {
+            throw new MessageFlagException("flag could not be fetched", 0, $e);
+        }
 
         if (isset($flags[$sequence_id])) {
             $this->parseRawFlags($flags[$sequence_id]);
@@ -481,14 +486,18 @@ class Message {
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\MessageContentFetchingException
      * @throws InvalidMessageDateException
-     * @throws Exceptions\RuntimeException
      * @throws Exceptions\EventNotFoundException
+     * @throws MessageFlagException
      */
     public function parseBody() {
         $this->client->openFolder($this->folder_path);
 
         $sequence_id = $this->getSequenceId();
-        $contents = $this->client->getConnection()->content([$sequence_id], "RFC822", $this->sequence === IMAP::ST_UID);
+        try {
+            $contents = $this->client->getConnection()->content([$sequence_id], "RFC822", $this->sequence === IMAP::ST_UID);
+        } catch (Exceptions\RuntimeException $e) {
+            throw new MessageContentFetchingException("failed to fetch content", 0);
+        }
         if (!isset($contents[$sequence_id])) {
             throw new MessageContentFetchingException("no content found", 0);
         }
@@ -523,14 +532,11 @@ class Message {
      *
      * @return $this
      * @throws Exceptions\ConnectionFailedException
-     * @throws Exceptions\EventNotFoundException
-     * @throws Exceptions\RuntimeException
      * @throws InvalidMessageDateException
      * @throws MessageContentFetchingException
      */
     public function parseRawBody($raw_body) {
         $this->structure = new Structure($raw_body, $this->header);
-
         $this->fetchStructure($this->structure);
 
         return $this;
@@ -555,7 +561,6 @@ class Message {
      * @param Part $part
      */
     private function fetchPart(Part $part) {
-
         if ($part->isAttachment()) {
             $this->fetchAttachment($part);
         }else{
@@ -590,7 +595,6 @@ class Message {
      * @param Part $part
      */
     protected function fetchAttachment($part) {
-
         $oAttachment = new Attachment($this, $part);
 
         if ($oAttachment->getName() !== null && $oAttachment->getSize() > 0) {
@@ -928,8 +932,8 @@ class Message {
      *
      * @return bool
      * @throws Exceptions\ConnectionFailedException
-     * @throws Exceptions\RuntimeException
      * @throws Exceptions\EventNotFoundException
+     * @throws MessageFlagException
      */
     public function delete($expunge = true) {
         $status = $this->setFlag("Deleted");
@@ -947,8 +951,8 @@ class Message {
      *
      * @return bool
      * @throws Exceptions\ConnectionFailedException
-     * @throws Exceptions\RuntimeException
      * @throws Exceptions\EventNotFoundException
+     * @throws MessageFlagException
      */
     public function restore($expunge = true) {
         $status = $this->unsetFlag("Deleted");
@@ -966,14 +970,18 @@ class Message {
      *
      * @return bool
      * @throws Exceptions\ConnectionFailedException
-     * @throws Exceptions\RuntimeException
+     * @throws MessageFlagException
      * @throws Exceptions\EventNotFoundException
      */
     public function setFlag($flag) {
         $this->client->openFolder($this->folder_path);
         $flag = "\\".trim(is_array($flag) ? implode(" \\", $flag) : $flag);
         $sequence_id = $this->getSequenceId();
-        $status = $this->client->getConnection()->store([$flag], $sequence_id, $sequence_id, "+", true, $this->sequence === IMAP::ST_UID);
+        try {
+            $status = $this->client->getConnection()->store([$flag], $sequence_id, $sequence_id, "+", true, $this->sequence === IMAP::ST_UID);
+        } catch (Exceptions\RuntimeException $e) {
+            throw new MessageFlagException("flag could not be set", 0, $e);
+        }
         $this->parseFlags();
 
         $event = $this->getEvent("flag", "new");
@@ -988,15 +996,19 @@ class Message {
      *
      * @return bool
      * @throws Exceptions\ConnectionFailedException
-     * @throws Exceptions\RuntimeException
      * @throws Exceptions\EventNotFoundException
+     * @throws MessageFlagException
      */
     public function unsetFlag($flag) {
         $this->client->openFolder($this->folder_path);
 
         $flag = "\\".trim(is_array($flag) ? implode(" \\", $flag) : $flag);
         $sequence_id = $this->getSequenceId();
-        $status = $this->client->getConnection()->store([$flag], $sequence_id, $sequence_id, "-", true, $this->sequence === IMAP::ST_UID);
+        try {
+            $status = $this->client->getConnection()->store([$flag], $sequence_id, $sequence_id, "-", true, $this->sequence === IMAP::ST_UID);
+        } catch (Exceptions\RuntimeException $e) {
+            throw new MessageFlagException("flag could not be removed", 0, $e);
+        }
         $this->parseFlags();
 
         $event = $this->getEvent("flag", "deleted");

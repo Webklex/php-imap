@@ -279,6 +279,7 @@ class Query {
      * @throws MessageContentFetchingException
      * @throws MessageHeaderFetchingException
      * @throws \Webklex\PHPIMAP\Exceptions\EventNotFoundException
+     * @throws \Webklex\PHPIMAP\Exceptions\MessageFlagException
      */
     public function getMessage($uid, $msglist = null, $sequence = null){
         return new Message($uid, $msglist, $this->getClient(), $this->getFetchOptions(), $this->getFetchBody(), $this->getFetchFlags(), $sequence ? $sequence : $this->sequence);
@@ -296,6 +297,7 @@ class Query {
      * @throws MessageHeaderFetchingException
      * @throws RuntimeException
      * @throws \Webklex\PHPIMAP\Exceptions\EventNotFoundException
+     * @throws \Webklex\PHPIMAP\Exceptions\MessageFlagException
      */
     public function getMessageByMsgn($msgn, $msglist = null){
         return $this->getMessage($msgn, $msglist, IMAP::ST_MSGN);
@@ -312,6 +314,7 @@ class Query {
      * @throws MessageHeaderFetchingException
      * @throws RuntimeException
      * @throws \Webklex\PHPIMAP\Exceptions\EventNotFoundException
+     * @throws \Webklex\PHPIMAP\Exceptions\MessageFlagException
      */
     public function getMessageByUid($uid){
         return $this->getMessage($uid, null, IMAP::ST_UID);
