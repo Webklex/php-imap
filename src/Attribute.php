@@ -74,6 +74,15 @@ class Attribute {
     }
 
     /**
+     * Convert instance to array
+     *
+     * @return array
+     */
+    public function toArray(){
+        return $this->__serialize();
+    }
+
+    /**
      * Add one or more values to the attribute
      * @param array|mixed $value
      * @param boolean $strict
