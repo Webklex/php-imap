@@ -1041,6 +1041,15 @@ class Message {
     }
 
     /**
+     * Get all message attachments.
+     *
+     * @return AttachmentCollection
+     */
+    public function attachments(){
+        return $this->getAttachments();
+    }
+
+    /**
      * Checks if there are any attachments present
      *
      * @return boolean

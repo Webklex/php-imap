@@ -13,6 +13,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Configurable supported default flags added
 - Message attribute class added to unify value handling
 - Address class added and integrated
+- Alias `Message::attachments()` for `Message::getAttachments()` added
 - Alias `Message::addFlag()` for `Message::setFlag()` added
 - Alias `Message::removeFlag()` for `Message::unsetFlag()` added
 
