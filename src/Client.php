@@ -37,7 +37,7 @@ class Client {
     /**
      * Connection resource
      *
-     * @var boolean|Protocol
+     * @var boolean|Protocol|ProtocolInterface
      */
     public $connection = false;
 
@@ -340,7 +340,13 @@ class Client {
             $this->connection->setProtocol($protocol);
         }
 
-        $this->connection->connect($this->host, $this->port);
+        try {
+            $this->connection->connect($this->host, $this->port);
+        } catch (\ErrorException $e) {
+            throw new ConnectionFailedException("connection setup failed", 0, $e);
+        } catch (Exceptions\RuntimeException $e) {
+            throw new ConnectionFailedException("connection setup failed", 0, $e);
+        }
         $this->authenticate();
 
         return $this;
@@ -387,6 +393,7 @@ class Client {
      * @return mixed
      * @throws ConnectionFailedException
      * @throws FolderFetchingException
+     * @throws Exceptions\RuntimeException
      */
     public function getFolder($folder_name, $delimiter = null) {
         // Set delimiter to false to force selection via getFolderByName (maybe useful for uncommon folder names)
@@ -407,6 +414,7 @@ class Client {
      * @return mixed
      * @throws ConnectionFailedException
      * @throws FolderFetchingException
+     * @throws Exceptions\RuntimeException
      */
     public function getFolderByName($folder_name) {
         return $this->getFolders(false)->where("name", $folder_name)->first();
@@ -419,6 +427,7 @@ class Client {
      * @return mixed
      * @throws ConnectionFailedException
      * @throws FolderFetchingException
+     * @throws Exceptions\RuntimeException
      */
     public function getFolderByPath($folder_path) {
         return $this->getFolders(false)->where("path", $folder_path)->first();
@@ -428,12 +437,13 @@ class Client {
      * Get folders list.
      * If hierarchical order is set to true, it will make a tree of folders, otherwise it will return flat array.
      *
-     * @param boolean     $hierarchical
+     * @param boolean $hierarchical
      * @param string|null $parent_folder
      *
      * @return FolderCollection
      * @throws ConnectionFailedException
      * @throws FolderFetchingException
+     * @throws Exceptions\RuntimeException
      */
     public function getFolders($hierarchical = true, $parent_folder = null) {
         $this->checkConnection();
@@ -469,6 +479,7 @@ class Client {
      *
      * @return mixed
      * @throws ConnectionFailedException
+     * @throws Exceptions\RuntimeException
      */
     public function openFolder($folder, $force_select = false) {
         if ($this->active_folder == $folder && $this->isConnected() && $force_select === false) {
@@ -488,6 +499,7 @@ class Client {
      * @throws ConnectionFailedException
      * @throws FolderFetchingException
      * @throws Exceptions\EventNotFoundException
+     * @throws Exceptions\RuntimeException
      */
     public function createFolder($folder, $expunge = true) {
         $this->checkConnection();
@@ -510,6 +522,7 @@ class Client {
      *
      * @return false|object
      * @throws ConnectionFailedException
+     * @throws Exceptions\RuntimeException
      */
     public function checkFolder($folder) {
         $this->checkConnection();
@@ -530,6 +543,7 @@ class Client {
      *
      * @return array
      * @throws ConnectionFailedException
+     * @throws Exceptions\RuntimeException
      */
     public function getQuota() {
         $this->checkConnection();
@@ -553,6 +567,7 @@ class Client {
      *
      * @return bool
      * @throws ConnectionFailedException
+     * @throws Exceptions\RuntimeException
      */
     public function expunge() {
         $this->checkConnection();

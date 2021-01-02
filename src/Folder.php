@@ -137,6 +137,7 @@ class Folder {
      *
      * @return WhereQuery
      * @throws Exceptions\ConnectionFailedException
+     * @throws Exceptions\RuntimeException
      */
     public function query($charset = 'UTF-8'){
         $this->getClient()->checkConnection();
@@ -148,6 +149,7 @@ class Folder {
     /**
      * @inheritdoc self::query($charset = 'UTF-8')
      * @throws Exceptions\ConnectionFailedException
+     * @throws Exceptions\RuntimeException
      */
     public function search($charset = 'UTF-8'){
         return $this->query($charset);
@@ -156,6 +158,7 @@ class Folder {
     /**
      * @inheritdoc self::query($charset = 'UTF-8')
      * @throws Exceptions\ConnectionFailedException
+     * @throws Exceptions\RuntimeException
      */
     public function messages($charset = 'UTF-8'){
         return $this->query($charset);
@@ -247,6 +250,7 @@ class Folder {
      *
      * @return array
      * @throws ConnectionFailedException
+     * @throws Exceptions\RuntimeException
      */
     public function overview($sequence = null){
         $this->client->openFolder($this->path);
@@ -332,6 +336,7 @@ class Folder {
      *
      * @return bool
      * @throws Exceptions\ConnectionFailedException
+     * @throws Exceptions\RuntimeException
      */
     public function unsubscribe() {
         $this->client->openFolder($this->path);

@@ -449,6 +449,7 @@ class Message {
      * @return void
      * @throws Exceptions\ConnectionFailedException
      * @throws MessageFlagException
+     * @throws Exceptions\RuntimeException
      */
     private function parseFlags() {
         $this->client->openFolder($this->folder_path);
@@ -475,6 +476,7 @@ class Message {
      * @throws InvalidMessageDateException
      * @throws Exceptions\EventNotFoundException
      * @throws MessageFlagException
+     * @throws Exceptions\RuntimeException
      */
     public function parseBody() {
         $this->client->openFolder($this->folder_path);
@@ -502,6 +504,7 @@ class Message {
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\EventNotFoundException
      * @throws MessageFlagException
+     * @throws Exceptions\RuntimeException
      */
     public function peek(){
         if ($this->fetch_options == IMAP::FT_PEEK) {
@@ -521,6 +524,7 @@ class Message {
      * @throws Exceptions\ConnectionFailedException
      * @throws InvalidMessageDateException
      * @throws MessageContentFetchingException
+     * @throws Exceptions\RuntimeException
      */
     public function parseRawBody($raw_body) {
         $this->structure = new Structure($raw_body, $this->header);
@@ -534,6 +538,7 @@ class Message {
      * @param $structure
      *
      * @throws Exceptions\ConnectionFailedException
+     * @throws Exceptions\RuntimeException
      */
     private function fetchStructure($structure) {
         $this->client->openFolder($this->folder_path);
@@ -757,6 +762,7 @@ class Message {
      * @return mixed
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\FolderFetchingException
+     * @throws Exceptions\RuntimeException
      */
     public function getFolder(){
         return $this->client->getFolder($this->folder_path);
@@ -772,6 +778,7 @@ class Message {
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\FolderFetchingException
      * @throws Exceptions\GetMessagesFailedException
+     * @throws Exceptions\RuntimeException
      */
     public function thread($sent_folder = null, &$thread = null, $folder = null){
         $thread = $thread ? $thread : MessageCollection::make([]);
@@ -809,6 +816,7 @@ class Message {
      *
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\GetMessagesFailedException
+     * @throws Exceptions\RuntimeException
      */
     protected function fetchThreadByInReplyTo(&$thread, $in_reply_to, $primary_folder, $secondary_folder, $sent_folder){
         $primary_folder->query()->inReplyTo($in_reply_to)
@@ -829,6 +837,7 @@ class Message {
      *
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\GetMessagesFailedException
+     * @throws Exceptions\RuntimeException
      */
     protected function fetchThreadByMessageId(&$thread, $message_id, $primary_folder, $secondary_folder, $sent_folder){
         $primary_folder->query()->messageId($message_id)
@@ -949,6 +958,7 @@ class Message {
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\EventNotFoundException
      * @throws MessageFlagException
+     * @throws Exceptions\RuntimeException
      */
     public function delete($expunge = true) {
         $status = $this->setFlag("Deleted");
@@ -968,6 +978,7 @@ class Message {
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\EventNotFoundException
      * @throws MessageFlagException
+     * @throws Exceptions\RuntimeException
      */
     public function restore($expunge = true) {
         $status = $this->unsetFlag("Deleted");
@@ -987,6 +998,7 @@ class Message {
      * @throws Exceptions\ConnectionFailedException
      * @throws MessageFlagException
      * @throws Exceptions\EventNotFoundException
+     * @throws Exceptions\RuntimeException
      */
     public function setFlag($flag) {
         $this->client->openFolder($this->folder_path);
@@ -1013,6 +1025,7 @@ class Message {
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\EventNotFoundException
      * @throws MessageFlagException
+     * @throws Exceptions\RuntimeException
      */
     public function unsetFlag($flag) {
         $this->client->openFolder($this->folder_path);
@@ -1040,6 +1053,7 @@ class Message {
      * @throws Exceptions\ConnectionFailedException
      * @throws MessageFlagException
      * @throws Exceptions\EventNotFoundException
+     * @throws Exceptions\RuntimeException
      */
     public function addFlag($flag) {
         return $this->setFlag($flag);
@@ -1053,6 +1067,7 @@ class Message {
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\EventNotFoundException
      * @throws MessageFlagException
+     * @throws Exceptions\RuntimeException
      */
     public function removeFlag($flag) {
         return $this->unsetFlag($flag);
@@ -1090,6 +1105,7 @@ class Message {
      *
      * @return string
      * @throws Exceptions\ConnectionFailedException
+     * @throws Exceptions\RuntimeException
      */
     public function getRawBody() {
         if ($this->raw_body === null) {
@@ -1311,8 +1327,9 @@ class Message {
      * Set the client
      * @param $client
      *
-     * @throws Exceptions\ConnectionFailedException
      * @return $this
+     * @throws Exceptions\RuntimeException
+     * @throws Exceptions\ConnectionFailedException
      */
     public function setClient($client){
         $this->client = $client;
