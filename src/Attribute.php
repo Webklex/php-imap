@@ -56,6 +56,15 @@ class Attribute {
     }
 
     /**
+     * Return the stringified attribute
+     *
+     * @return string
+     */
+    public function toString(){
+        return $this->__toString();
+    }
+
+    /**
      * Return the serialized attribute
      *
      * @return array
