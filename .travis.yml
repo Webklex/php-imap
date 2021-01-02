@@ -27,7 +27,7 @@ install:
   - COMPOSER_MEMORY_LIMIT=-1 composer install --no-interaction
 
 script:
-  - phpunit
+  - ./vendor/bin/phpunit
 
 notifications:
   email:
