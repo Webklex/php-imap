@@ -799,37 +799,57 @@ class Message {
         }
         $thread->push($this);
 
-        $folder->query()->inReplyTo($this->message_id)
-            ->setFetchBody($this->getFetchBodyOption())
-            ->leaveUnread()->get()->each(function($message) use(&$thread, $folder, $sent_folder){
-            /** @var Message $message */
-            $message->thread($sent_folder, $thread, $folder);
-        });
-        $sent_folder->query()->inReplyTo($this->message_id)
-            ->setFetchBody($this->getFetchBodyOption())
-            ->leaveUnread()->get()->each(function($message) use(&$thread, $folder, $sent_folder){
-            /** @var Message $message */
-                $message->thread($sent_folder, $thread, $folder);
-        });
+        $this->fetchThreadByInReplyTo($thread, $this->message_id, $folder, $folder, $sent_folder);
+        $this->fetchThreadByInReplyTo($thread, $this->message_id, $sent_folder, $folder, $sent_folder);
 
         if (is_array($this->in_reply_to)) {
             foreach($this->in_reply_to as $in_reply_to) {
-                $folder->query()->messageId($in_reply_to)
-                    ->setFetchBody($this->getFetchBodyOption())
-                    ->leaveUnread()->get()->each(function($message) use(&$thread, $folder, $sent_folder){
-                    /** @var Message $message */
-                        $message->thread($sent_folder, $thread, $folder);
-                });
-                $sent_folder->query()->messageId($in_reply_to)
-                    ->setFetchBody($this->getFetchBodyOption())
-                    ->leaveUnread()->get()->each(function($message) use(&$thread, $folder, $sent_folder){
-                    /** @var Message $message */
-                        $message->thread($sent_folder, $thread, $folder);
-                });
+                $this->fetchThreadByMessageId($thread, $in_reply_to, $folder, $folder, $sent_folder);
+                $this->fetchThreadByMessageId($thread, $in_reply_to, $sent_folder, $folder, $sent_folder);
             }
         }
 
         return $thread;
+    }
+
+    /**
+     * Fetch a partial thread by message id
+     * @param MessageCollection $thread
+     * @param string $in_reply_to
+     * @param Folder $primary_folder
+     * @param Folder $secondary_folder
+     * @param Folder $sent_folder
+     *
+     * @throws Exceptions\ConnectionFailedException
+     * @throws Exceptions\GetMessagesFailedException
+     */
+    protected function fetchThreadByInReplyTo(&$thread, $in_reply_to, $primary_folder, $secondary_folder, $sent_folder){
+        $primary_folder->query()->inReplyTo($in_reply_to)
+        ->setFetchBody($this->getFetchBodyOption())
+        ->leaveUnread()->get()->each(function($message) use(&$thread, $secondary_folder, $sent_folder){
+            /** @var Message $message */
+            $message->thread($sent_folder, $thread, $secondary_folder);
+        });
+    }
+
+    /**
+     * Fetch a partial thread by message id
+     * @param MessageCollection $thread
+     * @param string $message_id
+     * @param Folder $primary_folder
+     * @param Folder $secondary_folder
+     * @param Folder $sent_folder
+     *
+     * @throws Exceptions\ConnectionFailedException
+     * @throws Exceptions\GetMessagesFailedException
+     */
+    protected function fetchThreadByMessageId(&$thread, $message_id, $primary_folder, $secondary_folder, $sent_folder){
+        $primary_folder->query()->messageId($message_id)
+        ->setFetchBody($this->getFetchBodyOption())
+        ->leaveUnread()->get()->each(function($message) use(&$thread, $secondary_folder, $sent_folder){
+            /** @var Message $message */
+            $message->thread($sent_folder, $thread, $secondary_folder);
+        });
     }
 
     /**
