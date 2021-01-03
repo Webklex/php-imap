@@ -6,6 +6,19 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
+- NaN
+
+### Added
+- NaN
+
+### Affected Classes
+- NaN
+
+### Breaking changes
+- NaN
+
+## [2.4.0] - 2021-01-03
+### Fixed
 - Get partial overview when `IMAP::ST_UID` is set #74
 - Unnecessary "'" removed from address names
 - Folder referral typo fixed
