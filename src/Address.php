@@ -75,4 +75,22 @@ class Address {
             "full" => $this->full,
         ];
     }
+
+    /**
+     * Convert instance to array
+     *
+     * @return array
+     */
+    public function toArray(){
+        return $this->__serialize();
+    }
+
+    /**
+     * Return the stringified attribute
+     *
+     * @return string
+     */
+    public function toString(){
+        return $this->__toString();
+    }
 }
