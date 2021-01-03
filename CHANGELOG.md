@@ -10,6 +10,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Unnecessary "'" removed from address names
 - Folder referral typo fixed
 - Legacy protocol fixed
+- Treat message collection keys always as strings
 
 ### Added
 - Configurable supported default flags added
@@ -21,6 +22,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Alias `Message::flags()` for `Message::getFlags()` added
 - New Exception `MessageFlagException::class` added
 - New method `Message::setSequenceId($id)` added 
+- Optional Header attributizion option added
 
 ### Affected Classes
 - [Folder::class](src/Folder.php)

@@ -255,7 +255,7 @@ class Query {
                             break;
 
                     }
-                    $messages->put($message_key, $message);
+                    $messages->put("$message_key", $message);
                     $msglist++;
                 }
             }
