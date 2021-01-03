@@ -34,7 +34,7 @@ class Header {
     /**
      * Attribute holder
      *
-     * @var Attribute[] $attributes
+     * @var Attribute[]|array $attributes
      */
     protected $attributes = [];
 
@@ -53,14 +53,23 @@ class Header {
     public $fallback_encoding = 'UTF-8';
 
     /**
+     * Convert parsed values to attributes
+     *
+     * @var bool
+     */
+    protected $attributize = false;
+
+    /**
      * Header constructor.
      * @param $raw_header
+     * @param boolean $attributize
      *
      * @throws InvalidMessageDateException
      */
-    public function __construct($raw_header) {
+    public function __construct($raw_header, $attributize = true) {
         $this->raw = $raw_header;
         $this->config = ClientManager::get('options');
+        $this->attributize = $attributize;
         $this->parse();
     }
 
@@ -69,7 +78,7 @@ class Header {
      * @param string $method
      * @param array $arguments
      *
-     * @return Attribute
+     * @return Attribute|mixed
      * @throws MethodNotFoundException
      */
     public function __call($method, $arguments) {
@@ -99,7 +108,7 @@ class Header {
      * Get a specific header attribute
      * @param $name
      *
-     * @return Attribute|null
+     * @return Attribute|mixed
      */
     public function get($name) {
         if(isset($this->attributes[$name])) {
@@ -119,7 +128,21 @@ class Header {
      */
     public function set($name, $value, $strict = false) {
         if(isset($this->attributes[$name]) && $strict === false) {
-            $this->attributes[$name]->add($value, true);
+            if ($this->attributize) {
+                $this->attributes[$name]->add($value, true);
+            }else{
+                if(isset($this->attributes[$name])) {
+                    if (is_array($this->attributes[$name]) == false) {
+                        $this->attributes[$name] = [$this->attributes[$name], $value];
+                    }else{
+                        $this->attributes[$name][] = $value;
+                    }
+                }else{
+                    $this->attributes[$name] = $value;
+                }
+            }
+        }elseif($this->attributize == false){
+            $this->attributes[$name] = $value;
         }else{
             $this->attributes[$name] = new Attribute($name, $value);
         }
@@ -566,7 +589,11 @@ class Header {
      */
     private function extractHeaderExtensions(){
         foreach ($this->attributes as $key => $value) {
-            $value = (string)$value;
+            if (is_array($value)) {
+                $value = implode(", ", $value);
+            }else{
+                $value = (string)$value;
+            }
             // Only parse strings and don't parse any attributes like the user-agent
             if (in_array($key, ["user_agent"]) === false) {
                 if (($pos = strpos($value, ";")) !== false){
