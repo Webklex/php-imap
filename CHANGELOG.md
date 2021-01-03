@@ -9,6 +9,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Get partial overview when `IMAP::ST_UID` is set #74
 - Unnecessary "'" removed from address names
 - Folder referral typo fixed
+- Legacy protocol fixed
 
 ### Added
 - Configurable supported default flags added

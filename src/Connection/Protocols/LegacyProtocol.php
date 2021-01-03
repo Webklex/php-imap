@@ -53,13 +53,16 @@ class LegacyProtocol extends Protocol implements ProtocolInterface {
      * @param null $port
      * @param bool $encryption
      */
-    public function connect($host, $port = null, $encryption = false) {
-        if ($port === null) {
-            $port = $encryption == "ssl" ? 995 : 110;
+    public function connect($host, $port = null) {
+        if ($this->encryption) {
+            $encryption = strtolower($this->encryption);
+            if ($encryption == "ssl") {
+                $port = $port === null ? 993 : $port;
+            }
         }
+        $port = $port === null ? 143 : $port;
         $this->host = $host;
         $this->port = $port;
-        $this->encryption = $encryption;
     }
 
     /**
@@ -83,7 +86,6 @@ class LegacyProtocol extends Protocol implements ProtocolInterface {
         } catch (\ErrorException $e) {
             $errors = \imap_errors();
             $message = $e->getMessage().'. '.implode("; ", (is_array($errors) ? $errors : array()));
-
             throw new AuthFailedException($message);
         }
 
@@ -549,6 +551,9 @@ class LegacyProtocol extends Protocol implements ProtocolInterface {
      * @return LegacyProtocol
      */
     public function setProtocol($protocol) {
+        if (($pos = strpos($protocol, "legacy")) > 0) {
+            $protocol = substr($protocol, 0, ($pos + 2) * -1);
+        }
         $this->protocol = $protocol;
         return $this;
     }
