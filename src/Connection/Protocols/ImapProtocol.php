@@ -233,6 +233,7 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
         } else {
             $tokens = $line;
         }
+        if ($this->debug) echo "<< ".$line."\n";
 
         // if tag is wanted tag we might be at the end of a multiline response
         return $tag == $wantedTag;
@@ -256,11 +257,6 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
         if ($dontParse) {
             // First two chars are still needed for the response code
             $tokens = [substr($tokens, 0, 2)];
-        }
-        if (is_array($lines)){
-            if ($this->debug) echo "<< ".json_encode($lines)."\n";
-        }else{
-            if ($this->debug) echo "<< ".$lines."\n";
         }
 
         // last line has response code
