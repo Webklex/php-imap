@@ -6,8 +6,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- Debug line position fixed
-- Handle incomplete address to string conversion #83
+- NaN
 
 ### Added
 - NaN
@@ -17,6 +16,14 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Breaking changes
 - NaN
+
+## [2.4.1] - 2021-01-06
+### Fixed
+- Debug line position fixed
+- Handle incomplete address to string conversion #83
+
+### Affected Classes
+- [Address::class](src/Address.php)
 
 ## [2.4.0] - 2021-01-03
 ### Fixed
