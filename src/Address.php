@@ -58,7 +58,7 @@ class Address {
      * @return string
      */
     public function __toString() {
-        return $this->full;
+        return $this->full ? $this->full : "";
     }
 
     /**

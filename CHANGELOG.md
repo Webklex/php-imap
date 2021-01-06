@@ -7,6 +7,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ## [UNRELEASED]
 ### Fixed
 - Debug line position fixed
+- Handle incomplete address to string conversion #83
 
 ### Added
 - NaN
