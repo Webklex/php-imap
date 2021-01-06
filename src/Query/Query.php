@@ -242,20 +242,20 @@ class Query {
                     $message = Message::make($uid, $msglist, $this->getClient(), $raw_header, $raw_content, $raw_flag, $this->getFetchOptions(), $this->sequence);
                     switch ($message_key){
                         case 'number':
-                            $message_key = $message->getMessageNo();
+                            $key = $message->getMessageNo();
                             break;
                         case 'list':
-                            $message_key = $msglist;
+                            $key = $msglist;
                             break;
                         case 'uid':
-                            $message_key = $message->getUid();
+                            $key = $message->getUid();
                             break;
                         default:
-                            $message_key = $message->getMessageId();
+                            $key = $message->getMessageId();
                             break;
 
                     }
-                    $messages->put("$message_key", $message);
+                    $messages->put("$key", $message);
                     $msglist++;
                 }
             }

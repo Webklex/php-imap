@@ -6,13 +6,13 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
+- Configured message key gets overwritten by the first fetched message #84
 
 ### Added
 - NaN
 
 ### Affected Classes
-- NaN
+- [Query::class](src/Query/Query.php)
 
 ### Breaking changes
 - NaN
