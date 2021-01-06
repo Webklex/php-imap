@@ -6,13 +6,13 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- Configured message key gets overwritten by the first fetched message #84
+- NaN
 
 ### Added
 - NaN
 
 ### Affected Classes
-- [Query::class](src/Query/Query.php)
+- NaN
 
 ### Breaking changes
 - NaN
@@ -21,9 +21,11 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Fixed
 - Debug line position fixed
 - Handle incomplete address to string conversion #83
+- Configured message key gets overwritten by the first fetched message #84
 
 ### Affected Classes
 - [Address::class](src/Address.php)
+- [Query::class](src/Query/Query.php)
 
 ## [2.4.0] - 2021-01-03
 ### Fixed
