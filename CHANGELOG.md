@@ -21,8 +21,8 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Fixed
 - Attachment::save() return error 'A facade root has not been set' #87
 - Unused dependencies removed
-- Fix PHP 8 error that changes null back in to an empty string.
-- Fix regex to be case insensitive
+- Fix PHP 8 error that changes null back in to an empty string. #88 (thanks @mennovanhout)
+- Fix regex to be case insensitive #88 (thanks @mennovanhout)
 
 ### Affected Classes
 - [Attachment::class](src/Attachment.php)
