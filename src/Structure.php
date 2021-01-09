@@ -101,6 +101,11 @@ class Structure {
      */
     public function getBoundary(){
         $boundary = $this->header->find("/boundary=\"?([^\"]*)[\";\s]/");
+
+        if ($boundary === null) {
+            return null;
+        }
+
         return str_replace('"', '', $boundary);
     }
 
