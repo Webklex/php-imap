@@ -98,6 +98,8 @@ class Structure {
 
     /**
      * Determine the message content type
+     *
+     * @return string|null
      */
     public function getBoundary(){
         $boundary = $this->header->find("/boundary=\"?([^\"]*)[\";\s]/i");

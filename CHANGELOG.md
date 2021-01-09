@@ -8,6 +8,8 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Fixed
 - Attachment::save() return error 'A facade root has not been set' #87
 - Unused dependencies removed
+- Fix PHP 8 error that changes null back in to an empty string.
+- Fix regex to be case insensitive
 
 ### Added
 - NaN
@@ -16,6 +18,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - [Attachment::class](src/Attachment.php)
 - [Address::class](src/Address.php)
 - [Attribute::class](src/Attribute.php)
+- [Structure::class](src/Structure.php)
 
 ### Breaking changes
 - NaN
