@@ -3,7 +3,7 @@
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Software License][ico-license]][link-license]
-[![Build Status][ico-build]][link-scrutinizer] 
+[![Build Status][ico-travis]][link-scrutinizer] 
 [![Total Downloads][ico-downloads]][link-downloads]
 [![Hits][ico-hits]][link-hits]
 
