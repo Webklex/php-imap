@@ -13,7 +13,6 @@
 namespace Webklex\PHPIMAP;
 
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\File;
 use Webklex\PHPIMAP\Exceptions\MaskNotFoundException;
 use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
 use Webklex\PHPIMAP\Support\Masks\AttachmentMask;
@@ -246,7 +245,7 @@ class Attachment {
     public function save($path, $filename = null) {
         $filename = $filename ?: $this->getName();
 
-        return File::put($path.$filename, $this->getContent()) !== false;
+        return file_put_contents($path.$filename, $this->getContent()) !== false;
     }
 
     /**
