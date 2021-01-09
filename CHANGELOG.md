@@ -6,22 +6,29 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
+- NaN
+
+### Added
+- NaN
+
+### Affected Classes
+- NaN
+
+### Breaking changes
+- NaN
+
+## [2.4.2] - 2021-01-09
+### Fixed
 - Attachment::save() return error 'A facade root has not been set' #87
 - Unused dependencies removed
 - Fix PHP 8 error that changes null back in to an empty string.
 - Fix regex to be case insensitive
-
-### Added
-- NaN
 
 ### Affected Classes
 - [Attachment::class](src/Attachment.php)
 - [Address::class](src/Address.php)
 - [Attribute::class](src/Attribute.php)
 - [Structure::class](src/Structure.php)
-
-### Breaking changes
-- NaN
 
 ## [2.4.1] - 2021-01-06
 ### Fixed
