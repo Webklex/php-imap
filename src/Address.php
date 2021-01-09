@@ -12,12 +12,6 @@
 
 namespace Webklex\PHPIMAP;
 
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\File;
-use Webklex\PHPIMAP\Exceptions\MaskNotFoundException;
-use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
-use Webklex\PHPIMAP\Support\Masks\AttachmentMask;
-
 /**
  * Class Address
  *

@@ -7,12 +7,15 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ## [UNRELEASED]
 ### Fixed
 - Attachment::save() return error 'A facade root has not been set' #87
+- Unused dependencies removed
 
 ### Added
 - NaN
 
 ### Affected Classes
 - [Attachment::class](src/Attachment.php)
+- [Address::class](src/Address.php)
+- [Attribute::class](src/Attribute.php)
 
 ### Breaking changes
 - NaN
