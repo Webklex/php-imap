@@ -6,6 +6,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
+- Attachment detection updated #82 #90
 - Timeout handling improved
 
 ### Added
@@ -13,6 +14,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Affected Classes
 - [Folder::class](src/Folder.php)
+- [Part::class](src/Part.php)
 - [Client::class](src/Client.php)
 
 ### Breaking changes

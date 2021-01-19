@@ -299,11 +299,8 @@ class Part {
      * @return bool
      */
     public function isAttachment(){
-        if ($this->type == IMAP::MESSAGE_TYPE_TEXT &&
-            ($this->ifdisposition == 0 ||
-                (empty($this->disposition) || !in_array(strtolower($this->disposition), ClientManager::get('options.dispositions')))
-            )
-        ) {
+        $valid_disposition = in_array(strtolower($this->disposition), ClientManager::get('options.dispositions'));
+        if ($this->type == IMAP::MESSAGE_TYPE_TEXT && ($this->ifdisposition == 0 || (empty($this->disposition))) && !$valid_disposition) {
             if (($this->subtype == null || in_array((strtolower($this->subtype)), ["plain", "csv", "html"])) && $this->filename == null && $this->name == null) {
                 return false;
             }
