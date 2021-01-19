@@ -347,6 +347,7 @@ class Folder {
      * Idle the current connection
      * @param callable $callback
      * @param integer $timeout max 1740 seconds - recommended by rfc2177 §3
+     * @param boolean $auto_reconnect try to reconnect on connection close
      *
      * @throws ConnectionFailedException
      * @throws Exceptions\InvalidMessageDateException
@@ -356,7 +357,7 @@ class Folder {
      * @throws Exceptions\EventNotFoundException
      * @throws Exceptions\MessageFlagException
      */
-    public function idle(callable $callback, $timeout = 1200) {
+    public function idle(callable $callback, $timeout = 1200, $auto_reconnect = false) {
         $this->client->getConnection()->setConnectionTimeout($timeout);
 
         $this->client->reconnect();
@@ -386,6 +387,9 @@ class Folder {
             }catch (Exceptions\RuntimeException $e) {
                 if(strpos($e->getMessage(), "connection closed") === false) {
                     throw $e;
+                }
+                if ($auto_reconnect === true) {
+                    $this->client->reconnect();
                 }
             }
         }

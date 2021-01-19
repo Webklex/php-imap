@@ -9,9 +9,10 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Timeout handling improved
 
 ### Added
-- NaN
+- Auto reconnect option added to `Folder::idle()` #89
 
 ### Affected Classes
+- [Folder::class](src/Folder.php)
 - [Client::class](src/Client.php)
 
 ### Breaking changes
