@@ -191,6 +191,7 @@ abstract class Protocol {
             STREAM_CLIENT_CONNECT,
             stream_context_create($this->defaultSocketOptions($transport))
         );
+        stream_set_timeout($stream, $timeout);
 
         if (!$stream) {
             throw new ConnectionFailedException("Failed to connect to host", 0, $error);

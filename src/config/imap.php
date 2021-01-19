@@ -60,7 +60,8 @@ return [
                 'request_fulluri' => false,
                 'username' => null,
                 'password' => null,
-            ]
+            ],
+            "timeout" => 30
         ],
 
         /*

@@ -6,13 +6,13 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
+- Timeout handling improved
 
 ### Added
 - NaN
 
 ### Affected Classes
-- NaN
+- [Client::class](src/Client.php)
 
 ### Breaking changes
 - NaN

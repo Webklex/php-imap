@@ -89,6 +89,12 @@ class Client {
     ];
 
     /**
+     * Connection timeout
+     * @var int $timeout
+     */
+    public $timeout;
+
+    /**
      * Account username/
      *
      * @var mixed
@@ -149,7 +155,8 @@ class Client {
             'request_fulluri' => false,
             'username' => null,
             'password' => null,
-        ]
+        ],
+        "timeout" => 30
     ];
 
     /**
@@ -325,9 +332,8 @@ class Client {
         $protocol = strtolower($this->protocol);
 
         if ($protocol == "imap") {
-            $timeout = $this->connection !== false ? $this->connection->getConnectionTimeout() : null;
             $this->connection = new ImapProtocol($this->validate_cert, $this->encryption);
-            $this->connection->setConnectionTimeout($timeout);
+            $this->connection->setConnectionTimeout($this->timeout);
             $this->connection->setProxy($this->proxy);
         }else{
             if (extension_loaded('imap') === false) {
