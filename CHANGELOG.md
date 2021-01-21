@@ -6,6 +6,19 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
+- NaN
+
+### Added
+- NaN
+
+### Affected Classes
+- NaN
+
+### Breaking changes
+- NaN
+
+## [2.4.3] - 2021-01-21
+### Fixed
 - Attachment detection updated #82 #90
 - Timeout handling improved
 - Additional utf-8 checks added to prevent decoding of unencoded values #76
@@ -18,9 +31,6 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - [Part::class](src/Part.php)
 - [Client::class](src/Client.php)
 - [Header::class](src/Header.php)
-
-### Breaking changes
-- NaN
 
 ## [2.4.2] - 2021-01-09
 ### Fixed
