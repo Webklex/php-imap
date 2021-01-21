@@ -8,6 +8,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Fixed
 - Attachment detection updated #82 #90
 - Timeout handling improved
+- Additional utf-8 checks added to prevent decoding of unencoded values #76
 
 ### Added
 - Auto reconnect option added to `Folder::idle()` #89
@@ -16,6 +17,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - [Folder::class](src/Folder.php)
 - [Part::class](src/Part.php)
 - [Client::class](src/Client.php)
+- [Header::class](src/Header.php)
 
 ### Breaking changes
 - NaN

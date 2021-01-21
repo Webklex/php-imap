@@ -407,6 +407,16 @@ class Header {
     }
 
     /**
+     * Test if a given value is utf-8 encoded
+     * @param $value
+     *
+     * @return bool
+     */
+    private function is_uft8($value) {
+        return strpos(strtolower($value), '=?utf-8?') === 0;
+    }
+
+    /**
      * Try to decode a specific header
      * @param mixed $value
      *
@@ -420,9 +430,12 @@ class Header {
         $decoder = $this->config['decoder']['message'];
 
         if ($value !== null) {
+            $is_utf8_base = $this->is_uft8($value);
+
             if($decoder === 'utf-8' && extension_loaded('imap')) {
                 $value = \imap_utf8($value);
-                if (strpos(strtolower($value), '=?utf-8?') === 0) {
+                $is_utf8_base = $this->is_uft8($value);
+                if ($is_utf8_base) {
                     $value = mb_decode_mimeheader($value);
                 }
                 if ($this->notDecoded($original_value, $value)) {
@@ -433,13 +446,13 @@ class Header {
                         }
                     }
                 }
-            }elseif($decoder === 'iconv') {
+            }elseif($decoder === 'iconv' && $is_utf8_base) {
                 $value = iconv_mime_decode($value);
-            }else{
+            }elseif($is_utf8_base){
                 $value = mb_decode_mimeheader($value);
             }
 
-            if (strpos(strtolower($value), '=?utf-8?') === 0) {
+            if ($this->is_uft8($value)) {
                 $value = mb_decode_mimeheader($value);
             }
 
