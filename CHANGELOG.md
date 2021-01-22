@@ -6,22 +6,29 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- Boundary detection simplified #90
-- Prevent potential body overwriting #90
-- CSV files are no longer regarded as plain body
-- Boundary detection overhauled to support "related" and "alternative" multipart messages #90
+- NaN
 
 ### Added
 - NaN
+
+### Affected Classes
+- NaN
+
+### Breaking changes
+- NaN
+
+## [2.4.4] - 2022-01-22
+### Fixed
+- Boundary detection simplified #90
+- Prevent potential body overwriting #90
+- CSV files are no longer regarded as plain body
+- Boundary detection overhauled to support "related" and "alternative" multipart messages #90 #91
 
 ### Affected Classes
 - [Structure::class](src/Structure.php)
 - [Message::class](src/Message.php)
 - [Header::class](src/Header.php)
 - [Part::class](src/Part.php)
-
-### Breaking changes
-- NaN
 
 ## [2.4.3] - 2021-01-21
 ### Fixed
