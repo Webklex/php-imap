@@ -86,7 +86,6 @@ class Structure {
      * Determine the message content type
      */
     public function findContentType(){
-
         $content_type = $this->header->get("content_type");
         $content_type = (is_array($content_type)) ? implode(' ', $content_type) : $content_type;
         if(stripos($content_type, 'multipart') === 0) {
@@ -97,28 +96,51 @@ class Structure {
     }
 
     /**
-     * Determine the message content type
+     * Find all available headers and return the left over body segment
+     * @var string $context
+     * @var integer $part_number
      *
-     * @return string|null
+     * @return Part[]
+     * @throws InvalidMessageDateException
      */
-    public function getBoundary(){
-        $boundary = $this->header->find("/boundary\=(.*)/i");
-
-        if ($boundary === null) {
-            return null;
+    private function parsePart($context, $part_number = 0){
+        $body = $context;
+        while (($pos = strpos($body, "\r\n")) > 0) {
+            $body = substr($body, $pos + 2);
         }
+        $headers = substr($context, 0, strlen($body) * -1);
+        $body = substr($body, 0, -2);
 
-        return $this->clearBoundaryString($boundary);
+        $headers = new Header($headers);
+        if (($boundary = $headers->getBoundary()) !== null) {
+            return $this->detectParts($boundary, $body, $part_number);
+        }
+        return [new Part($body, $headers, $part_number)];
     }
 
     /**
-     * Remove all unwanted chars from a given boundary
-     * @param string $str
+     * @param string $boundary
+     * @param string $context
+     * @param int $part_number
      *
-     * @return string
+     * @return array
+     * @throws InvalidMessageDateException
      */
-    private function clearBoundaryString($str) {
-        return str_replace(['"', '\r', '\n', "\n", "\r", ";", "\s"], "", $str);
+    private function detectParts($boundary, $context, $part_number = 0){
+        $base_parts = explode( $boundary, $context);
+        $final_parts = [];
+        foreach($base_parts as $ctx) {
+            $ctx = substr($ctx, 2);
+            if ($ctx !== "--" && $ctx != "") {
+                $parts = $this->parsePart($ctx, $part_number);
+                foreach ($parts as $part) {
+                    $final_parts[] = $part;
+                    $part_number = $part->part_number;
+                }
+                $part_number++;
+            }
+        }
+        return $final_parts;
     }
 
     /**
@@ -130,39 +152,23 @@ class Structure {
      */
     public function find_parts(){
         if($this->type === IMAP::MESSAGE_TYPE_MULTIPART) {
-            if (($boundary = $this->getBoundary()) === null)  {
+            if (($boundary = $this->header->getBoundary()) === null)  {
                 throw new MessageContentFetchingException("no content found", 0);
             }
 
-            $boundaries = [
-                $boundary
-            ];
-
-            if (preg_match("/boundary\=\"?(.*)\"?/", $this->raw, $match) == 1) {
-                if(is_array($match[1])){
-                    foreach($match[1] as $matched){
-                        $boundaries[] = $this->clearBoundaryString($matched);
-                    }
-                }else{
-                    if(!empty($match[1])) {
-                        $boundaries[] = $this->clearBoundaryString($match[1]);
-                    }
-                }
-            }
-
-            $raw_parts = explode( $boundaries[0], str_replace($boundaries, $boundaries[0], $this->raw) );
-            $parts = [];
-            $part_number = 0;
-            foreach($raw_parts as $part) {
-                $part = trim(rtrim($part));
-                if ($part !== "--") {
-                    $parts[] = new Part($part, null, $part_number);
-                    $part_number++;
-                }
-            }
-            return $parts;
+            return $this->detectParts($boundary, $this->raw);
         }
 
         return [new Part($this->raw, $this->header)];
+    }
+
+    /**
+     * Try to find a boundary if possible
+     *
+     * @return string|null
+     * @Depricated since version 2.4.4
+     */
+    public function getBoundary(){
+        return $this->header->getBoundary();
     }
 }

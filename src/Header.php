@@ -168,6 +168,31 @@ class Header {
     }
 
     /**
+     * Try to find a boundary if possible
+     *
+     * @return string|null
+     */
+    public function getBoundary(){
+        $boundary = $this->find("/boundary\=(.*)/i");
+
+        if ($boundary === null) {
+            return null;
+        }
+
+        return $this->clearBoundaryString($boundary);
+    }
+
+    /**
+     * Remove all unwanted chars from a given boundary
+     * @param string $str
+     *
+     * @return string
+     */
+    private function clearBoundaryString($str) {
+        return str_replace(['"', '\r', '\n', "\n", "\r", ";", "\s"], "", $str);
+    }
+
+    /**
      * Parse the raw headers
      *
      * @throws InvalidMessageDateException
