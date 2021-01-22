@@ -6,13 +6,13 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
+- Boundary detection simplified #90
 
 ### Added
 - NaN
 
 ### Affected Classes
-- NaN
+- [Structure::class](src/Structure.php)
 
 ### Breaking changes
 - NaN

@@ -102,13 +102,23 @@ class Structure {
      * @return string|null
      */
     public function getBoundary(){
-        $boundary = $this->header->find("/boundary=\"?([^\"]*)[\";\s]/i");
+        $boundary = $this->header->find("/boundary\=(.*)/i");
 
         if ($boundary === null) {
             return null;
         }
 
-        return str_replace('"', '', $boundary);
+        return $this->clearBoundaryString($boundary);
+    }
+
+    /**
+     * Remove all unwanted chars from a given boundary
+     * @param string $str
+     *
+     * @return string
+     */
+    private function clearBoundaryString($str) {
+        return str_replace(['"', '\r', '\n', "\n", "\r", ";", "\s"], "", $str);
     }
 
     /**
@@ -131,11 +141,11 @@ class Structure {
             if (preg_match("/boundary\=\"?(.*)\"?/", $this->raw, $match) == 1) {
                 if(is_array($match[1])){
                     foreach($match[1] as $matched){
-                        $boundaries[] = str_replace('"', '', $matched);
+                        $boundaries[] = $this->clearBoundaryString($matched);
                     }
                 }else{
                     if(!empty($match[1])) {
-                        $boundaries[] = str_replace('"', '', $match[1]);
+                        $boundaries[] = $this->clearBoundaryString($match[1]);
                     }
                 }
             }
