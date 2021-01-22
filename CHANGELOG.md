@@ -7,12 +7,14 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ## [UNRELEASED]
 ### Fixed
 - Boundary detection simplified #90
+- Prevent potential body overwriting #90
 
 ### Added
 - NaN
 
 ### Affected Classes
 - [Structure::class](src/Structure.php)
+- [Message::class](src/Message.php)
 
 ### Breaking changes
 - NaN

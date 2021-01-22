@@ -578,7 +578,11 @@ class Message {
             $subtype = strtolower($part->subtype);
             $subtype = $subtype == "plain" || $subtype == "" ? "text" : $subtype;
 
-            $this->bodies[$subtype] = $content;
+            if (isset($this->bodies[$subtype])) {
+                $this->bodies[$subtype] .= "\n".$content;
+            }else{
+                $this->bodies[$subtype] = $content;
+            }
         }
     }
 
