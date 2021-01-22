@@ -8,6 +8,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Fixed
 - Boundary detection simplified #90
 - Prevent potential body overwriting #90
+- CSV files are no longer regarded as plain body
 
 ### Added
 - NaN
