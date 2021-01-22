@@ -535,7 +535,7 @@ class Message {
 
     /**
      * Fetch the Message structure
-     * @param $structure
+     * @param Structure $structure
      *
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\RuntimeException
