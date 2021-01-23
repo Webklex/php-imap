@@ -9,10 +9,10 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - NaN
 
 ### Added
-- NaN
+- Dynamic Attribute access support added (e.g `$message->from[0]`)
 
 ### Affected Classes
-- NaN
+- [Attribute::class](src/Attribute.php)
 
 ### Breaking changes
 - NaN
