@@ -1,9 +1,24 @@
 <?php
+/*
+* File:     FolderMovedEvent.php
+* Category: Event
+* Author:   M. Goldenbaum
+* Created:  25.11.20 22:21
+* Updated:  -
+*
+* Description:
+*  -
+*/
 
 namespace Webklex\PHPIMAP\Events;
 
 use Webklex\PHPIMAP\Folder;
 
+/**
+ * Class FolderMovedEvent
+ *
+ * @package Webklex\PHPIMAP\Events
+ */
 class FolderMovedEvent extends Event {
 
     /** @var Folder $old_folder */

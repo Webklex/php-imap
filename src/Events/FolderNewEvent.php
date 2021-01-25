@@ -1,9 +1,24 @@
 <?php
+/*
+* File:     FolderNewEvent.php
+* Category: Event
+* Author:   M. Goldenbaum
+* Created:  25.11.20 22:21
+* Updated:  -
+*
+* Description:
+*  -
+*/
 
 namespace Webklex\PHPIMAP\Events;
 
 use Webklex\PHPIMAP\Folder;
 
+/**
+ * Class FolderNewEvent
+ *
+ * @package Webklex\PHPIMAP\Events
+ */
 class FolderNewEvent extends Event {
 
     /** @var Folder $folder */
