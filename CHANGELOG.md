@@ -7,6 +7,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ## [UNRELEASED]
 ### Fixed
 - Attachment saving filename fixed
+- Unnecessary parameter removed from `Client::getTimeout()`
 
 ### Added
 - Dynamic Attribute access support added (e.g `$message->from[0]`)
@@ -14,6 +15,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Affected Classes
 - [Attribute::class](src/Attribute.php)
 - [Attachment::class](src/Attachment.php)
+- [Client::class](src/Client.php)
 
 ### Breaking changes
 - NaN

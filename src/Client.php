@@ -591,12 +591,11 @@ class Client {
     }
 
     /**
-     * Get the timeout for a certain operation
-     * @param $type
+     * Get the connection timeout
      *
      * @return int
      */
-    public function getTimeout($type){
+    public function getTimeout(){
         return $this->connection->getConnectionTimeout();
     }
 
