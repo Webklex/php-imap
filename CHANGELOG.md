@@ -6,13 +6,14 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
+- Attachment saving filename fixed
 
 ### Added
 - Dynamic Attribute access support added (e.g `$message->from[0]`)
 
 ### Affected Classes
 - [Attribute::class](src/Attribute.php)
+- [Attachment::class](src/Attachment.php)
 
 ### Breaking changes
 - NaN
