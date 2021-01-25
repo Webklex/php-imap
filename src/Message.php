@@ -13,6 +13,8 @@
 namespace Webklex\PHPIMAP;
 
 use Carbon\Carbon;
+use ReflectionClass;
+use ReflectionException;
 use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
 use Webklex\PHPIMAP\Exceptions\MaskNotFoundException;
 use Webklex\PHPIMAP\Exceptions\MessageContentFetchingException;
@@ -257,12 +259,12 @@ class Message {
      * @throws Exceptions\EventNotFoundException
      * @throws InvalidMessageDateException
      * @throws MessageContentFetchingException
-     * @throws \ReflectionException
+     * @throws ReflectionException
      * @throws MessageFlagException
      * @throws Exceptions\RuntimeException
      */
     public static function make($uid, $msglist, Client $client, $raw_header, $raw_body, $raw_flags, $fetch_options = null, $sequence = null){
-        $reflection = new \ReflectionClass(self::class);
+        $reflection = new ReflectionClass(self::class);
         /** @var self $instance */
         $instance = $reflection->newInstanceWithoutConstructor();
 

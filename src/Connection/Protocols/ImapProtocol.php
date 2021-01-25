@@ -12,8 +12,10 @@
 
 namespace Webklex\PHPIMAP\Connection\Protocols;
 
+use Exception;
 use Webklex\PHPIMAP\Exceptions\AuthFailedException;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
+use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
 use Webklex\PHPIMAP\Exceptions\RuntimeException;
 use Webklex\PHPIMAP\Header;
 
@@ -74,7 +76,7 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
             if ($encryption == "tls") {
                 $this->enableTls();
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new ConnectionFailedException('connection failed', 0, $e);
         }
     }
@@ -424,7 +426,7 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
         if ($this->stream) {
             try {
                 $result = $this->requestAndResponse('LOGOUT', [], true);
-            } catch (\Exception $e) {}
+            } catch (Exception $e) {}
             fclose($this->stream);
             $this->stream = null;
         }
@@ -993,7 +995,7 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
      *
      * @return array
      * @throws RuntimeException
-     * @throws \Webklex\PHPIMAP\Exceptions\InvalidMessageDateException
+     * @throws InvalidMessageDateException
      */
     public function overview($sequence, $uid = false) {
         $result = [];

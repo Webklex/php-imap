@@ -12,6 +12,8 @@
 
 namespace Webklex\PHPIMAP;
 
+use ErrorException;
+use Exception;
 use Webklex\PHPIMAP\Connection\Protocols\ImapProtocol;
 use Webklex\PHPIMAP\Connection\Protocols\LegacyProtocol;
 use Webklex\PHPIMAP\Connection\Protocols\Protocol;
@@ -348,7 +350,7 @@ class Client {
 
         try {
             $this->connection->connect($this->host, $this->port);
-        } catch (\ErrorException $e) {
+        } catch (ErrorException $e) {
             throw new ConnectionFailedException("connection setup failed", 0, $e);
         } catch (Exceptions\RuntimeException $e) {
             throw new ConnectionFailedException("connection setup failed", 0, $e);
@@ -372,7 +374,7 @@ class Client {
             } elseif (!$this->connection->login($this->username, $this->password)) {
                 throw new AuthFailedException();
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new ConnectionFailedException("connection setup failed", 0, $e);
         }
     }
@@ -581,7 +583,7 @@ class Client {
     }
 
     /**
-     * Set the imap timeout for a given operation type
+     * Set the connection timeout
      * @param $timeout
      *
      * @return Protocol

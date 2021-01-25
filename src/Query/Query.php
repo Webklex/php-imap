@@ -13,14 +13,18 @@
 namespace Webklex\PHPIMAP\Query;
 
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use ReflectionException;
 use Webklex\PHPIMAP\Client;
 use Webklex\PHPIMAP\ClientManager;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
+use Webklex\PHPIMAP\Exceptions\EventNotFoundException;
 use Webklex\PHPIMAP\Exceptions\GetMessagesFailedException;
 use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
 use Webklex\PHPIMAP\Exceptions\MessageContentFetchingException;
+use Webklex\PHPIMAP\Exceptions\MessageFlagException;
 use Webklex\PHPIMAP\Exceptions\MessageHeaderFetchingException;
 use Webklex\PHPIMAP\Exceptions\MessageSearchValidationException;
 use Webklex\PHPIMAP\Exceptions\RuntimeException;
@@ -38,7 +42,7 @@ class Query {
     /** @var array $query */
     protected $query;
 
-    /** @var string $raw_query  */
+    /** @var string $raw_query */
     protected $raw_query;
 
     /** @var string $charset */
@@ -80,7 +84,7 @@ class Query {
         $this->setClient($client);
 
         $this->sequence = ClientManager::get('options.sequence', IMAP::ST_MSGN);
-        if(ClientManager::get('options.fetch') === IMAP::FT_PEEK) $this->leaveUnread();
+        if (ClientManager::get('options.fetch') === IMAP::FT_PEEK) $this->leaveUnread();
 
         if (ClientManager::get('options.fetch_order') === 'desc') {
             $this->fetch_order = 'desc';
@@ -98,7 +102,8 @@ class Query {
     /**
      * Instance boot method for additional functionality
      */
-    protected function boot(){}
+    protected function boot() {
+    }
 
     /**
      * Parse a given value
@@ -106,29 +111,29 @@ class Query {
      *
      * @return string
      */
-    protected function parse_value($value){
-        switch(true){
-            case $value instanceof \Carbon\Carbon:
+    protected function parse_value($value) {
+        switch (true) {
+            case $value instanceof Carbon:
                 $value = $value->format($this->date_format);
                 break;
         }
 
-        return (string) $value;
+        return (string)$value;
     }
 
     /**
      * Check if a given date is a valid carbon object and if not try to convert it
-     * @param $date
+     * @param string|Carbon $date
      *
      * @return Carbon
      * @throws MessageSearchValidationException
      */
     protected function parse_date($date) {
-        if($date instanceof \Carbon\Carbon) return $date;
+        if ($date instanceof Carbon) return $date;
 
         try {
             $date = Carbon::parse($date);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new MessageSearchValidationException();
         }
 
@@ -175,7 +180,7 @@ class Query {
      * @return Collection
      * @throws GetMessagesFailedException
      */
-    protected function search(){
+    protected function search() {
         $this->generate_query();
 
         try {
@@ -388,7 +393,7 @@ class Query {
      * @return $this
      */
     public function limit($limit, $page = 1) {
-        if($page >= 1) $this->page = $page;
+        if ($page >= 1) $this->page = $page;
         $this->limit = $limit;
 
         return $this;

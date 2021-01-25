@@ -12,12 +12,14 @@
 
 namespace Webklex\PHPIMAP;
 
+use ArrayAccess;
+
 /**
  * Class Attribute
  *
  * @package Webklex\PHPIMAP
  */
-class Attribute implements \ArrayAccess {
+class Attribute implements ArrayAccess {
 
     /** @var string $name */
     protected $name;

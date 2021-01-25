@@ -14,11 +14,8 @@ namespace Webklex\PHPIMAP;
 
 use Carbon\Carbon;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
-use Webklex\PHPIMAP\Exceptions\GetMessagesFailedException;
-use Webklex\PHPIMAP\Exceptions\MessageSearchValidationException;
 use Webklex\PHPIMAP\Query\WhereQuery;
 use Webklex\PHPIMAP\Support\FolderCollection;
-use Webklex\PHPIMAP\Support\MessageCollection;
 use Webklex\PHPIMAP\Traits\HasEvents;
 
 /**
@@ -32,7 +29,7 @@ class Folder {
     /**
      * Client instance
      *
-     * @var \Webklex\PHPIMAP\Client
+     * @var Client
      */
     protected $client;
 
@@ -250,6 +247,7 @@ class Folder {
      *
      * @return array
      * @throws ConnectionFailedException
+     * @throws Exceptions\InvalidMessageDateException
      * @throws Exceptions\RuntimeException
      */
     public function overview($sequence = null){

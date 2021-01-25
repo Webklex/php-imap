@@ -12,6 +12,7 @@
 
 namespace Webklex\PHPIMAP\Query;
 
+use Closure;
 use Illuminate\Support\Str;
 use Webklex\PHPIMAP\Exceptions\InvalidWhereQueryCriteriaException;
 use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
@@ -78,22 +79,22 @@ class WhereQuery extends Query {
 
         $name = Str::camel($name);
 
-        if(strtolower(substr($name, 0, 3)) === 'not') {
+        if (strtolower(substr($name, 0, 3)) === 'not') {
             $that = $that->whereNot();
             $name = substr($name, 3);
         }
 
-        if (strpos(strtolower($name), "where") === false){
-            $method = 'where'.ucfirst($name);
-        }else{
+        if (strpos(strtolower($name), "where") === false) {
+            $method = 'where' . ucfirst($name);
+        } else {
             $method = lcfirst($name);
         }
 
-        if(method_exists($this, $method) === true){
+        if (method_exists($this, $method) === true) {
             return call_user_func_array([$that, $method], $arguments);
         }
 
-        throw new MethodNotFoundException("Method ".self::class.'::'.$method.'() is not supported');
+        throw new MethodNotFoundException("Method " . self::class . '::' . $method . '() is not supported');
     }
 
     /**
@@ -108,7 +109,7 @@ class WhereQuery extends Query {
         if (substr($criteria, 0, 7) === "CUSTOM ") {
             return substr($criteria, 7);
         }
-        if(in_array($criteria, $this->available_criteria) === false) {
+        if (in_array($criteria, $this->available_criteria) === false) {
             throw new InvalidWhereQueryCriteriaException();
         }
 
@@ -117,26 +118,26 @@ class WhereQuery extends Query {
 
     /**
      * @param mixed $criteria
-     * @param null  $value
+     * @param null $value
      *
      * @return $this
      * @throws InvalidWhereQueryCriteriaException
      */
     public function where($criteria, $value = null) {
-        if(is_array($criteria)){
-            foreach($criteria as $key => $value){
-                if(is_numeric($key)){
+        if (is_array($criteria)) {
+            foreach ($criteria as $key => $value) {
+                if (is_numeric($key)) {
                     return $this->where($value);
                 }
                 return $this->where($key, $value);
             }
-        }else{
+        } else {
             $criteria = $this->validate_criteria($criteria);
             $value = $this->parse_value($value);
 
-            if($value === null || $value === ''){
+            if ($value === null || $value === '') {
                 $this->query->push([$criteria]);
-            }else{
+            } else {
                 $this->query->push([$criteria, $value]);
             }
         }
@@ -145,25 +146,25 @@ class WhereQuery extends Query {
     }
 
     /**
-     * @param \Closure $closure
+     * @param Closure $closure
      *
      * @return $this
      */
-    public function orWhere(\Closure $closure = null) {
+    public function orWhere(Closure $closure = null) {
         $this->query->push(['OR']);
-        if($closure !== null) $closure($this);
+        if ($closure !== null) $closure($this);
 
         return $this;
     }
 
     /**
-     * @param \Closure $closure
+     * @param Closure $closure
      *
      * @return $this
      */
-    public function andWhere(\Closure $closure = null) {
+    public function andWhere(Closure $closure = null) {
         $this->query->push(['AND']);
-        if($closure !== null) $closure($this);
+        if ($closure !== null) $closure($this);
 
         return $this;
     }
@@ -403,7 +404,7 @@ class WhereQuery extends Query {
      * @return WhereQuery
      * @throws InvalidWhereQueryCriteriaException
      */
-    public function whereNoXSpam(){
+    public function whereNoXSpam() {
         return $this->where("CUSTOM X-Spam-Flag NO");
     }
 
@@ -411,7 +412,7 @@ class WhereQuery extends Query {
      * @return WhereQuery
      * @throws InvalidWhereQueryCriteriaException
      */
-    public function whereIsXSpam(){
+    public function whereIsXSpam() {
         return $this->where("CUSTOM X-Spam-Flag YES");
     }
 
@@ -423,7 +424,7 @@ class WhereQuery extends Query {
      * @return WhereQuery
      * @throws InvalidWhereQueryCriteriaException
      */
-    public function whereHeader($header, $value){
+    public function whereHeader($header, $value) {
         return $this->where("CUSTOM HEADER $header $value");
     }
 
@@ -434,7 +435,7 @@ class WhereQuery extends Query {
      * @return WhereQuery
      * @throws InvalidWhereQueryCriteriaException
      */
-    public function whereMessageId($messageId){
+    public function whereMessageId($messageId) {
         return $this->whereHeader("Message-ID", $messageId);
     }
 
@@ -445,7 +446,7 @@ class WhereQuery extends Query {
      * @return WhereQuery
      * @throws InvalidWhereQueryCriteriaException
      */
-    public function whereInReplyTo($messageId){
+    public function whereInReplyTo($messageId) {
         return $this->whereHeader("In-Reply-To", $messageId);
     }
 
@@ -455,7 +456,7 @@ class WhereQuery extends Query {
      * @return WhereQuery
      * @throws InvalidWhereQueryCriteriaException
      */
-    public function whereLanguage($country_code){
+    public function whereLanguage($country_code) {
         return $this->where("Content-Language $country_code");
     }
 }

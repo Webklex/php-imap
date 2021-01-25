@@ -35,6 +35,7 @@ class PaginatedCollection extends Collection {
      * @param int      $per_page
      * @param int|null $page
      * @param string   $page_name
+     * @param boolean  $prepaginated
      *
      * @return LengthAwarePaginator
      */

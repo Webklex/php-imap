@@ -14,6 +14,7 @@ namespace Webklex\PHPIMAP\Connection\Protocols;
 
 use Webklex\PHPIMAP\Exceptions\AuthFailedException;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
+use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
 use Webklex\PHPIMAP\Exceptions\RuntimeException;
 
 /**
@@ -291,6 +292,8 @@ interface ProtocolInterface {
      * @param bool $uid set to true if passing a unique id
      *
      * @return array
+     * @throws RuntimeException
+     * @throws InvalidMessageDateException
      */
     public function overview($sequence, $uid = false);
 
