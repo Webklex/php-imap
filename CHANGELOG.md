@@ -8,6 +8,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Fixed
 - Attachment saving filename fixed
 - Unnecessary parameter removed from `Client::getTimeout()`
+- Missing encryption variable added - could have caused problems with unencrypted communications
 
 ### Added
 - Dynamic Attribute access support added (e.g `$message->from[0]`)

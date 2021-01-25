@@ -56,6 +56,7 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
      */
     public function connect($host, $port = null) {
         $transport = 'tcp';
+        $encryption = "";
 
         if ($this->encryption) {
             $encryption = strtolower($this->encryption);
