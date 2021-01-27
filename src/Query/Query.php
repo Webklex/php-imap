@@ -529,7 +529,7 @@ class Query {
      * @return Query
      */
     public function setQuery($query) {
-        $this->query = $query;
+        $this->query = new Collection($query);
         return $this;
     }
 
