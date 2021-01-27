@@ -945,11 +945,10 @@ class ImapProtocol extends Protocol {
 
     /**
      * Send idle command
-     * @param bool $uid set to true if passing a unique id (depreciated argument: will be removed. CMD UID IDLE is not supported)
      *
      * @throws RuntimeException
      */
-    public function idle($uid = false) {
+    public function idle() {
         $this->sendRequest("IDLE");
         if (!$this->assumedNextLine('+ ')) {
             throw new RuntimeException('idle failed');
