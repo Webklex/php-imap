@@ -76,6 +76,12 @@ class Query {
     /** @var string $date_format */
     protected $date_format;
 
+    /** @var bool $soft_fail */
+    protected $soft_fail = false;
+
+    /** @var array $errors */
+    protected $errors = [];
+
     /**
      * Query constructor.
      * @param Client $client
@@ -94,6 +100,7 @@ class Query {
         }
 
         $this->date_format = ClientManager::get('date_format', 'd M y');
+        $this->soft_fail = ClientManager::get('options.soft_fail', false);
 
         $this->charset = $charset;
         $this->query = collect();
@@ -237,13 +244,10 @@ class Query {
      *
      * @return MessageCollection
      * @throws ConnectionFailedException
-     * @throws InvalidMessageDateException
-     * @throws MessageContentFetchingException
-     * @throws RuntimeException
-     * @throws ReflectionException
      * @throws EventNotFoundException
-     * @throws MessageFlagException
-     * @throws MessageNotFoundException
+     * @throws GetMessagesFailedException
+     * @throws ReflectionException
+     * @throws RuntimeException
      */
     protected function populate($available_messages) {
         $messages = MessageCollection::make([]);
@@ -261,25 +265,44 @@ class Query {
         foreach ($headers as $uid => $header) {
             $content = isset($contents[$uid]) ? $contents[$uid] : "";
             $flag = isset($flags[$uid]) ? $flags[$uid] : [];
+            $error = null;
 
-            $message = Message::make($uid, $msglist, $this->getClient(), $header, $content, $flag, $this->getFetchOptions(), $this->sequence);
-            switch ($message_key) {
-                case 'number':
-                    $key = $message->getMessageNo();
-                    break;
-                case 'list':
-                    $key = $msglist;
-                    break;
-                case 'uid':
-                    $key = $message->getUid();
-                    break;
-                default:
-                    $key = $message->getMessageId();
-                    break;
+            try {
+                $message = Message::make($uid, $msglist, $this->getClient(), $header, $content, $flag, $this->getFetchOptions(), $this->sequence);
 
+                switch ($message_key) {
+                    case 'number':
+                        $key = $message->getMessageNo();
+                        break;
+                    case 'list':
+                        $key = $msglist;
+                        break;
+                    case 'uid':
+                        $key = $message->getUid();
+                        break;
+                    default:
+                        $key = $message->getMessageId();
+                        break;
+
+                }
+                $messages->put("$key", $message);
+                $msglist++;
+            }catch (MessageNotFoundException $e) {
+                $this->setError($uid, $e);
+            }catch (RuntimeException $e) {
+                $this->setError($uid, $e);
+            }catch (MessageFlagException $e) {
+                $this->setError($uid, $e);
+            }catch (InvalidMessageDateException $e) {
+                $this->setError($uid, $e);
+            }catch (MessageContentFetchingException $e) {
+                $this->setError($uid, $e);
             }
-            $messages->put("$key", $message);
-            $msglist++;
+
+            if ($this->soft_fail === false && $this->hasError($uid)) {
+                $error = $this->getError($uid);
+                throw new GetMessagesFailedException($error->getMessage(), 0, $error);
+            }
         }
 
         return $messages;
@@ -325,7 +348,9 @@ class Query {
                     $messages = $this->populate($available_messages);
                     $callback($messages, $this->page);
                 } catch (Exception $e) {
-                    throw new GetMessagesFailedException($e->getMessage(), 0, $e);
+                    if ($this->soft_fail === false) {
+                        throw new GetMessagesFailedException($e->getMessage(), 0, $e);
+                    }
                 }
                 $this->page++;
             }
@@ -681,5 +706,105 @@ class Query {
      */
     public function fetchOrderDesc() {
         return $this->setFetchOrderDesc();
+    }
+
+    /**
+     * @var boolean $state
+     *
+     * @return Query
+     */
+    public function softFail($state = true) {
+        return $this->setSoftFail($state);
+    }
+
+    /**
+     * @var boolean $state
+     *
+     * @return Query
+     */
+    public function setSoftFail($state = true) {
+        $this->soft_fail = $state;
+
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getSoftFail() {
+        return $this->soft_fail;
+    }
+
+    /**
+     * Add a new error to the error holder
+     * @param integer $uid
+     * @param Exception $error
+     */
+    protected function setError($uid, $error) {
+        $this->errors[$uid] = $error;
+    }
+
+    /**
+     * Check if there are any errors / exceptions present
+     * @var integer|null $uid
+     *
+     * @return boolean
+     */
+    public function hasErrors($uid = null){
+        if ($uid !== null) {
+            return $this->hasError($uid);
+        }
+        return count($this->errors) > 0;
+    }
+
+    /**
+     * Check if there is an error / exception present
+     * @var integer $uid
+     *
+     * @return boolean
+     */
+    public function hasError($uid){
+        return isset($this->errors[$uid]);
+    }
+
+    /**
+     * Get all available errors / exceptions
+     *
+     * @return array
+     */
+    public function errors(){
+        return $this->getErrors();
+    }
+
+    /**
+     * Get all available errors / exceptions
+     *
+     * @return array
+     */
+    public function getErrors(){
+        return $this->errors;
+    }
+
+    /**
+     * Get a specific error / exception
+     * @var integer $uid
+     *
+     * @return Exception|null
+     */
+    public function error($uid){
+        return $this->getError($uid);
+    }
+
+    /**
+     * Get a specific error / exception
+     * @var integer $uid
+     *
+     * @return Exception|null
+     */
+    public function getError($uid){
+        if ($this->hasError($uid)) {
+            return $this->errors[$uid];
+        }
+        return null;
     }
 }

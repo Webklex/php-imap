@@ -106,6 +106,8 @@ return [
     |       Default TRUE
     |   -Flag download option
     |       Default TRUE
+    |   -Soft fail
+    |       Default FALSE - Set to TRUE if you want to ignore certain exception while fetching bulk messages
     |   -Message key identifier option
     |       You can choose between the following:
     |       'id'     - Use the MessageID as array key (default, might cause hickups with yahoo mail)
@@ -136,6 +138,7 @@ return [
         'sequence' => \Webklex\PHPIMAP\IMAP::ST_MSGN,
         'fetch_body' => true,
         'fetch_flags' => true,
+        'soft_fail' => false,
         'message_key' => 'list',
         'fetch_order' => 'asc',
         'dispositions' => ['attachment', 'inline'],
