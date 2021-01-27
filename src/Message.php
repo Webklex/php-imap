@@ -251,7 +251,7 @@ class Message {
      * @param Client $client
      * @param string $raw_header
      * @param string $raw_body
-     * @param string $raw_flags
+     * @param array $raw_flags
      * @param null $fetch_options
      * @param null $sequence
      *
@@ -431,7 +431,7 @@ class Message {
 
     /**
      * Parse additional raw flags
-     * @param $raw_flags
+     * @param array $raw_flags
      */
     public function parseRawFlags($raw_flags) {
         $this->flags = FlagCollection::make([]);

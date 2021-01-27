@@ -61,7 +61,7 @@ class Header {
 
     /**
      * Header constructor.
-     * @param $raw_header
+     * @param string $raw_header
      * @param boolean $attributize
      *
      * @throws InvalidMessageDateException

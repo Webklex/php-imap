@@ -103,7 +103,7 @@ class Query {
         $this->soft_fail = ClientManager::get('options.soft_fail', false);
 
         $this->charset = $charset;
-        $this->query = collect();
+        $this->query = new Collection();
         $this->boot();
     }
 
@@ -185,17 +185,12 @@ class Query {
 
         try {
             $available_messages = $this->client->getConnection()->search([$this->getRawQuery()], $this->sequence == IMAP::ST_UID);
+            return new Collection($available_messages);
         } catch (RuntimeException $e) {
-            $available_messages = false;
+            throw new GetMessagesFailedException("failed to fetch messages", 0, $e);
         } catch (ConnectionFailedException $e) {
             throw new GetMessagesFailedException("failed to fetch messages", 0, $e);
         }
-
-        if ($available_messages !== false) {
-            return collect($available_messages);
-        }
-
-        return collect();
     }
 
     /**
@@ -239,6 +234,66 @@ class Query {
     }
 
     /**
+     * Make a new message from given raw components
+     * @param integer $uid
+     * @param integer $msglist
+     * @param string $header
+     * @param string $content
+     * @param array $flags
+     *
+     * @return Message|null
+     * @throws ConnectionFailedException
+     * @throws EventNotFoundException
+     * @throws GetMessagesFailedException
+     * @throws ReflectionException
+     */
+    protected function make($uid, $msglist, $header, $content, $flags){
+        try {
+            return Message::make($uid, $msglist, $this->getClient(), $header, $content, $flags, $this->getFetchOptions(), $this->sequence);
+        }catch (MessageNotFoundException $e) {
+            $this->setError($uid, $e);
+        }catch (RuntimeException $e) {
+            $this->setError($uid, $e);
+        }catch (MessageFlagException $e) {
+            $this->setError($uid, $e);
+        }catch (InvalidMessageDateException $e) {
+            $this->setError($uid, $e);
+        }catch (MessageContentFetchingException $e) {
+            $this->setError($uid, $e);
+        }
+
+        $this->handleException($uid);
+
+        return null;
+    }
+
+    /**
+     * Get the message key for a given message
+     * @param string $message_key
+     * @param integer $msglist
+     * @param Message $message
+     *
+     * @return string
+     */
+    protected function getMessageKey($message_key, $msglist, $message){
+        switch ($message_key) {
+            case 'number':
+                $key = $message->getMessageNo();
+                break;
+            case 'list':
+                $key = $msglist;
+                break;
+            case 'uid':
+                $key = $message->getUid();
+                break;
+            default:
+                $key = $message->getMessageId();
+                break;
+        }
+        return (string)$key;
+    }
+
+    /**
      * Populate a given id collection and receive a fully fetched message collection
      * @param Collection $available_messages
      *
@@ -257,52 +312,18 @@ class Query {
         $message_key = ClientManager::get('options.message_key');
 
         $raw_messages = $this->fetch($available_messages);
-        $flags = $raw_messages["flags"];
-        $headers = $raw_messages["headers"];
-        $contents = $raw_messages["contents"];
 
         $msglist = 0;
-        foreach ($headers as $uid => $header) {
-            $content = isset($contents[$uid]) ? $contents[$uid] : "";
-            $flag = isset($flags[$uid]) ? $flags[$uid] : [];
-            $error = null;
+        foreach ($raw_messages["headers"] as $uid => $header) {
+            $content = isset($raw_messages["contents"][$uid]) ? $raw_messages["contents"][$uid] : "";
+            $flag = isset($raw_messages["flags"][$uid]) ? $raw_messages["flags"][$uid] : [];
 
-            try {
-                $message = Message::make($uid, $msglist, $this->getClient(), $header, $content, $flag, $this->getFetchOptions(), $this->sequence);
-
-                switch ($message_key) {
-                    case 'number':
-                        $key = $message->getMessageNo();
-                        break;
-                    case 'list':
-                        $key = $msglist;
-                        break;
-                    case 'uid':
-                        $key = $message->getUid();
-                        break;
-                    default:
-                        $key = $message->getMessageId();
-                        break;
-
-                }
+            $message = $this->make($uid, $msglist, $header, $content, $flag);
+            if ($message !== null) {
+                $key = $this->getMessageKey($message_key, $msglist, $message);
                 $messages->put("$key", $message);
-                $msglist++;
-            }catch (MessageNotFoundException $e) {
-                $this->setError($uid, $e);
-            }catch (RuntimeException $e) {
-                $this->setError($uid, $e);
-            }catch (MessageFlagException $e) {
-                $this->setError($uid, $e);
-            }catch (InvalidMessageDateException $e) {
-                $this->setError($uid, $e);
-            }catch (MessageContentFetchingException $e) {
-                $this->setError($uid, $e);
             }
-
-            if ($this->soft_fail === false && $this->hasError($uid)) {
-                $error = $this->getError($uid);
-                throw new GetMessagesFailedException($error->getMessage(), 0, $error);
-            }
+            $msglist++;
         }
 
         return $messages;
@@ -333,7 +354,11 @@ class Query {
      * @param int $chunk_size
      * @param int $start_chunk
      *
+     * @throws ConnectionFailedException
+     * @throws EventNotFoundException
      * @throws GetMessagesFailedException
+     * @throws ReflectionException
+     * @throws RuntimeException
      */
     public function chunked($callback, $chunk_size = 10, $start_chunk = 1) {
         $available_messages = $this->search();
@@ -344,14 +369,8 @@ class Query {
             $this->limit = $chunk_size;
             $this->page = $start_chunk;
             while ($this->limit * $this->page <= $available_messages_count) {
-                try {
-                    $messages = $this->populate($available_messages);
-                    $callback($messages, $this->page);
-                } catch (Exception $e) {
-                    if ($this->soft_fail === false) {
-                        throw new GetMessagesFailedException($e->getMessage(), 0, $e);
-                    }
-                }
+                $messages = $this->populate($available_messages);
+                $callback($messages, $this->page);
                 $this->page++;
             }
             $this->limit = $old_limit;
@@ -733,6 +752,19 @@ class Query {
      */
     public function getSoftFail() {
         return $this->soft_fail;
+    }
+
+    /**
+     * Handle the exception for a given uid
+     * @param integer $uid
+     *
+     * @throws GetMessagesFailedException
+     */
+    protected function handleException($uid) {
+        if ($this->soft_fail === false && $this->hasError($uid)) {
+            $error = $this->getError($uid);
+            throw new GetMessagesFailedException($error->getMessage(), 0, $error);
+        }
     }
 
     /**
