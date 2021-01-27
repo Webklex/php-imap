@@ -15,6 +15,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Added
 - Dynamic Attribute access support added (e.g `$message->from[0]`)
 - Message not found exception added #93
+- Chunked fetching support added `Query::chunked()`. Just in case you can't fetch all messages at once
 
 ### Affected Classes
 - [Attachment::class](src/Attachment.php)

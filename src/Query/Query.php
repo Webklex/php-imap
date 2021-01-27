@@ -142,37 +142,29 @@ class Query {
     }
 
     /**
-     * Don't mark messages as read when fetching
+     * Get the raw IMAP search query
      *
-     * @return $this
+     * @return string
      */
-    public function leaveUnread() {
-        $this->setFetchOptions(IMAP::FT_PEEK);
+    public function generate_query() {
+        $query = '';
+        $this->query->each(function($statement) use (&$query) {
+            if (count($statement) == 1) {
+                $query .= $statement[0];
+            } else {
+                if ($statement[1] === null) {
+                    $query .= $statement[0];
+                } else {
+                    $query .= $statement[0] . ' "' . $statement[1] . '"';
+                }
+            }
+            $query .= ' ';
 
-        return $this;
-    }
+        });
 
-    /**
-     * Mark all messages as read when fetching
-     *
-     * @return $this
-     */
-    public function markAsRead() {
-        $this->setFetchOptions(IMAP::FT_UID);
+        $this->raw_query = trim($query);
 
-        return $this;
-    }
-
-    /**
-     * Set the sequence type
-     * @param int $sequence
-     *
-     * @return $this
-     */
-    public function setSequence($sequence) {
-        $this->sequence = $sequence != IMAP::ST_MSGN ? IMAP::ST_UID : $sequence;
-
-        return $this;
+        return $this->raw_query;
     }
 
     /**
@@ -210,66 +202,161 @@ class Query {
     }
 
     /**
+     * Fetch a given id collection
+     * @param Collection $available_messages
+     *
+     * @return array
+     * @throws ConnectionFailedException
+     * @throws RuntimeException
+     */
+    protected function fetch($available_messages) {
+        if ($this->fetch_order === 'desc') {
+            $available_messages = $available_messages->reverse();
+        }
+
+        $uids = $available_messages->forPage($this->page, $this->limit)->toArray();
+        $flags = $this->client->getConnection()->flags($uids, $this->sequence == IMAP::ST_UID);
+        $headers = $this->client->getConnection()->headers($uids, "RFC822", $this->sequence == IMAP::ST_UID);
+
+        $contents = [];
+        if ($this->getFetchBody()) {
+            $contents = $this->client->getConnection()->content($uids, "RFC822", $this->sequence == IMAP::ST_UID);
+        }
+
+        return [
+            "uids"     => $uids,
+            "flags"    => $flags,
+            "headers"  => $headers,
+            "contents" => $contents,
+        ];
+    }
+
+    /**
+     * Populate a given id collection and receive a fully fetched message collection
+     * @param Collection $available_messages
+     *
+     * @return MessageCollection
+     * @throws ConnectionFailedException
+     * @throws InvalidMessageDateException
+     * @throws MessageContentFetchingException
+     * @throws RuntimeException
+     * @throws ReflectionException
+     * @throws EventNotFoundException
+     * @throws MessageFlagException
+     * @throws MessageNotFoundException
+     */
+    protected function populate($available_messages) {
+        $messages = MessageCollection::make([]);
+
+        $messages->total($available_messages->count());
+
+        $message_key = ClientManager::get('options.message_key');
+
+        $raw_messages = $this->fetch($available_messages);
+        $flags = $raw_messages["flags"];
+        $headers = $raw_messages["headers"];
+        $contents = $raw_messages["contents"];
+
+        $msglist = 0;
+        foreach ($headers as $uid => $header) {
+            $content = isset($contents[$uid]) ? $contents[$uid] : "";
+            $flag = isset($flags[$uid]) ? $flags[$uid] : [];
+
+            $message = Message::make($uid, $msglist, $this->getClient(), $header, $content, $flag, $this->getFetchOptions(), $this->sequence);
+            switch ($message_key) {
+                case 'number':
+                    $key = $message->getMessageNo();
+                    break;
+                case 'list':
+                    $key = $msglist;
+                    break;
+                case 'uid':
+                    $key = $message->getUid();
+                    break;
+                default:
+                    $key = $message->getMessageId();
+                    break;
+
+            }
+            $messages->put("$key", $message);
+            $msglist++;
+        }
+
+        return $messages;
+    }
+
+    /**
      * Fetch the current query and return all found messages
      *
      * @return MessageCollection
      * @throws GetMessagesFailedException
      */
     public function get() {
-        $messages = MessageCollection::make([]);
-
         $available_messages = $this->search();
+
         try {
             if (($available_messages_count = $available_messages->count()) > 0) {
-
-                $messages->total($available_messages_count);
-
-                if ($this->fetch_order === 'desc') {
-                    $available_messages = $available_messages->reverse();
-                }
-
-                $message_key = ClientManager::get('options.message_key');
-
-                $uids = $available_messages->forPage($this->page, $this->limit)->toArray();
-
-                $raw_flags = $this->client->getConnection()->flags($uids, $this->sequence == IMAP::ST_UID);
-                $raw_headers = $this->client->getConnection()->headers($uids, "RFC822", $this->sequence == IMAP::ST_UID);
-
-                $raw_contents = [];
-                if ($this->getFetchBody()) {
-                    $raw_contents = $this->client->getConnection()->content($uids, "RFC822", $this->sequence == IMAP::ST_UID);
-                }
-
-                $msglist = 0;
-                foreach ($raw_headers as $uid => $raw_header) {
-                    $raw_content = isset($raw_contents[$uid]) ? $raw_contents[$uid] : "";
-                    $raw_flag = isset($raw_flags[$uid]) ? $raw_flags[$uid] : [];
-
-                    $message = Message::make($uid, $msglist, $this->getClient(), $raw_header, $raw_content, $raw_flag, $this->getFetchOptions(), $this->sequence);
-                    switch ($message_key){
-                        case 'number':
-                            $key = $message->getMessageNo();
-                            break;
-                        case 'list':
-                            $key = $msglist;
-                            break;
-                        case 'uid':
-                            $key = $message->getUid();
-                            break;
-                        default:
-                            $key = $message->getMessageId();
-                            break;
-
-                    }
-                    $messages->put("$key", $message);
-                    $msglist++;
-                }
+                return $this->populate($available_messages);
             }
-
-            return $messages;
-        } catch (\Exception $e) {
-            throw new GetMessagesFailedException($e->getMessage(),0, $e);
+            return MessageCollection::make([]);
+        } catch (Exception $e) {
+            throw new GetMessagesFailedException($e->getMessage(), 0, $e);
         }
+    }
+
+    /**
+     * Fetch the current query as chunked requests
+     * @param callable $callback
+     * @param int $chunk_size
+     * @param int $start_chunk
+     *
+     * @throws GetMessagesFailedException
+     */
+    public function chunked($callback, $chunk_size = 10, $start_chunk = 1) {
+        $available_messages = $this->search();
+        if (($available_messages_count = $available_messages->count()) > 0) {
+            $old_limit = $this->limit;
+            $old_page = $this->page;
+
+            $this->limit = $chunk_size;
+            $this->page = $start_chunk;
+            while ($this->limit * $this->page <= $available_messages_count) {
+                try {
+                    $messages = $this->populate($available_messages);
+                    $callback($messages, $this->page);
+                } catch (Exception $e) {
+                    throw new GetMessagesFailedException($e->getMessage(), 0, $e);
+                }
+                $this->page++;
+            }
+            $this->limit = $old_limit;
+            $this->page = $old_page;
+        }
+    }
+
+    /**
+     * Paginate the current query
+     * @param int $per_page Results you which to receive per page
+     * @param int|null $page The current page you are on (e.g. 0, 1, 2, ...) use `null` to enable auto mode
+     * @param string $page_name The page name / uri parameter used for the generated links and the auto mode
+     *
+     * @return LengthAwarePaginator
+     * @throws GetMessagesFailedException
+     */
+    public function paginate($per_page = 5, $page = null, $page_name = 'imap_page') {
+        if (
+            $page === null
+            && isset($_GET[$page_name])
+            && $_GET[$page_name] > 0
+        ) {
+            $this->page = intval($_GET[$page_name]);
+        } elseif ($page > 0) {
+            $this->page = $page;
+        }
+
+        $this->limit = $per_page;
+
+        return $this->get()->paginate($per_page, $this->page, $page_name, true);
     }
 
     /**
