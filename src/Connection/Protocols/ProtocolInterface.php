@@ -58,6 +58,16 @@ interface ProtocolInterface {
     public function login($user, $password);
 
     /**
+     * Authenticate your current session.
+     * @param string $user username
+     * @param string $token access token
+     *
+     * @return bool|mixed
+     * @throws AuthFailedException
+     */
+    public function authenticate($user, $token);
+
+    /**
      * Logout of the current server session
      *
      * @return bool success

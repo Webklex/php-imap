@@ -40,7 +40,7 @@ use Webklex\PHPIMAP\Support\MessageCollection;
  */
 class Query {
 
-    /** @var array $query */
+    /** @var Collection $query */
     protected $query;
 
     /** @var string $raw_query */
@@ -518,7 +518,7 @@ class Query {
     }
 
     /**
-     * @return array
+     * @return Collection
      */
     public function getQuery() {
         return $this->query;

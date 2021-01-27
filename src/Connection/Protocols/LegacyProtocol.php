@@ -23,7 +23,7 @@ use Webklex\PHPIMAP\IMAP;
  *
  * @package Webklex\PHPIMAP\Connection\Protocols
  */
-class LegacyProtocol extends Protocol implements ProtocolInterface {
+class LegacyProtocol extends Protocol {
 
     protected $protocol = "imap";
     protected $host = null;
@@ -103,7 +103,7 @@ class LegacyProtocol extends Protocol implements ProtocolInterface {
      * @param string $user username
      * @param string $token access token
      *
-     * @return bool
+     * @return bool|mixed
      * @throws AuthFailedException
      */
     public function authenticate($user, $token) {

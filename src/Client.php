@@ -118,11 +118,11 @@ class Client {
     public $authentication;
 
     /**
-     * Active folder.
+     * Active folder path.
      *
-     * @var Folder
+     * @var string
      */
-    protected $active_folder = false;
+    protected $active_folder = null;
 
     /**
      * Default message mask
@@ -388,7 +388,7 @@ class Client {
         if ($this->isConnected() && $this->connection !== false) {
             $this->connection->logout();
         }
-        $this->active_folder = false;
+        $this->active_folder = null;
 
         return $this;
     }
@@ -540,7 +540,7 @@ class Client {
     /**
      * Get the current active folder
      *
-     * @return Folder
+     * @return string
      */
     public function getFolderPath(){
         return $this->active_folder;

@@ -25,7 +25,7 @@ use Webklex\PHPIMAP\Header;
  *
  * @package Webklex\PHPIMAP\Connection\Protocols
  */
-class ImapProtocol extends Protocol implements ProtocolInterface {
+class ImapProtocol extends Protocol {
 
     /**
      * Request noun

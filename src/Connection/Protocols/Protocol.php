@@ -19,7 +19,7 @@ use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
  *
  * @package Webklex\PHPIMAP\Connection\Protocols
  */
-abstract class Protocol {
+abstract class Protocol implements ProtocolInterface {
 
     /**
      * Default connection timeout in seconds
