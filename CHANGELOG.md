@@ -12,6 +12,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Prefer attachment filename attribute over name attribute #82
 - Missing connection settings added to `Folder:idle()` auto mode #89
 - Message move / copy expect a folder path #79
+- `Client::getFolder()` updated to circumvent special edge cases #79
 
 ### Added
 - Dynamic Attribute access support added (e.g `$message->from[0]`)

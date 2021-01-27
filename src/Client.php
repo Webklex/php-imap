@@ -396,7 +396,7 @@ class Client {
     /**
      * Get a folder instance by a folder name
      * @param string $folder_name
-     * @param string|bool $delimiter
+     * @param string|bool|null $delimiter
      *
      * @return mixed
      * @throws ConnectionFailedException
@@ -404,13 +404,15 @@ class Client {
      * @throws Exceptions\RuntimeException
      */
     public function getFolder($folder_name, $delimiter = null) {
+        if ($delimiter !== false && $delimiter !== null) {
+            return $this->getFolderByPath($folder_name);
+        }
+
         // Set delimiter to false to force selection via getFolderByName (maybe useful for uncommon folder names)
-        if ($delimiter !== false) {
-            $delimiter = (is_null($delimiter)) ? ClientManager::get('options.delimiter', "/") : $delimiter;
-            if (strpos($folder_name, $delimiter) !== false) {
-                return $this->getFolderByPath($folder_name);
-            }
-	    }
+        $delimiter = is_null($delimiter) ? ClientManager::get('options.delimiter', "/") : $delimiter;
+        if (strpos($folder_name, $delimiter) !== false) {
+            return $this->getFolderByPath($folder_name);
+        }
 
         return $this->getFolderByName($folder_name);
     }
