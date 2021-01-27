@@ -200,6 +200,7 @@ class Message {
      * @throws MessageContentFetchingException
      * @throws Exceptions\EventNotFoundException
      * @throws MessageFlagException
+     * @throws Exceptions\MessageNotFoundException
      */
     public function __construct($uid, $msglist, Client $client, $fetch_options = null, $fetch_body = false, $fetch_flags = false, $sequence = null) {
 
@@ -262,6 +263,7 @@ class Message {
      * @throws ReflectionException
      * @throws MessageFlagException
      * @throws Exceptions\RuntimeException
+     * @throws Exceptions\MessageNotFoundException
      */
     public static function make($uid, $msglist, Client $client, $raw_header, $raw_body, $raw_flags, $fetch_options = null, $sequence = null){
         $reflection = new ReflectionClass(self::class);
@@ -868,6 +870,7 @@ class Message {
      * @throws MessageHeaderFetchingException
      * @throws Exceptions\EventNotFoundException
      * @throws MessageFlagException
+     * @throws Exceptions\MessageNotFoundException
      */
     public function copy($folder_path, $expunge = false) {
         $this->client->openFolder($folder_path);
@@ -902,6 +905,7 @@ class Message {
      * @throws MessageHeaderFetchingException
      * @throws Exceptions\EventNotFoundException
      * @throws MessageFlagException
+     * @throws Exceptions\MessageNotFoundException
      */
     public function move($folder_path, $expunge = false) {
         $this->client->openFolder($folder_path);
@@ -932,6 +936,7 @@ class Message {
      * @return mixed
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\EventNotFoundException
+     * @throws Exceptions\MessageNotFoundException
      * @throws Exceptions\RuntimeException
      * @throws InvalidMessageDateException
      * @throws MessageContentFetchingException
@@ -1348,9 +1353,9 @@ class Message {
      * Set the message number
      * @param int $uid
      *
-     * @throws Exceptions\ConnectionFailedException
-     * @throws Exceptions\RuntimeException
      * @return $this
+     * @throws Exceptions\MessageNotFoundException
+     * @throws Exceptions\ConnectionFailedException
      */
     public function setUid($uid){
         $this->uid = $uid;
@@ -1365,9 +1370,9 @@ class Message {
      * @param $msgn
      * @param int|null $msglist
      *
-     * @throws Exceptions\ConnectionFailedException
-     * @throws Exceptions\RuntimeException
      * @return $this
+     * @throws Exceptions\MessageNotFoundException
+     * @throws Exceptions\ConnectionFailedException
      */
     public function setMsgn($msgn, $msglist = null){
         $this->msgn = $msgn;
@@ -1401,7 +1406,7 @@ class Message {
      * @param int|null $msglist
      *
      * @throws Exceptions\ConnectionFailedException
-     * @throws Exceptions\RuntimeException
+     * @throws Exceptions\MessageNotFoundException
      */
     public function setSequenceId($uid, $msglist = null){
         if ($this->getSequence() === IMAP::ST_UID) {

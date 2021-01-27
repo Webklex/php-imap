@@ -14,15 +14,17 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Added
 - Dynamic Attribute access support added (e.g `$message->from[0]`)
+- Message not found exception added #93
 
 ### Affected Classes
-- [Attribute::class](src/Attribute.php)
 - [Attachment::class](src/Attachment.php)
+- [Attribute::class](src/Attribute.php)
+- [Query::class](src/Query/Query.php)
 - [Client::class](src/Client.php)
 - [Folder::class](src/Folder.php)
 
 ### Breaking changes
-- NaN
+- A new exception can occur if a message can't be fetched (`\Webklex\PHPIMAP\Exceptions\MessageNotFoundException::class`)
 
 ## [2.4.4] - 2022-01-22
 ### Fixed

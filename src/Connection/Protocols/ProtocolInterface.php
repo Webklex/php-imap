@@ -15,6 +15,7 @@ namespace Webklex\PHPIMAP\Connection\Protocols;
 use Webklex\PHPIMAP\Exceptions\AuthFailedException;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
 use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
+use Webklex\PHPIMAP\Exceptions\MessageNotFoundException;
 use Webklex\PHPIMAP\Exceptions\RuntimeException;
 
 /**
@@ -126,7 +127,7 @@ interface ProtocolInterface {
      * @param int|null $id message number
      *
      * @return array|string message number for given message or all messages as array
-     * @throws RuntimeException
+     * @throws MessageNotFoundException
      */
     public function getUid($id = null);
 
@@ -135,7 +136,7 @@ interface ProtocolInterface {
      * @param string $id uid
      *
      * @return int message number
-     * @throws RuntimeException
+     * @throws MessageNotFoundException
      */
     public function getMessageNumber($id);
 
@@ -293,6 +294,7 @@ interface ProtocolInterface {
      *
      * @return array
      * @throws RuntimeException
+     * @throws MessageNotFoundException
      * @throws InvalidMessageDateException
      */
     public function overview($sequence, $uid = false);

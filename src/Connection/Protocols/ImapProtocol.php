@@ -16,6 +16,7 @@ use Exception;
 use Webklex\PHPIMAP\Exceptions\AuthFailedException;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
 use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
+use Webklex\PHPIMAP\Exceptions\MessageNotFoundException;
 use Webklex\PHPIMAP\Exceptions\RuntimeException;
 use Webklex\PHPIMAP\Header;
 
@@ -669,21 +670,23 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
      * @param int|null $id message number
      *
      * @return array|string message number for given message or all messages as array
-     * @throws RuntimeException
+     * @throws MessageNotFoundException
      */
     public function getUid($id = null) {
-        $uids = $this->fetch('UID', 1, INF);
-        if ($id == null) {
-            return $uids;
-        }
-
-        foreach ($uids as $k => $v) {
-            if ($k == $id) {
-                return $v;
+        try {
+            $uids = $this->fetch('UID', 1, INF);
+            if ($id == null) {
+                return $uids;
             }
-        }
 
-        throw new RuntimeException('unique id not found');
+            foreach ($uids as $k => $v) {
+                if ($k == $id) {
+                    return $v;
+                }
+            }
+        } catch (RuntimeException $e) {}
+
+        throw new MessageNotFoundException('unique id not found');
     }
 
     /**
@@ -691,7 +694,7 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
      * @param string $id uid
      *
      * @return int message number
-     * @throws RuntimeException
+     * @throws MessageNotFoundException
      */
     public function getMessageNumber($id) {
         $ids = $this->getUid();
@@ -701,7 +704,7 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
             }
         }
 
-        throw new RuntimeException('message number not found');
+        throw new MessageNotFoundException('message number not found');
     }
 
     /**
@@ -995,6 +998,7 @@ class ImapProtocol extends Protocol implements ProtocolInterface {
      *
      * @return array
      * @throws RuntimeException
+     * @throws MessageNotFoundException
      * @throws InvalidMessageDateException
      */
     public function overview($sequence, $uid = false) {

@@ -26,6 +26,7 @@ use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
 use Webklex\PHPIMAP\Exceptions\MessageContentFetchingException;
 use Webklex\PHPIMAP\Exceptions\MessageFlagException;
 use Webklex\PHPIMAP\Exceptions\MessageHeaderFetchingException;
+use Webklex\PHPIMAP\Exceptions\MessageNotFoundException;
 use Webklex\PHPIMAP\Exceptions\MessageSearchValidationException;
 use Webklex\PHPIMAP\Exceptions\RuntimeException;
 use Webklex\PHPIMAP\IMAP;
@@ -274,8 +275,8 @@ class Query {
     /**
      * Get a new Message instance
      * @param int $uid
-     * @param null $msglist
-     * @param null $sequence
+     * @param int|null $msglist
+     * @param int|null $sequence
      *
      * @return Message
      * @throws ConnectionFailedException
@@ -283,17 +284,18 @@ class Query {
      * @throws InvalidMessageDateException
      * @throws MessageContentFetchingException
      * @throws MessageHeaderFetchingException
-     * @throws \Webklex\PHPIMAP\Exceptions\EventNotFoundException
-     * @throws \Webklex\PHPIMAP\Exceptions\MessageFlagException
+     * @throws EventNotFoundException
+     * @throws MessageFlagException
+     * @throws MessageNotFoundException
      */
-    public function getMessage($uid, $msglist = null, $sequence = null){
+    public function getMessage($uid, $msglist = null, $sequence = null) {
         return new Message($uid, $msglist, $this->getClient(), $this->getFetchOptions(), $this->getFetchBody(), $this->getFetchFlags(), $sequence ? $sequence : $this->sequence);
     }
 
     /**
      * Get a message by its message number
      * @param $msgn
-     * @param null $msglist
+     * @param int|null $msglist
      *
      * @return Message
      * @throws ConnectionFailedException
@@ -301,10 +303,11 @@ class Query {
      * @throws MessageContentFetchingException
      * @throws MessageHeaderFetchingException
      * @throws RuntimeException
-     * @throws \Webklex\PHPIMAP\Exceptions\EventNotFoundException
-     * @throws \Webklex\PHPIMAP\Exceptions\MessageFlagException
+     * @throws EventNotFoundException
+     * @throws MessageFlagException
+     * @throws MessageNotFoundException
      */
-    public function getMessageByMsgn($msgn, $msglist = null){
+    public function getMessageByMsgn($msgn, $msglist = null) {
         return $this->getMessage($msgn, $msglist, IMAP::ST_MSGN);
     }
 
@@ -318,62 +321,46 @@ class Query {
      * @throws MessageContentFetchingException
      * @throws MessageHeaderFetchingException
      * @throws RuntimeException
-     * @throws \Webklex\PHPIMAP\Exceptions\EventNotFoundException
-     * @throws \Webklex\PHPIMAP\Exceptions\MessageFlagException
+     * @throws EventNotFoundException
+     * @throws MessageFlagException
+     * @throws MessageNotFoundException
      */
-    public function getMessageByUid($uid){
+    public function getMessageByUid($uid) {
         return $this->getMessage($uid, null, IMAP::ST_UID);
     }
 
     /**
-     * Paginate the current query
-     * @param int $per_page Results you which to receive per page
-     * @param int $page The current page you are on (e.g. 0, 1, 2, ...) use `null` to enable auto mode
-     * @param string $page_name The page name / uri parameter used for the generated links and the auto mode
+     * Don't mark messages as read when fetching
      *
-     * @return LengthAwarePaginator
-     * @throws GetMessagesFailedException
+     * @return $this
      */
-    public function paginate($per_page = 5, $page = null, $page_name = 'imap_page'){
-        if (
-               $page === null
-            && isset($_GET[$page_name])
-            && $_GET[$page_name] > 0
-        ) {
-            $this->page = intval($_GET[$page_name]);
-        } elseif ($page > 0) {
-            $this->page = $page;
-        }
+    public function leaveUnread() {
+        $this->setFetchOptions(IMAP::FT_PEEK);
 
-        $this->limit = $per_page;
-
-        return $this->get()->paginate($per_page, $this->page, $page_name, true);
+        return $this;
     }
 
     /**
-     * Get the raw IMAP search query
+     * Mark all messages as read when fetching
      *
-     * @return string
+     * @return $this
      */
-    public function generate_query() {
-        $query = '';
-        $this->query->each(function($statement) use(&$query) {
-            if (count($statement) == 1) {
-                $query .= $statement[0];
-            } else {
-                if($statement[1] === null){
-                    $query .= $statement[0];
-                }else{
-                    $query .= $statement[0].' "'.$statement[1].'"';
-                }
-            }
-            $query .= ' ';
+    public function markAsRead() {
+        $this->setFetchOptions(IMAP::FT_UID);
 
-        });
+        return $this;
+    }
 
-        $this->raw_query = trim($query);
+    /**
+     * Set the sequence type
+     * @param int $sequence
+     *
+     * @return $this
+     */
+    public function setSequence($sequence) {
+        $this->sequence = $sequence != IMAP::ST_MSGN ? IMAP::ST_UID : $sequence;
 
-        return $this->raw_query;
+        return $this;
     }
 
     /**
