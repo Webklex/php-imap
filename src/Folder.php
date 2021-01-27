@@ -388,6 +388,10 @@ class Folder {
                 }
                 if ($auto_reconnect === true) {
                     $this->client->reconnect();
+                    $this->client->openFolder($this->path, true);
+
+                    $connection = $this->client->getConnection();
+                    $connection->idle();
                 }
             }
         }

@@ -10,6 +10,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Unnecessary parameter removed from `Client::getTimeout()`
 - Missing encryption variable added - could have caused problems with unencrypted communications
 - Prefer attachment filename attribute over name attribute #82
+- Missing connection settings added to `Folder:idle()` auto mode #89
 
 ### Added
 - Dynamic Attribute access support added (e.g `$message->from[0]`)
@@ -18,6 +19,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - [Attribute::class](src/Attribute.php)
 - [Attachment::class](src/Attachment.php)
 - [Client::class](src/Client.php)
+- [Folder::class](src/Folder.php)
 
 ### Breaking changes
 - NaN
