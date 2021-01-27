@@ -275,6 +275,12 @@ interface ProtocolInterface {
     public function idle();
 
     /**
+     * Send done command
+     * @throws RuntimeException
+     */
+    public function done();
+
+    /**
      * Apply session saved changes to the server
      *
      * @return bool success
