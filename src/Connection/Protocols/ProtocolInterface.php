@@ -259,6 +259,22 @@ interface ProtocolInterface {
     public function subscribeFolder($folder);
 
     /**
+     * Unsubscribe from a folder
+     * @param string $folder folder name
+     *
+     * @return bool success
+     * @throws RuntimeException
+     */
+    public function unsubscribeFolder($folder);
+
+    /**
+     * Send idle command
+     *
+     * @throws RuntimeException
+     */
+    public function idle();
+
+    /**
      * Apply session saved changes to the server
      *
      * @return bool success
