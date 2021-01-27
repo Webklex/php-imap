@@ -218,11 +218,11 @@ class Attachment {
         $this->size = $this->part->bytes;
         $this->disposition = $this->part->disposition;
 
-        if (($name = $this->part->name) !== null) {
-            $this->setName($name);
-        }elseif (($filename = $this->part->filename) !== null) {
+        if (($filename = $this->part->filename) !== null) {
             $this->setName($filename);
-        } else {
+        } elseif (($name = $this->part->name) !== null) {
+            $this->setName($name);
+        }else {
             $this->setName("undefined");
         }
 
