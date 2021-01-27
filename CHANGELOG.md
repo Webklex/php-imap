@@ -13,6 +13,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Missing connection settings added to `Folder:idle()` auto mode #89
 - Message move / copy expect a folder path #79
 - `Client::getFolder()` updated to circumvent special edge cases #79
+- Missing connection status checks added to various methods
 
 ### Added
 - Dynamic Attribute access support added (e.g `$message->from[0]`)

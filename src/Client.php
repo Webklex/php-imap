@@ -410,7 +410,7 @@ class Client {
 
         // Set delimiter to false to force selection via getFolderByName (maybe useful for uncommon folder names)
         $delimiter = is_null($delimiter) ? ClientManager::get('options.delimiter', "/") : $delimiter;
-        if (strpos($folder_name, $delimiter) !== false) {
+        if (strpos($folder_name, (string)$delimiter) !== false) {
             return $this->getFolderByPath($folder_name);
         }
 
@@ -586,11 +586,13 @@ class Client {
 
     /**
      * Set the connection timeout
-     * @param $timeout
+     * @param integer $timeout
      *
      * @return Protocol
+     * @throws ConnectionFailedException
      */
     public function setTimeout($timeout) {
+        $this->checkConnection();
         return $this->connection->setConnectionTimeout($timeout);
     }
 
@@ -598,8 +600,10 @@ class Client {
      * Get the connection timeout
      *
      * @return int
+     * @throws ConnectionFailedException
      */
     public function getTimeout(){
+        $this->checkConnection();
         return $this->connection->getConnectionTimeout();
     }
 

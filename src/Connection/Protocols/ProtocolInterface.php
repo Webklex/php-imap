@@ -75,6 +75,13 @@ interface ProtocolInterface {
     public function logout();
 
     /**
+     * Check if the current session is connected
+     *
+     * @return bool
+     */
+    public function connected();
+
+    /**
      * Get an array of available capabilities
      *
      * @return array list of capabilities
