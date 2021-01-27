@@ -481,21 +481,21 @@ class Client {
     }
 
     /**
-     * Open folder.
-     * @param string $folder
+     * Open a given folder.
+     * @param string $folder_path
      * @param boolean $force_select
      *
      * @return mixed
      * @throws ConnectionFailedException
      * @throws Exceptions\RuntimeException
      */
-    public function openFolder($folder, $force_select = false) {
-        if ($this->active_folder == $folder && $this->isConnected() && $force_select === false) {
+    public function openFolder($folder_path, $force_select = false) {
+        if ($this->active_folder == $folder_path && $this->isConnected() && $force_select === false) {
             return true;
         }
         $this->checkConnection();
-        $this->active_folder = $folder;
-        return $this->connection->selectFolder($folder);
+        $this->active_folder = $folder_path;
+        return $this->connection->selectFolder($folder_path);
     }
 
     /**
