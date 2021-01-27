@@ -11,6 +11,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Missing encryption variable added - could have caused problems with unencrypted communications
 - Prefer attachment filename attribute over name attribute #82
 - Missing connection settings added to `Folder:idle()` auto mode #89
+- Message move / copy expect a folder path #79
 
 ### Added
 - Dynamic Attribute access support added (e.g `$message->from[0]`)
@@ -22,11 +23,13 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - [Attachment::class](src/Attachment.php)
 - [Attribute::class](src/Attribute.php)
 - [Query::class](src/Query/Query.php)
+- [Message::class](src/Message.php)
 - [Client::class](src/Client.php)
 - [Folder::class](src/Folder.php)
 
 ### Breaking changes
 - A new exception can occur if a message can't be fetched (`\Webklex\PHPIMAP\Exceptions\MessageNotFoundException::class`)
+- `Message::move()` and `Message::copy()` no longer accept folder names as folder path
 
 ## [2.4.4] - 2022-01-22
 ### Fixed

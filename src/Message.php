@@ -773,7 +773,7 @@ class Message {
      * @throws Exceptions\RuntimeException
      */
     public function getFolder(){
-        return $this->client->getFolder($this->folder_path);
+        return $this->client->getFolderByPath($this->folder_path);
     }
 
     /**
@@ -791,7 +791,7 @@ class Message {
     public function thread($sent_folder = null, &$thread = null, $folder = null){
         $thread = $thread ? $thread : MessageCollection::make([]);
         $folder = $folder ? $folder :  $this->getFolder();
-        $sent_folder = $sent_folder ? $sent_folder : $this->client->getFolder(ClientManager::get("options.common_folders.sent", "INBOX/Sent"));
+        $sent_folder = $sent_folder ? $sent_folder : $this->client->getFolderByPath(ClientManager::get("options.common_folders.sent", "INBOX/Sent"));
 
         /** @var Message $message */
         foreach($thread as $message) {
@@ -880,7 +880,7 @@ class Message {
             $next_uid = $status["uidnext"];
 
             /** @var Folder $folder */
-            $folder = $this->client->getFolder($folder_path);
+            $folder = $this->client->getFolderByPath($folder_path);
 
             $this->client->openFolder($this->folder_path);
             if ($this->client->getConnection()->copyMessage($folder->path, $this->getSequenceId(), null, $this->sequence === IMAP::ST_UID) == true) {
@@ -915,7 +915,7 @@ class Message {
             $next_uid = $status["uidnext"];
 
             /** @var Folder $folder */
-            $folder = $this->client->getFolder($folder_path);
+            $folder = $this->client->getFolderByPath($folder_path);
 
             $this->client->openFolder($this->folder_path);
             if ($this->client->getConnection()->moveMessage($folder->path, $this->getSequenceId(), null, $this->sequence === IMAP::ST_UID) == true) {
