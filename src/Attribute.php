@@ -13,6 +13,7 @@
 namespace Webklex\PHPIMAP;
 
 use ArrayAccess;
+use Carbon\Carbon;
 
 /**
  * Class Attribute
@@ -76,6 +77,18 @@ class Attribute implements ArrayAccess {
      */
     public function toArray(){
         return $this->__serialize();
+    }
+
+    /**
+     * Convert first value to a date object
+     *
+     * @return Carbon|null
+     */
+    public function toDate(){
+        $date = $this->first();
+        if ($date instanceof Carbon) return $date;
+
+        return Carbon::parse($date);
     }
 
     /**

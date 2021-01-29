@@ -21,6 +21,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Chunked fetching support added `Query::chunked()`. Just in case you can't fetch all messages at once
 - "Soft fail" support added
 - Count method added to `Attribute:class`
+- Convert an Attribute instance into a Carbon date object #95
 
 ### Affected Classes
 - [Attachment::class](src/Attachment.php)
