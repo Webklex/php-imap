@@ -245,7 +245,7 @@ class Attribute implements ArrayAccess {
      * @return mixed|null
      */
     public function first(){
-        if (count($this->values) > 0) {
+        if ($this->offsetExists(0)) {
             return $this->values[0];
         }
         return null;
