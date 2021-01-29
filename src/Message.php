@@ -95,9 +95,7 @@ class Message {
      *
      * @var Attribute[]|mixed[] $attributes
      */
-    protected $attributes = [
-        'message_no' => null,
-    ];
+    protected $attributes = [];
 
     /**
      * The message folder path

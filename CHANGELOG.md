@@ -14,6 +14,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Message move / copy expect a folder path #79
 - `Client::getFolder()` updated to circumvent special edge cases #79
 - Missing connection status checks added to various methods
+- Unused default attribute `message_no` removed from `Message::class`
 
 ### Added
 - Dynamic Attribute access support added (e.g `$message->from[0]`)
@@ -34,6 +35,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Breaking changes
 - A new exception can occur if a message can't be fetched (`\Webklex\PHPIMAP\Exceptions\MessageNotFoundException::class`)
 - `Message::move()` and `Message::copy()` no longer accept folder names as folder path
+- A `Message::class` instance might no longer have a `message_no` attribute
 
 ## [2.4.4] - 2022-01-22
 ### Fixed
