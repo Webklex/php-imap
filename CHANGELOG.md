@@ -20,6 +20,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Message not found exception added #93
 - Chunked fetching support added `Query::chunked()`. Just in case you can't fetch all messages at once
 - "Soft fail" support added
+- Count method added to `Attribute:class`
 
 ### Affected Classes
 - [Attachment::class](src/Attachment.php)

@@ -244,10 +244,18 @@ class Attribute implements ArrayAccess {
      * @return mixed|null
      */
     public function last(){
-        $cnt = count($this->values);
-        if ($cnt > 0) {
+        if (($cnt = $this->count()) > 0) {
             return $this->values[$cnt - 1];
         }
         return null;
+    }
+
+    /**
+     * Get the number of values
+     *
+     * @return int
+     */
+    public function count(){
+        return count($this->values);
     }
 }
