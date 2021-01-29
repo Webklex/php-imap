@@ -153,12 +153,14 @@ class Message {
      * Message body components
      *
      * @var array   $bodies
-     * @var AttachmentCollection|array $attachments
-     * @var FlagCollection|array       $flags
      */
     public $bodies = [];
-    public $attachments = [];
-    public $flags = [];
+
+    /** @var AttachmentCollection $attachments */
+    public $attachments;
+
+    /** @var FlagCollection $flags */
+    public $flags;
 
     /**
      * A list of all available and supported flags
@@ -187,6 +189,7 @@ class Message {
      * @throws Exceptions\MessageNotFoundException
      */
     public function __construct($uid, $msglist, Client $client, $fetch_options = null, $fetch_body = false, $fetch_flags = false, $sequence = null) {
+        $this->boot();
 
         $default_mask = $client->getDefaultMessageMask();
         if($default_mask != null) {
@@ -197,16 +200,10 @@ class Message {
 
         $this->folder_path = $client->getFolderPath();
 
-        $this->config = ClientManager::get('options');
-        $this->available_flags = ClientManager::get('flags');
-
         $this->setSequence($sequence);
         $this->setFetchOption($fetch_options);
         $this->setFetchBodyOption($fetch_body);
         $this->setFetchFlagsOption($fetch_flags);
-
-        $this->attachments = AttachmentCollection::make([]);
-        $this->flags = FlagCollection::make([]);
 
         $this->client = $client;
         $this->client->openFolder($this->folder_path);
@@ -253,6 +250,7 @@ class Message {
         $reflection = new ReflectionClass(self::class);
         /** @var self $instance */
         $instance = $reflection->newInstanceWithoutConstructor();
+        $instance->boot();
 
         $default_mask = $client->getDefaultMessageMask();
         if($default_mask != null) {
@@ -263,12 +261,8 @@ class Message {
             "flag" => $client->getDefaultEvents("flag"),
         ]);
         $instance->setFolderPath($client->getFolderPath());
-        $instance->setConfig(ClientManager::get('options'));
-        $instance->setAvailableFlags(ClientManager::get('flags'));
         $instance->setSequence($sequence);
         $instance->setFetchOption($fetch_options);
-
-        $instance->setAttachments(AttachmentCollection::make([]));
 
         $instance->setClient($client);
         $instance->setSequenceId($uid, $msglist);
@@ -279,6 +273,19 @@ class Message {
         $instance->peek();
 
         return $instance;
+    }
+
+    /**
+     * Boot a new instance
+     */
+    public function boot(){
+        $this->attributes = [];
+
+        $this->config = ClientManager::get('options');
+        $this->available_flags = ClientManager::get('flags');
+
+        $this->attachments = AttachmentCollection::make([]);
+        $this->flags = FlagCollection::make([]);
     }
 
     /**
