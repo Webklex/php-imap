@@ -12,7 +12,6 @@
 
 namespace Webklex\PHPIMAP;
 
-use Carbon\Carbon;
 use ReflectionClass;
 use ReflectionException;
 use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
@@ -36,49 +35,36 @@ use Webklex\PHPIMAP\Traits\HasEvents;
  * @property integer msglist
  * @property integer uid
  * @property integer msgn
- * @property string subject
- * @property string message_id
- * @property string message_no
- * @property string references
- * @property carbon date
- * @property array from
- * @property array to
- * @property array cc
- * @property array bcc
- * @property array reply_to
- * @property array in_reply_to
- * @property array sender
+ * @property Attribute subject
+ * @property Attribute message_id
+ * @property Attribute message_no
+ * @property Attribute references
+ * @property Attribute date
+ * @property Attribute from
+ * @property Attribute to
+ * @property Attribute cc
+ * @property Attribute bcc
+ * @property Attribute reply_to
+ * @property Attribute in_reply_to
+ * @property Attribute sender
  *
  * @method integer getMsglist()
- * @method integer setMsglist(integer $msglist)
+ * @method integer setMsglist($msglist)
  * @method integer getUid()
  * @method integer getMsgn()
- * @method integer getPriority()
- * @method integer setPriority(integer $priority)
- * @method string getSubject()
- * @method string setSubject(string $subject)
- * @method string getMessageId()
- * @method string setMessageId(string $message_id)
- * @method string getMessageNo()
- * @method string setMessageNo(string $message_no)
- * @method string getReferences()
- * @method string setReferences(string $references)
- * @method carbon getDate()
- * @method carbon setDate(carbon $date)
- * @method array getFrom()
- * @method array setFrom(array $from)
- * @method array getTo()
- * @method array setTo(array $to)
- * @method array getCc()
- * @method array setCc(array $cc)
- * @method array getBcc()
- * @method array setBcc(array $bcc)
- * @method array getReplyTo()
- * @method array setReplyTo(array $reply_to)
- * @method array getInReplyTo()
- * @method array setInReplyTo(array $in_reply_to)
- * @method array getSender()
- * @method array setSender(array $sender)
+ * @method Attribute getPriority()
+ * @method Attribute getSubject()
+ * @method Attribute getMessageId()
+ * @method Attribute getMessageNo()
+ * @method Attribute getReferences()
+ * @method Attribute getDate()
+ * @method Attribute getFrom()
+ * @method Attribute getTo()
+ * @method Attribute getCc()
+ * @method Attribute getBcc()
+ * @method Attribute getReplyTo()
+ * @method Attribute getInReplyTo()
+ * @method Attribute getSender()
  */
 class Message {
     use HasEvents;
@@ -107,7 +93,7 @@ class Message {
     /**
      * Attribute holder
      *
-     * @var array $attributes
+     * @var Attribute[]|mixed[] $attributes
      */
     protected $attributes = [
         'message_no' => null,
@@ -338,7 +324,7 @@ class Message {
      * Magic getter
      * @param $name
      *
-     * @return mixed|null
+     * @return Attribute|mixed|null
      */
     public function __get($name) {
         return $this->get($name);
@@ -348,7 +334,7 @@ class Message {
      * Get an available message or message header attribute
      * @param $name
      *
-     * @return mixed|null
+     * @return Attribute|mixed|null
      */
     public function get($name) {
         if(isset($this->attributes[$name])) {
@@ -795,7 +781,7 @@ class Message {
 
         /** @var Message $message */
         foreach($thread as $message) {
-            if ($message->message_id == $this->message_id) {
+            if ($message->message_id->first() == $this->message_id->first()) {
                 return $thread;
             }
         }
@@ -1221,9 +1207,9 @@ class Message {
         }
 
         return $this->uid == $message->uid
-            && $this->message_id == $message->message_id
-            && $this->subject == $message->subject
-            && $this->date->eq($message->date);
+            && $this->message_id->first() == $message->message_id->first()
+            && $this->subject->first() == $message->subject->first()
+            && $this->date->toDate()->eq($message->date);
     }
 
     /**
