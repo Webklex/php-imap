@@ -6,6 +6,19 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
+- NaN
+
+### Added
+- NaN
+
+### Affected Classes
+- NaN
+
+### Breaking changes
+- NaN
+
+## [2.5.0] - 2021-02-01
+### Fixed
 - Attachment saving filename fixed
 - Unnecessary parameter removed from `Client::getTimeout()`
 - Missing encryption variable added - could have caused problems with unencrypted communications
@@ -37,7 +50,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - `Message::move()` and `Message::copy()` no longer accept folder names as folder path
 - A `Message::class` instance might no longer have a `message_no` attribute
 
-## [2.4.4] - 2022-01-22
+## [2.4.4] - 2021-01-22
 ### Fixed
 - Boundary detection simplified #90
 - Prevent potential body overwriting #90
