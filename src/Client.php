@@ -220,10 +220,8 @@ class Client {
     protected function setEventsFromConfig($config) {
         $this->events = ClientManager::get("events");
         if(isset($config['events'])){
-            if(isset($config['events'])) {
-                foreach($config['events'] as $section => $events) {
-                    $this->events[$section] = array_merge($this->events[$section], $events);
-                }
+            foreach($config['events'] as $section => $events) {
+                $this->events[$section] = array_merge($this->events[$section], $events);
             }
         }
     }
