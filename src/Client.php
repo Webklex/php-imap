@@ -251,13 +251,13 @@ class Client {
             }
             if(isset($config['masks']['attachment'])) {
                 if(class_exists($config['masks']['attachment'])) {
-                    $this->default_message_mask = $config['masks']['attachment'];
+                    $this->default_attachment_mask = $config['masks']['attachment'];
                 }else{
                     throw new MaskNotFoundException("Unknown mask provided: ".$config['masks']['attachment']);
                 }
             }else{
                 if(class_exists($default_config['attachment'])) {
-                    $this->default_message_mask = $default_config['attachment'];
+                    $this->default_attachment_mask = $default_config['attachment'];
                 }else{
                     throw new MaskNotFoundException("Unknown mask provided: ".$default_config['attachment']);
                 }
@@ -270,7 +270,7 @@ class Client {
             }
 
             if(class_exists($default_config['attachment'])) {
-                $this->default_message_mask = $default_config['attachment'];
+                $this->default_attachment_mask = $default_config['attachment'];
             }else{
                 throw new MaskNotFoundException("Unknown mask provided: ".$default_config['attachment']);
             }
