@@ -10,7 +10,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Chunked fetch fails in case of less available mails than page size #114
 
 ### Added
-- NaN
+- Disable rfc822 header parsing via config option #115
 
 ### Affected Classes
 - NaN
