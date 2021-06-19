@@ -194,7 +194,7 @@ abstract class Protocol implements ProtocolInterface {
         stream_set_timeout($stream, $timeout);
 
         if (!$stream) {
-            throw new ConnectionFailedException("Failed to connect to host", 0, $error);
+            throw new ConnectionFailedException($errstr, $errno);
         }
 
         if (false === stream_set_timeout($stream, $timeout)) {
