@@ -6,7 +6,8 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
+- Fix setting default mask from config #133 (thanks @shacky)
+- Chunked fetch fails in case of less available mails than page size #114
 
 ### Added
 - NaN
