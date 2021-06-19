@@ -374,10 +374,11 @@ class Folder {
                     $msgn = (int) substr($line, 2, $pos -2);
                     $connection->done();
 
-                    $this->client->openFolder($this->path, true);
+                    $openFolder = $this->client->openFolder($this->path, true);
                     $message = $this->query()->getMessageByMsgn($msgn);
                     $message->setSequence($sequence);
-                    $callback($message);
+
+                    $callback($message, $openFolder);
 
                     $event = $this->getEvent("message", "new");
                     $event::dispatch($message);
