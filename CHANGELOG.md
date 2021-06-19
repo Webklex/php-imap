@@ -9,6 +9,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Fix setting default mask from config #133 (thanks @shacky)
 - Chunked fetch fails in case of less available mails than page size #114
 - Protocol::createStream() exception information fixed #137
+- Legacy methods (headers, content, flags) fixed #125
 
 ### Added
 - Disable rfc822 header parsing via config option #115

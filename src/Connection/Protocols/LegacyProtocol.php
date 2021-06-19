@@ -206,8 +206,8 @@ class LegacyProtocol extends Protocol {
     public function content($uids, $rfc = "RFC822", $uid = false) {
         $result = [];
         $uids = is_array($uids) ? $uids : [$uids];
-        foreach ($uids as $uid) {
-            $result[$uid] = \imap_fetchbody($this->stream, $uid, "", $uid ? IMAP::FT_UID : IMAP::NIL);
+        foreach ($uids as $id) {
+            $result[$id] = \imap_fetchbody($this->stream, $id, "", $uid ? IMAP::FT_UID : IMAP::NIL);
         }
         return $result;
     }
@@ -223,8 +223,8 @@ class LegacyProtocol extends Protocol {
     public function headers($uids, $rfc = "RFC822", $uid = false){
         $result = [];
         $uids = is_array($uids) ? $uids : [$uids];
-        foreach ($uids as $uid) {
-            $result[$uid] = \imap_fetchheader($this->stream, $uid, $uid ? IMAP::FT_UID : IMAP::NIL);
+        foreach ($uids as $id) {
+            $result[$id] = \imap_fetchheader($this->stream, $id, $uid ? IMAP::FT_UID : IMAP::NIL);
         }
         return $result;
     }
@@ -239,8 +239,8 @@ class LegacyProtocol extends Protocol {
     public function flags($uids, $uid = false){
         $result = [];
         $uids = is_array($uids) ? $uids : [$uids];
-        foreach ($uids as $uid) {
-            $raw_flags = \imap_fetch_overview($this->stream, $uid, $uid ? IMAP::FT_UID : IMAP::NIL);
+        foreach ($uids as $id) {
+            $raw_flags = \imap_fetch_overview($this->stream, $id, $uid ? IMAP::FT_UID : IMAP::NIL);
             $flags = [];
             if (is_array($raw_flags) && isset($raw_flags[0])) {
                 $raw_flags = (array) $raw_flags[0];
