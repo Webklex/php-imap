@@ -138,6 +138,7 @@ class LegacyProtocol extends Protocol {
      */
     public function logout() {
         if ($this->stream) {
+            $this->stream = false;
             return \imap_close($this->stream, IMAP::CL_EXPUNGE);
         }
         return false;
@@ -149,7 +150,7 @@ class LegacyProtocol extends Protocol {
      * @return bool
      */
     public function connected(){
-        return !$this->stream;
+        return boolval($this->stream);
     }
 
     /**
