@@ -6,6 +6,19 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
+- NaN
+
+### Added
+- NaN
+
+### Affected Classes
+- NaN
+
+### Breaking changes
+- NaN
+
+## [2.5.1] - 2021-06-19
+### Fixed
 - Fix setting default mask from config #133 (thanks @shacky)
 - Chunked fetch fails in case of less available mails than page size #114
 - Protocol::createStream() exception information fixed #137
@@ -14,12 +27,6 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Added
 - Disable rfc822 header parsing via config option #115
-
-### Affected Classes
-- NaN
-
-### Breaking changes
-- NaN
 
 ## [2.5.0] - 2021-02-01
 ### Fixed
