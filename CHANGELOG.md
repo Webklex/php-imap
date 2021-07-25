@@ -9,7 +9,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - NaN
 
 ### Added
-- NaN
+- Added imap 4 handling. #146 (thanks @szymekjanaczek)
 
 ### Affected Classes
 - NaN
