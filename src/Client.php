@@ -331,7 +331,7 @@ class Client {
         $this->disconnect();
         $protocol = strtolower($this->protocol);
 
-        if ($protocol == "imap") {
+        if (in_array($protocol, ['imap', 'imap4', 'imap4rev1'])) {
             $this->connection = new ImapProtocol($this->validate_cert, $this->encryption);
             $this->connection->setConnectionTimeout($this->timeout);
             $this->connection->setProxy($this->proxy);
