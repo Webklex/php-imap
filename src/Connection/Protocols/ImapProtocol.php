@@ -428,6 +428,7 @@ class ImapProtocol extends Protocol {
             try {
                 $result = $this->requestAndResponse('LOGOUT', [], true);
             } catch (Exception $e) {}
+            imap_errors();
             fclose($this->stream);
             $this->stream = null;
         }
