@@ -79,7 +79,7 @@ class LegacyProtocol extends Protocol {
                 $this->getAddress(),
                 $user,
                 $password,
-                IMAP::OP_READONLY,
+                0,
                 $attempts = 3,
                 ClientManager::get('options.open')
             );
@@ -93,6 +93,15 @@ class LegacyProtocol extends Protocol {
             $errors = \imap_errors();
             $message = implode("; ", (is_array($errors) ? $errors : array()));
             throw new AuthFailedException($message);
+        }
+
+        $errors = \imap_errors();
+        if(is_array($errors)) {
+            $status = $this->examineFolder();
+            if($status['exists'] !== 0) {
+                $message = implode("; ", (is_array($errors) ? $errors : array()));
+                throw new RuntimeException($message);
+            }
         }
 
         return $this->stream;
@@ -138,8 +147,9 @@ class LegacyProtocol extends Protocol {
      */
     public function logout() {
         if ($this->stream) {
+            $result = \imap_close($this->stream, IMAP::CL_EXPUNGE);
             $this->stream = false;
-            return \imap_close($this->stream, IMAP::CL_EXPUNGE);
+            return $result;
         }
         return false;
     }

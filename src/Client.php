@@ -331,7 +331,7 @@ class Client {
         $this->disconnect();
         $protocol = strtolower($this->protocol);
 
-        if (in_array($protocol, ['imap', 'imap4', 'imap4rev1'])) {
+        if ($protocol == "imap") {
             $this->connection = new ImapProtocol($this->validate_cert, $this->encryption);
             $this->connection->setConnectionTimeout($this->timeout);
             $this->connection->setProxy($this->proxy);
@@ -372,7 +372,7 @@ class Client {
             } elseif (!$this->connection->login($this->username, $this->password)) {
                 throw new AuthFailedException();
             }
-        } catch (Exception $e) {
+        } catch (AuthFailedException $e) {
             throw new ConnectionFailedException("connection setup failed", 0, $e);
         }
     }

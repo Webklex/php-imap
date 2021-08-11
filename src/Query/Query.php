@@ -216,7 +216,7 @@ class Query {
             $available_messages = $available_messages->reverse();
         }
 
-        $uids = $available_messages->forPage($this->page, $this->limit)->toArray();
+        $uids = $available_messages->forPage($this->page, $this->limit)->filter(function($message) { return $message !== false; })->toArray();
         $flags = $this->client->getConnection()->flags($uids, $this->sequence == IMAP::ST_UID);
         $headers = $this->client->getConnection()->headers($uids, "RFC822", $this->sequence == IMAP::ST_UID);
 
