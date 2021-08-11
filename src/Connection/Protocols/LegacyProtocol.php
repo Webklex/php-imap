@@ -72,6 +72,7 @@ class LegacyProtocol extends Protocol {
      *
      * @return bool
      * @throws AuthFailedException
+     * @throws RuntimeException
      */
     public function login($user, $password) {
         try {
