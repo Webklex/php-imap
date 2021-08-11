@@ -185,7 +185,7 @@ class Query {
 
         try {
             $available_messages = $this->client->getConnection()->search([$this->getRawQuery()], $this->sequence == IMAP::ST_UID);
-            return new Collection($available_messages);
+            return $available_messages !== false ? new Collection($available_messages) : new Collection();
         } catch (RuntimeException $e) {
             throw new GetMessagesFailedException("failed to fetch messages", 0, $e);
         } catch (ConnectionFailedException $e) {
@@ -216,7 +216,7 @@ class Query {
             $available_messages = $available_messages->reverse();
         }
 
-        $uids = $available_messages->forPage($this->page, $this->limit)->filter(function($message) { return $message !== false; })->toArray();
+        $uids = $available_messages->forPage($this->page, $this->limit)->toArray();
         $flags = $this->client->getConnection()->flags($uids, $this->sequence == IMAP::ST_UID);
         $headers = $this->client->getConnection()->headers($uids, "RFC822", $this->sequence == IMAP::ST_UID);
 
@@ -339,7 +339,7 @@ class Query {
         $available_messages = $this->search();
 
         try {
-            if (($available_messages_count = $available_messages->count()) > 0) {
+            if ($available_messages->count() > 0) {
                 return $this->populate($available_messages);
             }
             return MessageCollection::make([]);
