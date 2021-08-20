@@ -9,13 +9,25 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - NaN
 
 ### Added
-- Added imap 4 handling. #146 (thanks @szymekjanaczek)
+- NaN
 
 ### Affected Classes
 - NaN
 
 ### Breaking changes
 - NaN
+
+## [2.6.0] - 2021-08-20
+### Fixed
+- POP3 fixes #151 (thanks @Korko)
+
+### Added
+- Added imap 4 handling. #146 (thanks @szymekjanaczek)
+- Added laravel's conditionable methods. #147  (thanks @szymekjanaczek)
+
+### Affected Classes
+- [Query::class](src/Query/Query.php)
+- [Client::class](src/Client.php)
 
 ## [2.5.1] - 2021-06-19
 ### Fixed
