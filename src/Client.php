@@ -372,7 +372,7 @@ class Client {
             } elseif (!$this->connection->login($this->username, $this->password)) {
                 throw new AuthFailedException();
             }
-        } catch (Exception $e) {
+        } catch (AuthFailedException $e) {
             throw new ConnectionFailedException("connection setup failed", 0, $e);
         }
     }
