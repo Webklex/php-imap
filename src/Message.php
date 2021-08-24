@@ -1266,6 +1266,15 @@ class Message {
     }
 
     /**
+     * Get the message path aka folder path
+     *
+     * @return string
+     */
+    public function getFolderPath(){
+        return $this->folder_path;
+    }
+
+    /**
      * Set the message path aka folder path
      * @param $folder_path
      *
