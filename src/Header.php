@@ -241,6 +241,8 @@ class Header {
                 $imap_headers[$key] = $values;
             }
         }
+        
+        $raw_headers = str_replace(", ", ",\r\n ", $raw_headers);
 
         $lines = explode("\r\n", $raw_headers);
         $prev_header = null;
