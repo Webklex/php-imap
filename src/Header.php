@@ -539,6 +539,25 @@ class Header {
     private function decodeAddresses($values) {
         $addresses = [];
 
+        if (extension_loaded('mailparse') && $this->config["rfc822"]) {
+            foreach ($values as $address) {
+                foreach (\mailparse_rfc822_parse_addresses($address) as $parsed_address) {
+                    if (isset($parsed_address['address'])) {
+                        $mail_address = explode('@', $parsed_address['address']);
+                        if (count($mail_address) == 2) {
+                            $addresses[] = (object)[
+                                "personal" => isset($parsed_address['display']) ? $parsed_address['display'] : '',
+                                "mailbox" => $mail_address[0],
+                                "host" => $mail_address[1],
+                            ];
+                        }
+                    }
+                }
+            }
+
+            return $addresses;
+        }
+
         foreach($values as $address) {
             foreach (preg_split('/, (?=(?:[^"]*"[^"]*")*[^"]*$)/', $address) as $split_address) {
                 $split_address = trim(rtrim($split_address));
