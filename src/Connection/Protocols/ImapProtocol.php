@@ -846,6 +846,25 @@ class ImapProtocol extends Protocol {
     }
 
     /**
+     * Move multiple messages to the target folder
+     *
+     * @param array<string> $messages List of message identifiers
+     * @param string $folder Destination folder
+     * @param bool $uid Set to true if you pass message unique identifiers instead of numbers
+     * @return bool Success
+     *
+     * @throws RuntimeException
+     */
+    public function moveManyMessages($messages, $folder, $uid = false) {
+        $command = $uid ? 'UID MOVE' : 'MOVE';
+
+        $set = implode(',', $messages);
+        $tokens = [$set, $this->escapeString($folder)];
+
+        return $this->requestAndResponse($command, $tokens, true);
+    }
+
+    /**
      * Create a new folder (and parent folders if needed)
      * @param string $folder folder name
      *
