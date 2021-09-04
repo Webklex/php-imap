@@ -830,7 +830,7 @@ class ImapProtocol extends Protocol {
      * @param array<string> $messages List of message identifiers
      * @param string $folder Destination folder
      * @param bool $uid Set to true if you pass message unique identifiers instead of numbers
-     * @return bool Success
+     * @return array|bool Tokens if operation successful, false if an error occurred
      *
      * @throws RuntimeException
      */
@@ -870,7 +870,7 @@ class ImapProtocol extends Protocol {
      * @param array<string> $messages List of message identifiers
      * @param string $folder Destination folder
      * @param bool $uid Set to true if you pass message unique identifiers instead of numbers
-     * @return bool Success
+     * @return array|bool Tokens if operation successful, false if an error occurred
      *
      * @throws RuntimeException
      */
