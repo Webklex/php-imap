@@ -6,6 +6,19 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
+- NaN
+
+### Added
+- NaN
+
+### Affected Classes
+- NaN
+
+### Breaking changes
+- NaN
+
+## [2.7.0] - 2021-09-04
+### Fixed
 - Fixes handling of long header lines which are seperated by `\r\n\t` (thanks @Oliver-Holz)
 - Fixes to line parsing with multiple addresses (thanks @Oliver-Holz)
 
@@ -18,9 +31,6 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Affected Classes
 - [Header::class](src/Header.php)
 - [Message::class](src/Message.php)
-
-### Breaking changes
-- NaN
 
 ## [2.6.0] - 2021-08-20
 ### Fixed
