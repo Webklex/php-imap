@@ -1050,7 +1050,7 @@ class ImapProtocol extends Protocol {
                 $ids[] = $id;
             }
         }
-        $headers = $this->headers($ids, $rfc = "RFC822", $uid);
+        $headers = $this->headers($ids, "RFC822", $uid);
         foreach ($headers as $id => $raw_header) {
             $result[$id] = (new Header($raw_header, false))->getAttributes();
         }
