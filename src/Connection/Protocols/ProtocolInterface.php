@@ -211,6 +211,18 @@ interface ProtocolInterface {
     public function copyMessage($folder, $from, $to = null, $uid = false);
 
     /**
+     * Copy multiple messages to the target folder
+     *
+     * @param array<string> $messages List of message identifiers
+     * @param string $folder Destination folder
+     * @param bool $uid Set to true if you pass message unique identifiers instead of numbers
+     * @return array|bool Tokens if operation successful, false if an error occurred
+     *
+     * @throws RuntimeException
+     */
+    public function copyManyMessages($messages, $folder, $uid = false);
+
+    /**
      * Move a message set from current folder to an other folder
      * @param string $folder destination folder
      * @param $from
@@ -221,6 +233,18 @@ interface ProtocolInterface {
      * @return bool success
      */
     public function moveMessage($folder, $from, $to = null, $uid = false);
+
+    /**
+     * Move multiple messages to the target folder
+     *
+     * @param array<string> $messages List of message identifiers
+     * @param string $folder Destination folder
+     * @param bool $uid Set to true if you pass message unique identifiers instead of numbers
+     * @return array|bool Tokens if operation successful, false if an error occurred
+     *
+     * @throws RuntimeException
+     */
+    public function moveManyMessages($messages, $folder, $uid = false);
 
     /**
      * Create a new folder
