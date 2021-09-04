@@ -161,11 +161,11 @@ interface ProtocolInterface {
      * Get a list of available folders
      *
      * @param string $reference mailbox reference for list
-     * @param string $mailbox mailbox name match with wildcards
-     * @return array mailboxes that matched $mailbox as array(globalName => array('delim' => .., 'flags' => ..))
+     * @param string $folder mailbox / folder name match with wildcards
+     * @return array mailboxes that matched $folder as array(globalName => array('delim' => .., 'flags' => ..))
      * @throws RuntimeException
      */
-    public function folders($reference = '', $mailbox = '*');
+    public function folders($reference = '', $folder = '*');
 
     /**
      * Set message flags
