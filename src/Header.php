@@ -241,8 +241,7 @@ class Header {
                 $imap_headers[$key] = $values;
             }
         }
-
-        $lines = explode("\r\n", $raw_headers);
+        $lines = explode("\r\n", str_replace("\r\n\t", ' ', $raw_headers));
         $prev_header = null;
         foreach($lines as $line) {
             if (substr($line, 0, 1) === "\n") {
@@ -539,26 +538,50 @@ class Header {
      */
     private function decodeAddresses($values) {
         $addresses = [];
-        foreach($values as $address) {
-            $address = trim(rtrim($address));
-            if (strpos($address, ",") == strlen($address) - 1) {
-                $address = substr($address, 0, -1);
+
+        if (extension_loaded('mailparse') && $this->config["rfc822"]) {
+            foreach ($values as $address) {
+                foreach (\mailparse_rfc822_parse_addresses($address) as $parsed_address) {
+                    if (isset($parsed_address['address'])) {
+                        $mail_address = explode('@', $parsed_address['address']);
+                        if (count($mail_address) == 2) {
+                            $addresses[] = (object)[
+                                "personal" => isset($parsed_address['display']) ? $parsed_address['display'] : '',
+                                "mailbox" => $mail_address[0],
+                                "host" => $mail_address[1],
+                            ];
+                        }
+                    }
+                }
             }
-            if (preg_match(
-                '/^(?:(?P<name>.+)\s)?(?(name)<|<?)(?P<email>[^\s]+?)(?(name)>|>?)$/',
-                $address,
-                $matches
-            )){
-                $name = trim(rtrim($matches["name"]));
-                $email = trim(rtrim($matches["email"]));
-                list($mailbox, $host) = array_pad(explode("@", $email), 2, null);
-                $addresses[] = (object) [
-                    "personal" => $name,
-                    "mailbox" => $mailbox,
-                    "host" => $host,
-                ];
+
+            return $addresses;
+        }
+
+        foreach($values as $address) {
+            foreach (preg_split('/, (?=(?:[^"]*"[^"]*")*[^"]*$)/', $address) as $split_address) {
+                $split_address = trim(rtrim($split_address));
+
+                if (strpos($split_address, ",") == strlen($split_address) - 1) {
+                    $split_address = substr($split_address, 0, -1);
+                }
+                if (preg_match(
+                    '/^(?:(?P<name>.+)\s)?(?(name)<|<?)(?P<email>[^\s]+?)(?(name)>|>?)$/',
+                    $split_address,
+                    $matches
+                )) {
+                    $name = trim(rtrim($matches["name"]));
+                    $email = trim(rtrim($matches["email"]));
+                    list($mailbox, $host) = array_pad(explode("@", $email), 2, null);
+                    $addresses[] = (object)[
+                        "personal" => $name,
+                        "mailbox" => $mailbox,
+                        "host" => $host,
+                    ];
+                }
             }
         }
+
         return $addresses;
     }
 
