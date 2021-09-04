@@ -393,6 +393,24 @@ class LegacyProtocol extends Protocol {
     }
 
     /**
+     * Copy multiple messages to the target folder
+     *
+     * @param array<string> $messages List of message identifiers
+     * @param string $folder Destination folder
+     * @param bool $uid Set to true if you pass message unique identifiers instead of numbers
+     * @return array|bool Tokens if operation successful, false if an error occurred
+     */
+    public function copyManyMessages($messages, $folder, $uid = false) {
+        foreach($messages as $msg) {
+            if ($this->copyMessage($folder, $msg, null, $uid) == false) {
+                return false;
+            }
+        }
+
+        return $messages;
+    }
+
+    /**
      * Move a message set from current folder to an other folder
      * @param string $folder destination folder
      * @param $from
@@ -404,6 +422,24 @@ class LegacyProtocol extends Protocol {
      */
     public function moveMessage($folder, $from, $to = null, $uid = false) {
         return \imap_mail_move($this->stream, $from, $folder, $uid ? IMAP::FT_UID : IMAP::NIL);
+    }
+
+    /**
+     * Move multiple messages to the target folder
+     *
+     * @param array<string> $messages List of message identifiers
+     * @param string $folder Destination folder
+     * @param bool $uid Set to true if you pass message unique identifiers instead of numbers
+     * @return array|bool Tokens if operation successful, false if an error occurred
+     */
+    public function moveManyMessages($messages, $folder, $uid = false) {
+        foreach($messages as $msg) {
+            if ($this->moveMessage($folder, $msg, null, $uid) == false) {
+                return false;
+            }
+        }
+
+        return $messages;
     }
 
     /**
