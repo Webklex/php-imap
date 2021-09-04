@@ -6,13 +6,18 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
+- Fixes handling of long header lines which are seperated by `\r\n\t` (thanks @Oliver-Holz)
+- Fixes to line parsing with multiple addresses (thanks @Oliver-Holz)
 
 ### Added
-- NaN
+- Expose message folder path #154 (thanks @Magiczne)
+- Adds mailparse_rfc822_parse_addresses integration (thanks @Oliver-Holz)
+- Added moveManyMessages method (thanks @Magiczne)
+- Added copyManyMessages method (thanks @Magiczne)
 
 ### Affected Classes
-- NaN
+- [Header::class](src/Header.php)
+- [Message::class](src/Message.php)
 
 ### Breaking changes
 - NaN
