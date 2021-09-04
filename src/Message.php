@@ -681,9 +681,9 @@ class Message {
                 return base64_decode($string);
             case IMAP::MESSAGE_ENC_BASE64:
                 return base64_decode($string);
-            case IMAP::MESSAGE_ENC_8BIT:
             case IMAP::MESSAGE_ENC_QUOTED_PRINTABLE:
                 return quoted_printable_decode($string);
+            case IMAP::MESSAGE_ENC_8BIT:
             case IMAP::MESSAGE_ENC_7BIT:
             case IMAP::MESSAGE_ENC_OTHER:
             default:
