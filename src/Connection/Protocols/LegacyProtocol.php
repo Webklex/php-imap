@@ -51,7 +51,6 @@ class LegacyProtocol extends Protocol {
      * Save the information for a nw connection
      * @param string $host
      * @param null $port
-     * @param bool $encryption
      */
     public function connect($host, $port = null) {
         if ($this->encryption) {
@@ -113,8 +112,8 @@ class LegacyProtocol extends Protocol {
      * @param string $user username
      * @param string $token access token
      *
-     * @return bool|mixed
-     * @throws AuthFailedException
+     * @return bool|resource
+     * @throws AuthFailedException|RuntimeException
      */
     public function authenticate($user, $token) {
         return $this->login($user, $token);
@@ -189,7 +188,7 @@ class LegacyProtocol extends Protocol {
      * Examine a given folder
      * @param string $folder examine this folder
      *
-     * @return bool|array see examineOrselect()
+     * @return bool|array
      * @throws RuntimeException
      */
     public function examineFolder($folder = 'INBOX') {

@@ -12,6 +12,7 @@
 
 namespace Webklex\PHPIMAP\Connection\Protocols;
 
+use ErrorException;
 use Webklex\PHPIMAP\Exceptions\AuthFailedException;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
 use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
@@ -41,7 +42,7 @@ interface ProtocolInterface {
      * @param string $host hostname or IP address of IMAP server
      * @param int|null $port of service server
      *
-     * @throws \ErrorException
+     * @throws ErrorException
      * @throws ConnectionFailedException
      * @throws RuntimeException
      */

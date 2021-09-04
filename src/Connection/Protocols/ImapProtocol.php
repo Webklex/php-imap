@@ -385,7 +385,7 @@ class ImapProtocol extends Protocol {
      * @param string $user username
      * @param string $token access token
      *
-     * @return bool|mixed
+     * @return bool
      * @throws AuthFailedException
      */
     public function authenticate($user, $token) {

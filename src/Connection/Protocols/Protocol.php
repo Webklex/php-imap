@@ -183,7 +183,6 @@ abstract class Protocol implements ProtocolInterface {
      *
      * @return resource|boolean The socket created.
      * @throws ConnectionFailedException
-     * @throws \ErrorException
      */
     protected function createStream($transport, $host, $port, $timeout) {
         $socket = "$transport://$host:$port";
