@@ -461,6 +461,33 @@ class WhereQuery extends Query {
     }
 
     /**
+     * Get message be it UID.
+     *
+     * @param int|string $uid
+     *
+     * @return WhereQuery
+     * @throws InvalidWhereQueryCriteriaException
+     */
+    public function whereUid($uid)
+    {
+        return $this->where('UID', $uid);
+    }
+
+    /**
+     * Get messages by their UIDs.
+     *
+     * @param array<int, int> $uids
+     *
+     * @return WhereQuery
+     * @throws InvalidWhereQueryCriteriaException
+     */
+    public function whereUidIn($uids)
+    {
+        $uids = implode(',', $uids);
+        return $this->where('UID', $uids);
+    }
+
+    /**
      * Apply the callback if the given "value" is truthy.
      * copied from @url https://github.com/laravel/framework/blob/8.x/src/Illuminate/Support/Traits/Conditionable.php
      *
