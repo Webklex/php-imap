@@ -9,13 +9,17 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - NaN
 
 ### Added
-- NaN
+- Added `UID` as available search criteria #161 (thanks @szymekjanaczek)
 
 ### Affected Classes
 - NaN
 
 ### Breaking changes
 - NaN
+
+## [2.7.1] - 2021-09-08
+### Added
+- Added `UID` as available search criteria #161 (thanks @szymekjanaczek)
 
 ## [2.7.0] - 2021-09-04
 ### Fixed
