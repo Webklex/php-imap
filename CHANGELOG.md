@@ -9,7 +9,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - NaN
 
 ### Added
-- Added `UID` as available search criteria #161 (thanks @szymekjanaczek)
+- NaN
 
 ### Affected Classes
 - NaN
