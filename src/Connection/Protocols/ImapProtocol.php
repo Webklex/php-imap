@@ -254,9 +254,10 @@ class ImapProtocol extends Protocol {
     public function readResponse($tag, $dontParse = false) {
         $lines = [];
         $tokens = null; // define $tokens variable before first use
-        while (!$this->readLine($tokens, $tag, $dontParse)) {
+        do {
+            $readAll = $this->readLine($tokens, $tag, $dontParse);
             $lines[] = $tokens;
-        }
+        } while (!$readAll);
 
         if ($dontParse) {
             // First two chars are still needed for the response code
