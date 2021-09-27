@@ -17,6 +17,10 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Breaking changes
 - NaN
 
+## [2.7.2] - 2021-09-27
+### Added
+- Fixed problem with skipping last line of the response. #166 (thanks @szymekjanaczek)
+
 ## [2.7.1] - 2021-09-08
 ### Added
 - Added `UID` as available search criteria #161 (thanks @szymekjanaczek)
