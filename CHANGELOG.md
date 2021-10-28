@@ -13,7 +13,8 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - IMAP ID support added #174
 
 ### Affected Classes
-- NaN
+- [Header::class](src/Header.php)
+- [Protocol::class](src/Connection/Protocols/Protocol.php)
 
 ### Breaking changes
 - NaN
