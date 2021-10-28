@@ -173,7 +173,8 @@ class Header {
      * @return string|null
      */
     public function getBoundary(){
-        $boundary = $this->find("/boundary\=(.*)/i");
+        $regex = isset($this->config["boundary"]) ? $this->config["boundary"] : "/boundary=(.*?(?=;)|(.*))/i";
+        $boundary = $this->find($regex);
 
         if ($boundary === null) {
             return null;

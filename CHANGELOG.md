@@ -9,7 +9,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - NaN
 
 ### Added
-- NaN
+- Make boundary regex configurable #108 #152 (thanks @EthraZa)
 
 ### Affected Classes
 - NaN

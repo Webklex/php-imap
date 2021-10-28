@@ -143,6 +143,7 @@ return [
         'fetch_flags' => true,
         'soft_fail' => false,
         'rfc822' => true,
+        'boundary' => '/boundary=(.*?(?=;)|(.*))/i',
         'message_key' => 'list',
         'fetch_order' => 'asc',
         'dispositions' => ['attachment', 'inline'],
