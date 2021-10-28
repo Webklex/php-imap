@@ -6,7 +6,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
+- Extend date parsing error message #173
 
 ### Added
 - Make boundary regex configurable #108 #152 (thanks @EthraZa)

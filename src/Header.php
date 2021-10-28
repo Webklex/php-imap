@@ -734,7 +734,8 @@ class Header {
                 try{
                     $parsed_date = Carbon::parse($date);
                 } catch (\Exception $_e) {
-                    throw new InvalidMessageDateException("Invalid message date. ID:".$this->get("message_id"), 1100, $e);
+                    $error_message = "Invalid message date. ID:".$this->get("message_id")." Date:".$header->date."/".$date;
+                    throw new InvalidMessageDateException($error_message, 1100, $e);
                 }
             }
 
