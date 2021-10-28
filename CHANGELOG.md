@@ -9,7 +9,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Extend date parsing error message #173
 
 ### Added
-- Make boundary regex configurable #108 #152 (thanks @EthraZa)
+- Make boundary regex configurable #169 #150 #126 #121 #111 #152 #108 (thanks @EthraZa)
 
 ### Affected Classes
 - NaN

@@ -111,6 +111,8 @@ return [
     |   -RFC822
     |       Default TRUE - Set to FALSE to prevent the usage of \imap_rfc822_parse_headers().
     |                      See https://github.com/Webklex/php-imap/issues/115 for more information.
+    |   -Boundary regex used to detect message boundaries. If you are having problems with empty messages, missing
+    |       attachments or anything like this. Be advised that it likes to break which causes new problems..
     |   -Message key identifier option
     |       You can choose between the following:
     |       'id'     - Use the MessageID as array key (default, might cause hickups with yahoo mail)
