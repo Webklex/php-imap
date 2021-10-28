@@ -10,6 +10,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Added
 - Make boundary regex configurable #169 #150 #126 #121 #111 #152 #108 (thanks @EthraZa)
+- IMAP ID support added #174
 
 ### Affected Classes
 - NaN

@@ -885,6 +885,28 @@ class ImapProtocol extends Protocol {
     }
 
     /**
+     * Exchange identification information
+     * Ref.: https://datatracker.ietf.org/doc/html/rfc2971
+     *
+     * @param null $ids
+     * @return array|bool|void|null
+     *
+     * @throws RuntimeException
+     */
+    public function ID($ids = null) {
+        $token = "NIL";
+        if (is_array($ids) && !empty($ids)) {
+            $token = "(";
+            foreach ($ids as $id) {
+                $token .= '"'.$id.'" ';
+            }
+            $token = rtrim($token).")";
+        }
+
+        return $this->requestAndResponse("ID", [$token], true);
+    }
+
+    /**
      * Create a new folder (and parent folders if needed)
      * @param string $folder folder name
      *

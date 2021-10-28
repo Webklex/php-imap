@@ -247,6 +247,17 @@ interface ProtocolInterface {
     public function moveManyMessages($messages, $folder, $uid = false);
 
     /**
+     * Exchange identification information
+     * Ref.: https://datatracker.ietf.org/doc/html/rfc2971
+     *
+     * @param null $ids
+     * @return array|bool|void|null
+     *
+     * @throws RuntimeException
+     */
+    public function ID($ids = null);
+
+    /**
      * Create a new folder
      *
      * @param string $folder folder name

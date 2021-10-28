@@ -443,6 +443,19 @@ class LegacyProtocol extends Protocol {
     }
 
     /**
+     * Exchange identification information
+     * Ref.: https://datatracker.ietf.org/doc/html/rfc2971
+     *
+     * @param null $ids
+     * @return array|bool|void|null
+     *
+     * @throws MethodNotSupportedException
+     */
+    public function ID($ids = null) {
+        throw new MethodNotSupportedException();
+    }
+
+    /**
      * Create a new folder (and parent folders if needed)
      * @param string $folder folder name
      *
