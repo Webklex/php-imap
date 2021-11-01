@@ -13,7 +13,6 @@
 namespace Webklex\PHPIMAP;
 
 use ErrorException;
-use Exception;
 use Webklex\PHPIMAP\Connection\Protocols\ImapProtocol;
 use Webklex\PHPIMAP\Connection\Protocols\LegacyProtocol;
 use Webklex\PHPIMAP\Connection\Protocols\Protocol;
@@ -544,6 +543,21 @@ class Client {
      */
     public function getFolderPath(){
         return $this->active_folder;
+    }
+
+    /**
+     * Exchange identification information
+     * Ref.: https://datatracker.ietf.org/doc/html/rfc2971
+     *
+     * @param null|array $ids
+     * @return array|bool|void|null
+     *
+     * @throws ConnectionFailedException
+     * @throws Exceptions\RuntimeException
+     */
+    public function Id($ids = null) {
+        $this->checkConnection();
+        return $this->connection->ID($ids);
     }
 
     /**
