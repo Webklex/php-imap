@@ -13,6 +13,7 @@
 namespace Webklex\PHPIMAP\Connection\Protocols;
 
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
+use Webklex\PHPIMAP\IMAP;
 
 /**
  * Class Protocol
@@ -219,6 +220,23 @@ abstract class Protocol implements ProtocolInterface {
             $this->connection_timeout = $connection_timeout;
         }
         return $this;
+    }
+
+    /**
+     * Get the UID key string
+     * @param int|string $uid
+     *
+     * @return string
+     */
+    public function getUIDKey($uid) {
+        if ($uid == IMAP::ST_UID || $uid == IMAP::FT_UID) {
+            return "UID";
+        }
+        if (strlen($uid) > 0 && !is_numeric($uid)) {
+            return (string)$uid;
+        }
+
+        return "";
     }
 
 }

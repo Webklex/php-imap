@@ -67,7 +67,7 @@ class Query {
     /** @var int $fetch_flags */
     protected $fetch_flags = true;
 
-    /** @var int $sequence */
+    /** @var int|string $sequence */
     protected $sequence = IMAP::NIL;
 
     /** @var string $fetch_order */
@@ -188,7 +188,7 @@ class Query {
         $this->generate_query();
 
         try {
-            $available_messages = $this->client->getConnection()->search([$this->getRawQuery()], $this->sequence == IMAP::ST_UID);
+            $available_messages = $this->client->getConnection()->search([$this->getRawQuery()], $this->sequence);
             return $available_messages !== false ? new Collection($available_messages) : new Collection();
         } catch (RuntimeException $e) {
             throw new GetMessagesFailedException("failed to fetch messages", 0, $e);
@@ -223,10 +223,12 @@ class Query {
         $uids = $available_messages->forPage($this->page, $this->limit)->toArray();
         $flags = $this->client->getConnection()->flags($uids, $this->sequence == IMAP::ST_UID);
         $headers = $this->client->getConnection()->headers($uids, "RFC822", $this->sequence == IMAP::ST_UID);
+        $flags = $this->client->getConnection()->flags($uids, $this->sequence);
+        $headers = $this->client->getConnection()->headers($uids, "RFC822", $this->sequence);
 
         $contents = [];
         if ($this->getFetchBody()) {
-            $contents = $this->client->getConnection()->content($uids, "RFC822", $this->sequence == IMAP::ST_UID);
+            $contents = $this->client->getConnection()->content($uids, "RFC822", $this->sequence);
         }
 
         return [
@@ -411,7 +413,7 @@ class Query {
      * Get a new Message instance
      * @param int $uid
      * @param int|null $msglist
-     * @param int|null $sequence
+     * @param int|string|null $sequence
      *
      * @return Message
      * @throws ConnectionFailedException
@@ -493,9 +495,18 @@ class Query {
      * @return $this
      */
     public function setSequence($sequence) {
-        $this->sequence = $sequence != IMAP::ST_MSGN ? IMAP::ST_UID : $sequence;
+        $this->sequence = $sequence;
 
         return $this;
+    }
+
+    /**
+     * Get the sequence type
+     *
+     * @return int|string
+     */
+    public function getSequence() {
+        return $this->sequence;
     }
 
     /**
