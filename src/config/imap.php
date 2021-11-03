@@ -111,6 +111,7 @@ return [
     |   -RFC822
     |       Default TRUE - Set to FALSE to prevent the usage of \imap_rfc822_parse_headers().
     |                      See https://github.com/Webklex/php-imap/issues/115 for more information.
+    |   -Debug enable to trace communication traffic
     |   -Boundary regex used to detect message boundaries. If you are having problems with empty messages, missing
     |       attachments or anything like this. Be advised that it likes to break which causes new problems..
     |   -Message key identifier option
@@ -145,6 +146,7 @@ return [
         'fetch_flags' => true,
         'soft_fail' => false,
         'rfc822' => true,
+        'debug' => false,
         'boundary' => '/boundary=(.*?(?=;)|(.*))/i',
         'message_key' => 'list',
         'fetch_order' => 'asc',

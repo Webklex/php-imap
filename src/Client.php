@@ -345,6 +345,10 @@ class Client {
             $this->connection->setProtocol($protocol);
         }
 
+        if (ClientManager::get('options.debug')) {
+            $this->connection->enableDebug();
+        }
+
         try {
             $this->connection->connect($this->host, $this->port);
         } catch (ErrorException $e) {
