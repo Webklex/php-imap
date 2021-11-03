@@ -14,6 +14,8 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Make boundary regex configurable #169 #150 #126 #121 #111 #152 #108 (thanks @EthraZa)
 - IMAP ID support added #174
 - Enable debug mode via config
+- Custom UID alternative support added
+- Fetch additional extensions using `Folder::query(["FEATURE_NAME"])`
 
 ### Affected Classes
 - [Header::class](src/Header.php)
@@ -21,7 +23,9 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - [Query::class](src/Query/Query.php)
 
 ### Breaking changes
-- NaN
+- All protocol methods which had a `boolean` `$uid` option no longer support a boolean. Use `IMAP::ST_UID` or `IMAP::NIL` instead. If you want to use an alternative to `UID` just use the string instead.
+- Default config option `options.sequence` changed from `IMAP::ST_MSGN` to `IMAP::ST_UID`.
+- `Folder::query()` no longer accepts a charset string. It has been replaced by an extension array, which provides the ability to automatically fetch additional features.
 
 ## [2.7.2] - 2021-09-27
 ### Fixed

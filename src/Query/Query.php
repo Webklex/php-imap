@@ -46,8 +46,8 @@ class Query {
     /** @var string $raw_query */
     protected $raw_query;
 
-    /** @var string $charset */
-    protected $charset;
+    /** @var string[] $extensions */
+    protected $extensions;
 
     /** @var Client $client */
     protected $client;
@@ -85,9 +85,9 @@ class Query {
     /**
      * Query constructor.
      * @param Client $client
-     * @param string $charset
+     * @param string[] $extensions
      */
-    public function __construct(Client $client, $charset = 'UTF-8') {
+    public function __construct(Client $client, $extensions = []) {
         $this->setClient($client);
 
         $this->sequence = ClientManager::get('options.sequence', IMAP::ST_MSGN);
@@ -102,7 +102,7 @@ class Query {
         $this->date_format = ClientManager::get('date_format', 'd M y');
         $this->soft_fail = ClientManager::get('options.soft_fail', false);
 
-        $this->charset = $charset;
+        $this->setExtensions($extensions);
         $this->query = new Collection();
         $this->boot();
     }
@@ -221,8 +221,10 @@ class Query {
         }
 
         $uids = $available_messages->forPage($this->page, $this->limit)->toArray();
-        $flags = $this->client->getConnection()->flags($uids, $this->sequence == IMAP::ST_UID);
-        $headers = $this->client->getConnection()->headers($uids, "RFC822", $this->sequence == IMAP::ST_UID);
+        $extensions = [];
+        if (empty($this->getExtensions()) === false) {
+            $extensions = $this->client->getConnection()->fetch($this->getExtensions(), $uids, null, $this->sequence);
+        }
         $flags = $this->client->getConnection()->flags($uids, $this->sequence);
         $headers = $this->client->getConnection()->headers($uids, "RFC822", $this->sequence);
 
@@ -232,10 +234,11 @@ class Query {
         }
 
         return [
-            "uids"     => $uids,
-            "flags"    => $flags,
-            "headers"  => $headers,
-            "contents" => $contents,
+            "uids"       => $uids,
+            "flags"      => $flags,
+            "headers"    => $headers,
+            "contents"   => $contents,
+            "extensions" => $extensions,
         ];
     }
 
@@ -323,8 +326,12 @@ class Query {
         foreach ($raw_messages["headers"] as $uid => $header) {
             $content = isset($raw_messages["contents"][$uid]) ? $raw_messages["contents"][$uid] : "";
             $flag = isset($raw_messages["flags"][$uid]) ? $raw_messages["flags"][$uid] : [];
+            $extensions = isset($raw_messages["extensions"][$uid]) ? $raw_messages["extensions"][$uid] : [];
 
             $message = $this->make($uid, $msglist, $header, $content, $flag);
+            foreach($extensions as $key => $extension) {
+                $message->getHeader()->set($key, $extension);
+            }
             if ($message !== null) {
                 $key = $this->getMessageKey($message_key, $msglist, $message);
                 $messages->put("$key", $message);
@@ -565,18 +572,23 @@ class Query {
     }
 
     /**
-     * @return string
+     * @return string[]
      */
-    public function getCharset() {
-        return $this->charset;
+    public function getExtensions() {
+        return $this->extensions;
     }
 
     /**
-     * @param string $charset
+     * @param string[] $extensions
      * @return Query
      */
-    public function setCharset($charset) {
-        $this->charset = $charset;
+    public function setExtensions($extensions) {
+        $this->extensions = $extensions;
+        if (count($this->extensions) > 0) {
+            if (in_array("UID", $this->extensions) === false) {
+                $this->extensions[] = "UID";
+            }
+        }
         return $this;
     }
 

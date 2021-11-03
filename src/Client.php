@@ -110,6 +110,13 @@ class Client {
     public $password;
 
     /**
+     * Additional data fetched from the server.
+     *
+     * @var string
+     */
+    public $extensions;
+
+    /**
      * Account authentication method.
      *
      * @var string
@@ -151,6 +158,7 @@ class Client {
         'username' => '',
         'password' => '',
         'authentication' => null,
+        "extensions" => [],
         'proxy' => [
             'socket' => null,
             'request_fulluri' => false,

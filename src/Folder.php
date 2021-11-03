@@ -130,35 +130,36 @@ class Folder {
 
     /**
      * Get a new search query instance
-     * @param string $charset
+     * @param string[] $extensions
      *
      * @return WhereQuery
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\RuntimeException
      */
-    public function query($charset = 'UTF-8'){
+    public function query($extensions = []){
         $this->getClient()->checkConnection();
         $this->getClient()->openFolder($this->path);
+        $extensions = count($extensions) > 0 ? $extensions : $this->getClient()->extensions;
 
-        return new WhereQuery($this->getClient(), $charset);
+        return new WhereQuery($this->getClient(), $extensions);
     }
 
     /**
-     * @inheritdoc self::query($charset = 'UTF-8')
+     * @inheritdoc self::query($extensions = [])
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\RuntimeException
      */
-    public function search($charset = 'UTF-8'){
-        return $this->query($charset);
+    public function search($extensions = 'UTF-8'){
+        return $this->query($extensions);
     }
 
     /**
-     * @inheritdoc self::query($charset = 'UTF-8')
+     * @inheritdoc self::query($extensions = [])
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\RuntimeException
      */
-    public function messages($charset = 'UTF-8'){
-        return $this->query($charset);
+    public function messages($extensions = []){
+        return $this->query($extensions);
     }
 
     /**

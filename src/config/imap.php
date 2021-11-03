@@ -61,7 +61,8 @@ return [
                 'username' => null,
                 'password' => null,
             ],
-            "timeout" => 30
+            "timeout" => 30,
+            "extensions" => []
         ],
 
         /*
