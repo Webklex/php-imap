@@ -162,7 +162,11 @@ class Query {
                 if ($statement[1] === null) {
                     $query .= $statement[0];
                 } else {
-                    $query .= $statement[0] . ' "' . $statement[1] . '"';
+                    if (is_numeric($statement[1])) {
+                        $query .= $statement[0] . ' ' . $statement[1];
+                    } else {
+                        $query .= $statement[0] . ' "' . $statement[1] . '"';
+                    }
                 }
             }
             $query .= ' ';

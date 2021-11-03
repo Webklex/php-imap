@@ -8,6 +8,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Fixed
 - Extend date parsing error message #173
 - Fixed 'Where' method replaces the content with uppercase #148
+- Don't surround numeric search values with quotes
 
 ### Added
 - Make boundary regex configurable #169 #150 #126 #121 #111 #152 #108 (thanks @EthraZa)
