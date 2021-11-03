@@ -7,6 +7,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ## [UNRELEASED]
 ### Fixed
 - Extend date parsing error message #173
+- Fixed 'Where' method replaces the content with uppercase #148
 
 ### Added
 - Make boundary regex configurable #169 #150 #126 #121 #111 #152 #108 (thanks @EthraZa)
@@ -15,6 +16,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Affected Classes
 - [Header::class](src/Header.php)
 - [Protocol::class](src/Connection/Protocols/Protocol.php)
+- [Query::class](src/Query/Query.php)
 
 ### Breaking changes
 - NaN

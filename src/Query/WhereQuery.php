@@ -105,11 +105,11 @@ class WhereQuery extends Query {
      * @throws InvalidWhereQueryCriteriaException
      */
     protected function validate_criteria($criteria) {
-        $criteria = strtoupper($criteria);
-        if (substr($criteria, 0, 7) === "CUSTOM ") {
+        $command = strtoupper($criteria);
+        if (substr($command, 0, 7) === "CUSTOM ") {
             return substr($criteria, 7);
         }
-        if (in_array($criteria, $this->available_criteria) === false) {
+        if (in_array($command, $this->available_criteria) === false) {
             throw new InvalidWhereQueryCriteriaException();
         }
 
