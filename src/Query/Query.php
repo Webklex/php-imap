@@ -256,18 +256,18 @@ class Query {
      * @throws GetMessagesFailedException
      * @throws ReflectionException
      */
-    protected function make($uid, $msglist, $header, $content, $flags){
+    protected function make($uid, $msglist, $header, $content, $flags) {
         try {
             return Message::make($uid, $msglist, $this->getClient(), $header, $content, $flags, $this->getFetchOptions(), $this->sequence);
-        }catch (MessageNotFoundException $e) {
+        } catch (MessageNotFoundException $e) {
             $this->setError($uid, $e);
-        }catch (RuntimeException $e) {
+        } catch (RuntimeException $e) {
             $this->setError($uid, $e);
-        }catch (MessageFlagException $e) {
+        } catch (MessageFlagException $e) {
             $this->setError($uid, $e);
-        }catch (InvalidMessageDateException $e) {
+        } catch (InvalidMessageDateException $e) {
             $this->setError($uid, $e);
-        }catch (MessageContentFetchingException $e) {
+        } catch (MessageContentFetchingException $e) {
             $this->setError($uid, $e);
         }
 
@@ -284,7 +284,7 @@ class Query {
      *
      * @return string
      */
-    protected function getMessageKey($message_key, $msglist, $message){
+    protected function getMessageKey($message_key, $msglist, $message) {
         switch ($message_key) {
             case 'number':
                 $key = $message->getMessageNo();
@@ -755,18 +755,18 @@ class Query {
     }
 
     /**
+     * @return Query
      * @var boolean $state
      *
-     * @return Query
      */
     public function softFail($state = true) {
         return $this->setSoftFail($state);
     }
 
     /**
+     * @return Query
      * @var boolean $state
      *
-     * @return Query
      */
     public function setSoftFail($state = true) {
         $this->soft_fail = $state;
@@ -805,11 +805,11 @@ class Query {
 
     /**
      * Check if there are any errors / exceptions present
+     * @return boolean
      * @var integer|null $uid
      *
-     * @return boolean
      */
-    public function hasErrors($uid = null){
+    public function hasErrors($uid = null) {
         if ($uid !== null) {
             return $this->hasError($uid);
         }
@@ -818,11 +818,11 @@ class Query {
 
     /**
      * Check if there is an error / exception present
+     * @return boolean
      * @var integer $uid
      *
-     * @return boolean
      */
-    public function hasError($uid){
+    public function hasError($uid) {
         return isset($this->errors[$uid]);
     }
 
@@ -831,7 +831,7 @@ class Query {
      *
      * @return array
      */
-    public function errors(){
+    public function errors() {
         return $this->getErrors();
     }
 
@@ -840,27 +840,27 @@ class Query {
      *
      * @return array
      */
-    public function getErrors(){
+    public function getErrors() {
         return $this->errors;
     }
 
     /**
      * Get a specific error / exception
+     * @return Exception|null
      * @var integer $uid
      *
-     * @return Exception|null
      */
-    public function error($uid){
+    public function error($uid) {
         return $this->getError($uid);
     }
 
     /**
      * Get a specific error / exception
+     * @return Exception|null
      * @var integer $uid
      *
-     * @return Exception|null
      */
-    public function getError($uid){
+    public function getError($uid) {
         if ($this->hasError($uid)) {
             return $this->errors[$uid];
         }
