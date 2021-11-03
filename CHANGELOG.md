@@ -16,6 +16,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Enable debug mode via config
 - Custom UID alternative support added
 - Fetch additional extensions using `Folder::query(["FEATURE_NAME"])`
+- Optionally move a message during "deletion" instead of just "flagging" it #106 (thanks @EthraZa)
 
 ### Affected Classes
 - [Header::class](src/Header.php)

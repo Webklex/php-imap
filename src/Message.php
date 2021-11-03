@@ -955,6 +955,8 @@ class Message {
     /**
      * Delete the current Message
      * @param bool $expunge
+     * @param string|null $trash_path
+     * @param boolean $force_move
      *
      * @return bool
      * @throws Exceptions\ConnectionFailedException
@@ -962,8 +964,12 @@ class Message {
      * @throws MessageFlagException
      * @throws Exceptions\RuntimeException
      */
-    public function delete($expunge = true) {
+    public function delete($expunge = true, $trash_path = null, $force_move = false) {
         $status = $this->setFlag("Deleted");
+        if($force_move) {
+            $trash_path = $trash_path === null ? $this->config["common_folders"]["trash"]: $trash_path;
+            $status = $this->move($trash_path);
+        }
         if($expunge) $this->client->expunge();
 
         $event = $this->getEvent("message", "deleted");
