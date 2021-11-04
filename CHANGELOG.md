@@ -26,6 +26,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - [Protocol::class](src/Connection/Protocols/Protocol.php)
 - [Query::class](src/Query/Query.php)
 - [WhereQuery::class](src/Query/WhereQuery.php)
+- [Message::class](src/Message.php)
 
 ### Breaking changes
 - All protocol methods which had a `boolean` `$uid` option no longer support a boolean. Use `IMAP::ST_UID` or `IMAP::NIL` instead. If you want to use an alternative to `UID` just use the string instead.

@@ -238,4 +238,8 @@ abstract class Protocol implements ProtocolInterface {
         return "";
     }
 
+    public function buildUIDCommand($command, $uid) {
+        return trim($this->getUIDKey($uid)." ".$command);
+    }
+
 }

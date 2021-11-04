@@ -556,7 +556,7 @@ class ImapProtocol extends Protocol {
         $items = (array)$items;
         $itemList = $this->escapeList($items);
 
-        $this->sendRequest(trim($this->getUIDKey($uid) . ' FETCH'), [$set, $itemList], $tag);
+        $this->sendRequest($this->buildUIDCommand("FETCH", $uid), [$set, $itemList], $tag);
         $result = [];
         $tokens = null; // define $tokens variable before first use
         while (!$this->readLine($tokens, $tag)) {
@@ -753,33 +753,20 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function store(array $flags, $from, $to = null, $mode = null, $silent = true, $uid = IMAP::ST_UID, $item = null) {
-        if ($item === null) {
-            $item = 'FLAGS';
-        }
-        if ($mode == '+' || $mode == '-') {
-            $item = $mode . $item;
-        }
-
-        if ($silent) {
-            $item .= '.SILENT';
-        }
-
         $flags = $this->escapeList($flags);
-        $set = (int)$from;
-        if ($to !== null) {
-            $set .= ':' . ($to == INF ? '*' : (int)$to);
-        }
+        $set = $this->buildSet($from, $to);
 
-        $command = ($uid ? "UID " : "")."STORE";
-        $result = $this->requestAndResponse($command, [$set, $item, $flags], $silent);
+        $command = $this->buildUIDCommand("STORE", $uid);
+        $item = ($mode == '-' ? "-" : "+").($item === null ? "FLAGS" : $item).($silent ? '.SILENT' : "");
+
+        $response = $this->requestAndResponse($command, [$set, $item, $flags], $silent);
 
         if ($silent) {
-            return (bool)$result;
+            return (bool)$response;
         }
 
-        $tokens = $result;
         $result = [];
-        foreach ($tokens as $token) {
+        foreach ($response as $token) {
             if ($token[1] != 'FETCH' || $token[2][0] != 'FLAGS') {
                 continue;
             }
@@ -826,11 +813,8 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function copyMessage($folder, $from, $to = null, $uid = IMAP::ST_UID) {
-        $set = (int)$from;
-        if ($to !== null) {
-            $set .= ':' . ($to == INF ? '*' : (int)$to);
-        }
-        $command = trim($this->getUIDKey($uid)." COPY");
+        $set = $this->buildSet($from, $to);
+        $command = $this->buildUIDCommand("COPY", $uid);
         return $this->requestAndResponse($command, [$set, $this->escapeString($folder)], true);
     }
 
@@ -846,7 +830,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function copyManyMessages($messages, $folder, $uid = IMAP::ST_UID) {
-        $command = trim($this->getUIDKey($uid)." COPY");
+        $command = $this->buildUIDCommand("COPY", $uid);
 
         $set = implode(',', $messages);
         $tokens = [$set, $this->escapeString($folder)];
@@ -867,11 +851,8 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function moveMessage($folder, $from, $to = null, $uid = IMAP::ST_UID) {
-        $set = (int)$from;
-        if ($to !== null) {
-            $set .= ':' . ($to == INF ? '*' : (int)$to);
-        }
-        $command = trim($this->getUIDKey($uid)." MOVE");
+        $set = $this->buildSet($from, $to);
+        $command = $this->buildUIDCommand("MOVE", $uid);
 
         return $this->requestAndResponse($command, [$set, $this->escapeString($folder)], true);
     }
@@ -887,7 +868,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function moveManyMessages($messages, $folder, $uid = IMAP::ST_UID) {
-        $command = trim($this->getUIDKey($uid)." MOVE");
+        $command = $this->buildUIDCommand("MOVE", $uid);
 
         $set = implode(',', $messages);
         $tokens = [$set, $this->escapeString($folder)];
@@ -1048,8 +1029,8 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function search(array $params, $uid = IMAP::ST_UID) {
-        $token = trim($this->getUIDKey($uid)." SEARCH");
-        $response = $this->requestAndResponse($token, $params);
+        $command = $this->buildUIDCommand("SEARCH", $uid);
+        $response = $this->requestAndResponse($command, $params);
         if (!$response) {
             return $response;
         }
@@ -1105,5 +1086,20 @@ class ImapProtocol extends Protocol {
      */
     public function disableDebug(){
         $this->debug = false;
+    }
+
+    /**
+     * Build a valid UID number set
+     * @param $from
+     * @param null $to
+     *
+     * @return int|string
+     */
+    public function buildSet($from, $to = null) {
+        $set = (int)$from;
+        if ($to !== null) {
+            $set .= ':' . ($to == INF ? '*' : (int)$to);
+        }
+        return $set;
     }
 }
