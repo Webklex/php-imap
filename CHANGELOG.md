@@ -6,6 +6,19 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
+- NaN
+
+### Added
+- NaN
+
+### Affected Classes
+- NaN
+
+### Breaking changes
+- NaN
+
+## [3.0.0-alpha] - 2021-11-04
+### Fixed
 - Extend date parsing error message #173
 - Fixed 'Where' method replaces the content with uppercase #148
 - Don't surround numeric search values with quotes
