@@ -10,6 +10,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Fixed 'Where' method replaces the content with uppercase #148
 - Don't surround numeric search values with quotes
 - Context added to `InvalidWhereQueryCriteriaException` 
+- Redundant `stream_set_timeout()` removed
 
 ### Added
 - Make boundary regex configurable #169 #150 #126 #121 #111 #152 #108 (thanks @EthraZa)
