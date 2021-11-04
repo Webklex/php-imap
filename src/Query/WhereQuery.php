@@ -110,7 +110,7 @@ class WhereQuery extends Query {
             return substr($criteria, 7);
         }
         if (in_array($command, $this->available_criteria) === false) {
-            throw new InvalidWhereQueryCriteriaException();
+            throw new InvalidWhereQueryCriteriaException("Invalid imap search criteria: $command");
         }
 
         return $criteria;
