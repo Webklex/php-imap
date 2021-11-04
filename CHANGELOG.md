@@ -19,11 +19,13 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Custom UID alternative support added
 - Fetch additional extensions using `Folder::query(["FEATURE_NAME"])`
 - Optionally move a message during "deletion" instead of just "flagging" it #106 (thanks @EthraZa)
+- `WhereQuery::where()` accepts now a wide range of criteria / values.
 
 ### Affected Classes
 - [Header::class](src/Header.php)
 - [Protocol::class](src/Connection/Protocols/Protocol.php)
 - [Query::class](src/Query/Query.php)
+- [WhereQuery::class](src/Query/WhereQuery.php)
 
 ### Breaking changes
 - All protocol methods which had a `boolean` `$uid` option no longer support a boolean. Use `IMAP::ST_UID` or `IMAP::NIL` instead. If you want to use an alternative to `UID` just use the string instead.

@@ -117,32 +117,53 @@ class WhereQuery extends Query {
     }
 
     /**
+     * Register search parameters
      * @param mixed $criteria
      * @param null $value
      *
      * @return $this
      * @throws InvalidWhereQueryCriteriaException
+     *
+     * Examples:
+     * $query->from("someone@email.tld")->seen();
+     * $query->whereFrom("someone@email.tld")->whereSeen();
+     * $query->where([["FROM" => "someone@email.tld"], ["SEEN"]]);
+     * $query->where(["FROM" => "someone@email.tld"])->where(["SEEN"]);
+     * $query->where(["FROM" => "someone@email.tld", "SEEN"]);
+     * $query->where("FROM", "someone@email.tld")->where("SEEN");
      */
     public function where($criteria, $value = null) {
         if (is_array($criteria)) {
             foreach ($criteria as $key => $value) {
                 if (is_numeric($key)) {
-                    return $this->where($value);
+                    $this->where($value);
+                }else{
+                    $this->where($key, $value);
                 }
-                return $this->where($key, $value);
             }
         } else {
-            $criteria = $this->validate_criteria($criteria);
-            $value = $this->parse_value($value);
-
-            if ($value === null || $value === '') {
-                $this->query->push([$criteria]);
-            } else {
-                $this->query->push([$criteria, $value]);
-            }
+            $this->push_search_criteria($criteria, $value);
         }
 
         return $this;
+    }
+
+    /**
+     * Push a given search criteria and value pair to the search query
+     * @param $criteria string
+     * @param $value mixed
+     *
+     * @throws InvalidWhereQueryCriteriaException
+     */
+    protected function push_search_criteria($criteria, $value){
+        $criteria = $this->validate_criteria($criteria);
+        $value = $this->parse_value($value);
+
+        if ($value === null || $value === '') {
+            $this->query->push([$criteria]);
+        } else {
+            $this->query->push([$criteria, $value]);
+        }
     }
 
     /**
@@ -468,8 +489,7 @@ class WhereQuery extends Query {
      * @return WhereQuery
      * @throws InvalidWhereQueryCriteriaException
      */
-    public function whereUid($uid)
-    {
+    public function whereUid($uid) {
         return $this->where('UID', $uid);
     }
 
@@ -481,8 +501,7 @@ class WhereQuery extends Query {
      * @return WhereQuery
      * @throws InvalidWhereQueryCriteriaException
      */
-    public function whereUidIn($uids)
-    {
+    public function whereUidIn($uids) {
         $uids = implode(',', $uids);
         return $this->where('UID', $uids);
     }
@@ -491,10 +510,9 @@ class WhereQuery extends Query {
      * Apply the callback if the given "value" is truthy.
      * copied from @url https://github.com/laravel/framework/blob/8.x/src/Illuminate/Support/Traits/Conditionable.php
      *
-     * @param mixed  $value
-     * @param callable  $callback
-     * @param callable|null  $default
-
+     * @param mixed $value
+     * @param callable $callback
+     * @param callable|null $default
      * @return $this|mixed
      */
     public function when($value, $callback, $default = null) {
@@ -511,14 +529,13 @@ class WhereQuery extends Query {
      * Apply the callback if the given "value" is falsy.
      * copied from @url https://github.com/laravel/framework/blob/8.x/src/Illuminate/Support/Traits/Conditionable.php
      *
-     * @param mixed  $value
-     * @param callable  $callback
-     * @param callable|null  $default
-
+     * @param mixed $value
+     * @param callable $callback
+     * @param callable|null $default
      * @return $this|mixed
      */
     public function unless($value, $callback, $default = null) {
-        if (! $value) {
+        if (!$value) {
             return $callback($this, $value) ?: $this;
         } elseif ($default) {
             return $default($this, $value) ?: $this;
