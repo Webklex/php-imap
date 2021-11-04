@@ -19,7 +19,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Custom UID alternative support added
 - Fetch additional extensions using `Folder::query(["FEATURE_NAME"])`
 - Optionally move a message during "deletion" instead of just "flagging" it #106 (thanks @EthraZa)
-- `WhereQuery::where()` accepts now a wide range of criteria / values.
+- `WhereQuery::where()` accepts now a wide range of criteria / values. #104
 
 ### Affected Classes
 - [Header::class](src/Header.php)
