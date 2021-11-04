@@ -19,7 +19,7 @@ Official documentation: [php-imap.com](https://www.php-imap.com/)
 
 Laravel wrapper: [webklex/laravel-imap](https://github.com/Webklex/laravel-imap)
 
-Discord: https://discord.gg/jCcZWCSq
+Discord: https://discord.gg/vUHrbfbDr9
 
 ## Table of Contents
 - [Documentations](#documentations)
