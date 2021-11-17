@@ -60,12 +60,12 @@ class ImapProtocol extends Protocol {
      */
     public function connect($host, $port = null) {
         $transport = 'tcp';
-        $encryption = "";
+        $encryption = '';
 
         if ($this->encryption) {
             $encryption = strtolower($this->encryption);
-            if ($encryption == "ssl") {
-                $transport = 'ssl';
+            if (in_array($encryption, ['ssl', 'tls'])) {
+                $transport = $encryption;
                 $port = $port === null ? 993 : $port;
             }
         }
@@ -75,8 +75,8 @@ class ImapProtocol extends Protocol {
             if (!$this->assumedNextLine('* OK')) {
                 throw new ConnectionFailedException('connection refused');
             }
-            if ($encryption == "tls") {
-                $this->enableTls();
+            if ($encryption == 'starttls') {
+                $this->enableStartTls();
             }
         } catch (Exception $e) {
             throw new ConnectionFailedException('connection failed', 0, $e);
@@ -89,7 +89,7 @@ class ImapProtocol extends Protocol {
      * @throws ConnectionFailedException
      * @throws RuntimeException
      */
-    protected function enableTls(){
+    protected function enableStartTls(){
         $response = $this->requestAndResponse('STARTTLS');
         $result = $response && stream_socket_enable_crypto($this->stream, true, $this->getCryptoMethod());
         if (!$result) {

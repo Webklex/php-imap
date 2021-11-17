@@ -65,7 +65,7 @@ class Client {
 
     /**
      * Server encryption.
-     * Supported: none, ssl, tls, or notls.
+     * Supported: none, ssl, tls, starttls or notls.
      *
      * @var string
      */
