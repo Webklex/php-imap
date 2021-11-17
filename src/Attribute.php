@@ -62,21 +62,12 @@ class Attribute implements ArrayAccess {
     }
 
     /**
-     * Return the serialized attribute
-     *
-     * @return array
-     */
-    public function __serialize(){
-        return $this->values;
-    }
-
-    /**
      * Convert instance to array
      *
      * @return array
      */
     public function toArray(){
-        return $this->__serialize();
+        return $this->values;
     }
 
     /**
