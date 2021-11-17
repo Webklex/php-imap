@@ -6,7 +6,8 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
+- Fix attribute serialization #179 (thanks @netpok)
+- Use real tls instead of starttls #180 (thanks @netpok)
 
 ### Added
 - NaN
