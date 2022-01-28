@@ -381,11 +381,13 @@ class Query {
 
             $this->limit = $chunk_size;
             $this->page = $start_chunk;
+            $handled_messages_count = 0;
             do {
                 $messages = $this->populate($available_messages);
+                $handled_messages_count += $messages->count();
                 $callback($messages, $this->page);
                 $this->page++;
-            } while ($this->limit * $this->page <= $available_messages_count);
+            } while ($handled_messages_count < $available_messages_count);
             $this->limit = $old_limit;
             $this->page = $old_page;
         }
