@@ -232,6 +232,12 @@ class ClientManager {
         $arrays = func_get_args();
         $base = array_shift($arrays);
 
+        // From https://stackoverflow.com/a/173479
+        $isAssoc = function(array $arr) {
+            if (array() === $arr) return false;
+            return array_keys($arr) !== range(0, count($arr) - 1);
+        };
+
         if(!is_array($base)) $base = empty($base) ? array() : array($base);
 
         foreach($arrays as $append) {
@@ -245,7 +251,19 @@ class ClientManager {
                     continue;
                 }
 
-                if(is_array($value) or is_array($base[$key])) {
+                if(
+                    (
+                        is_array($value)
+                        && $isAssoc($value)
+                    )
+                    || (
+                        is_array($base[$key])
+                        && $isAssoc($base[$key])
+                    )
+                ) {
+                    // If the arrays are not associates we don't want to array_merge_recursive_distinct
+                    // else merging $baseConfig['dispositions'] = ['attachment', 'inline'] with $customConfig['dispositions'] = ['attachment']
+                    // results in $resultConfig['dispositions'] = ['attachment', 'inline']
                     $base[$key] = $this->array_merge_recursive_distinct($base[$key], $append[$key]);
                 } else if(is_numeric($key)) {
                     if(!in_array($value, $base)) $base[] = $value;
