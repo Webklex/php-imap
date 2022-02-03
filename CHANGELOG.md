@@ -25,6 +25,13 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Query::chunked does not loop over the last chunk #196 (thanks @laurent-rizer)
 - Fix isAttachment that did not properly take in consideration dispositions options #195 (thanks @laurent-rizer)
 
+### Affected Classes
+- [Header::class](src/Header.php)
+- [Protocol::class](src/Connection/Protocols/Protocol.php)
+- [Query::class](src/Query/Query.php)
+- [Part::class](src/Part.php)
+- [ClientManager::class](src/ClientManager.php)
+
 ## [3.0.0-alpha] - 2021-11-04
 ### Fixed
 - Extend date parsing error message #173
