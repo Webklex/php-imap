@@ -6,8 +6,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- Fix attribute serialization #179 (thanks @netpok)
-- Use real tls instead of starttls #180 (thanks @netpok)
+- NaN
 
 ### Added
 - NaN
@@ -17,6 +16,14 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Breaking changes
 - NaN
+
+## [3.1.0-alpha] - 2022-02-03
+### Fixed
+- Fix attribute serialization #179 (thanks @netpok)
+- Use real tls instead of starttls #180 (thanks @netpok)
+- Allow to fully overwrite default config arrays #194 (thanks @laurent-rizer)
+- Query::chunked does not loop over the last chunk #196 (thanks @laurent-rizer)
+- Fix isAttachment that did not properly take in consideration dispositions options #195 (thanks @laurent-rizer)
 
 ## [3.0.0-alpha] - 2021-11-04
 ### Fixed
