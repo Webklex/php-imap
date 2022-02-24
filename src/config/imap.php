@@ -148,6 +148,7 @@ return [
         'soft_fail' => false,
         'rfc822' => true,
         'debug' => false,
+        'uid_cache' => true,
         'boundary' => '/boundary=(.*?(?=;)|(.*))/i',
         'message_key' => 'list',
         'fetch_order' => 'asc',

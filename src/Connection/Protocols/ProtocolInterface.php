@@ -13,6 +13,7 @@
 namespace Webklex\PHPIMAP\Connection\Protocols;
 
 use ErrorException;
+use Webklex\PHPIMAP\Client;
 use Webklex\PHPIMAP\Exceptions\AuthFailedException;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
 use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
@@ -392,4 +393,21 @@ interface ProtocolInterface {
      * Disable the debug mode
      */
     public function disableDebug();
+
+    /**
+     * Enable uid caching
+     */
+    public function enableUidCache();
+
+    /**
+     * Disable uid caching
+     */
+    public function disableUidCache();
+
+    /**
+     * Set the uid cache of current active folder
+     *
+     * @param array|null $uids
+     */
+    public function setUidCache($uids);
 }
