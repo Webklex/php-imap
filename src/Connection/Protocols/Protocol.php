@@ -33,6 +33,11 @@ abstract class Protocol implements ProtocolInterface {
     protected $debug = false;
 
     /**
+     * @var boolean
+     */
+    protected $enable_uid_cache = true;
+
+    /**
      * @var false|resource
      */
     public $stream = false;
@@ -59,6 +64,13 @@ abstract class Protocol implements ProtocolInterface {
         'username' => null,
         'password' => null,
     ];
+
+    /**
+     * Cache for uid of active folder.
+     *
+     * @var null|array
+     */
+    protected $uid_cache = null;
 
     /**
      * Get an available cryptographic method
@@ -242,4 +254,32 @@ abstract class Protocol implements ProtocolInterface {
         return trim($this->getUIDKey($uid)." ".$command);
     }
 
+    /**
+     * Set the uid cache of current active folder
+     *
+     * @param array|null $uids
+     */
+    public function setUidCache($uids) {
+        if (is_null($uids)) {
+            $this->uid_cache = null;
+            return;
+        }
+
+        $messageNumber = 1;
+
+        $uid_cache = [];
+        foreach ($uids as $uid) {
+            $uid_cache[$messageNumber++] = $uid;
+        }
+
+        $this->uid_cache = $uid_cache;
+    }
+
+    public function enableUidCache() {
+        $this->enable_uid_cache = true;
+    }
+
+    public function disableUidCache() {
+        $this->enable_uid_cache = false;
+    }
 }
