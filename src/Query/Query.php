@@ -476,6 +476,38 @@ class Query {
     }
 
     /**
+     * Get messages with UID equal or greater than given UID.
+     *
+     * @param int|string $uid
+     *
+     * @return MessageCollection
+     * @throws ConnectionFailedException
+     * @throws GetMessagesFailedException
+     * @throws MessageNotFoundException
+     */
+    public function getByUidGreaterThanEqual($uid) {
+        $connection = $this->getClient()->getConnection();
+
+        $uids = $connection->getUid();
+        $available_messages = new Collection();
+        $i = 0;
+        foreach ($uids as $id) {
+            if ($id >= $uid) {
+                $available_messages->put($i++, $id);
+            }
+        }
+
+        try {
+            if ($available_messages->count() > 0) {
+                return $this->populate($available_messages);
+            }
+            return MessageCollection::make([]);
+        } catch (Exception $e) {
+            throw new GetMessagesFailedException($e->getMessage(), 0, $e);
+        }
+    }
+
+    /**
      * Don't mark messages as read when fetching
      *
      * @return $this

@@ -514,7 +514,7 @@ class Client {
      * @param string $folder
      * @param boolean $expunge
      *
-     * @return bool
+     * @return Folder
      * @throws ConnectionFailedException
      * @throws FolderFetchingException
      * @throws Exceptions\EventNotFoundException
