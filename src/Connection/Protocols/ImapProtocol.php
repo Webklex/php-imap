@@ -432,7 +432,9 @@ class ImapProtocol extends Protocol {
             } catch (Exception $e) {}
             fclose($this->stream);
             $this->stream = null;
+            $this->uid_cache = null;
         }
+
         return $result;
     }
 
@@ -513,6 +515,8 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function selectFolder($folder = 'INBOX') {
+        $this->uid_cache = null;
+
         return $this->examineOrSelect('SELECT', $folder);
     }
 
@@ -678,18 +682,31 @@ class ImapProtocol extends Protocol {
      * @throws MessageNotFoundException
      */
     public function getUid($id = null) {
-        try {
-            $uids = $this->fetch('UID', 1, INF);
-            if ($id == null) {
-                return $uids;
-            }
 
-            foreach ($uids as $k => $v) {
-                if ($k == $id) {
-                    return $v;
-                }
+        if ($this->enable_uid_cache && $this->uid_cache) {
+            $uids = $this->uid_cache;
+        } else {
+            try {
+                $uids = $this->fetch('UID', 1, INF);
+                $this->setUidCache($uids); // set cache for this folder
+            } catch (RuntimeException $e) {}
+        }
+
+        if ($id == null) {
+            return $uids;
+        }
+
+        foreach ($uids as $k => $v) {
+            if ($k == $id) {
+                return $v;
             }
-        } catch (RuntimeException $e) {}
+        }
+
+        // clear uid cache and run method again
+        if ($this->enable_uid_cache && $this->uid_cache) {
+            $this->setUidCache(null);
+            return $this->getUid($id);
+        }
 
         throw new MessageNotFoundException('unique id not found');
     }

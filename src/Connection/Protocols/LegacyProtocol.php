@@ -149,6 +149,7 @@ class LegacyProtocol extends Protocol {
         if ($this->stream) {
             $result = \imap_close($this->stream, IMAP::CL_EXPUNGE);
             $this->stream = false;
+            $this->uid_cache = null;
             return $result;
         }
         return false;
@@ -181,6 +182,7 @@ class LegacyProtocol extends Protocol {
      */
     public function selectFolder($folder = 'INBOX') {
         \imap_reopen($this->stream, $folder, IMAP::OP_READONLY, 3);
+        $this->uid_cache = null;
         return $this->examineFolder($folder);
     }
 
@@ -275,13 +277,20 @@ class LegacyProtocol extends Protocol {
      */
     public function getUid($id = null) {
         if ($id === null) {
+            if ($this->enable_uid_cache && $this->uid_cache) {
+                return $this->uid_cache;
+            }
+
             $overview = $this->overview("1:*");
             $uids = [];
             foreach($overview as $set){
                 $uids[$set->msgno] = $set->uid;
             }
+
+            $this->setUidCache($uids);
             return $uids;
         }
+
         return \imap_uid($this->stream, $id);
     }
 

@@ -357,6 +357,10 @@ class Client {
             $this->connection->enableDebug();
         }
 
+        if (!ClientManager::get('options.uid_cache')) {
+            $this->connection->disableUidCache();
+        }
+
         try {
             $this->connection->connect($this->host, $this->port);
         } catch (ErrorException $e) {
