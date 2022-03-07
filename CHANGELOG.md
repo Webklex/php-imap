@@ -7,10 +7,10 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ## [UNRELEASED]
 ### Fixed
 - NaN
-- 
+
 ### Added
 - NaN
-- 
+
 ### Affected Classes
 - NaN
 
