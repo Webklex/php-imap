@@ -303,6 +303,24 @@ class Query {
     }
 
     /**
+     * Currates a given collection aof messages
+     * @param Collection $available_messages
+     *
+     * @return MessageCollection
+     * @throws GetMessagesFailedException
+     */
+    public function curate_messages($available_messages) {
+        try {
+            if ($available_messages->count() > 0) {
+                return $this->populate($available_messages);
+            }
+            return MessageCollection::make([]);
+        } catch (Exception $e) {
+            throw new GetMessagesFailedException($e->getMessage(), 0, $e);
+        }
+    }
+
+    /**
      * Populate a given id collection and receive a fully fetched message collection
      * @param Collection $available_messages
      *
@@ -349,16 +367,7 @@ class Query {
      * @throws GetMessagesFailedException
      */
     public function get() {
-        $available_messages = $this->search();
-
-        try {
-            if ($available_messages->count() > 0) {
-                return $this->populate($available_messages);
-            }
-            return MessageCollection::make([]);
-        } catch (Exception $e) {
-            throw new GetMessagesFailedException($e->getMessage(), 0, $e);
-        }
+        return $this->curate_messages($this->search());
     }
 
     /**
@@ -476,35 +485,103 @@ class Query {
     }
 
     /**
-     * Get messages with UID equal or greater than given UID.
-     *
-     * @param int|string $uid
+     * Filter all available uids by a given closure and get a curated list of messages
+     * @param callable $closure
      *
      * @return MessageCollection
      * @throws ConnectionFailedException
      * @throws GetMessagesFailedException
      * @throws MessageNotFoundException
      */
-    public function getByUidGreaterThanEqual($uid) {
+    public function filter($closure) {
         $connection = $this->getClient()->getConnection();
 
         $uids = $connection->getUid();
         $available_messages = new Collection();
-        $i = 0;
-        foreach ($uids as $id) {
-            if ($id >= $uid) {
-                $available_messages->put($i++, $id);
+        if (is_array($uids)) {
+            foreach ($uids as $id){
+                if ($closure($id)) {
+                    $available_messages->push($id);
+                }
             }
         }
 
-        try {
-            if ($available_messages->count() > 0) {
-                return $this->populate($available_messages);
-            }
-            return MessageCollection::make([]);
-        } catch (Exception $e) {
-            throw new GetMessagesFailedException($e->getMessage(), 0, $e);
-        }
+        return $this->curate_messages($available_messages);
+    }
+
+    /**
+     * Get all messages with an uid greater or equal to a given UID
+     * @param int $uid
+     *
+     * @return MessageCollection
+     * @throws ConnectionFailedException
+     * @throws GetMessagesFailedException
+     * @throws MessageNotFoundException
+     */
+    public function getByUidGreaterOrEqual($uid) {
+        return $this->filter(function($id) use($uid){
+            return $id >= $uid;
+        });
+    }
+
+    /**
+     * Get all messages with an uid greater than a given UID
+     * @param int $uid
+     *
+     * @return MessageCollection
+     * @throws ConnectionFailedException
+     * @throws GetMessagesFailedException
+     * @throws MessageNotFoundException
+     */
+    public function getByUidGreater($uid) {
+        return $this->filter(function($id) use($uid){
+            return $id > $uid;
+        });
+    }
+
+    /**
+     * Get all messages with an uid lower than a given UID
+     * @param int $uid
+     *
+     * @return MessageCollection
+     * @throws ConnectionFailedException
+     * @throws GetMessagesFailedException
+     * @throws MessageNotFoundException
+     */
+    public function getByUidLower($uid) {
+        return $this->filter(function($id) use($uid){
+            return $id < $uid;
+        });
+    }
+
+    /**
+     * Get all messages with an uid lower or equal to a given UID
+     * @param int $uid
+     *
+     * @return MessageCollection
+     * @throws ConnectionFailedException
+     * @throws GetMessagesFailedException
+     * @throws MessageNotFoundException
+     */
+    public function getByUidLowerOrEqual($uid) {
+        return $this->filter(function($id) use($uid){
+            return $id <= $uid;
+        });
+    }
+
+    /**
+     * Get all messages with an uid greater than a given UID
+     * @param int $uid
+     *
+     * @return MessageCollection
+     * @throws ConnectionFailedException
+     * @throws GetMessagesFailedException
+     * @throws MessageNotFoundException
+     */
+    public function getByUidLowerThan($uid) {
+        return $this->filter(function($id) use($uid){
+            return $id < $uid;
+        });
     }
 
     /**
