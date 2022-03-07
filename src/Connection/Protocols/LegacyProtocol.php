@@ -559,7 +559,11 @@ class LegacyProtocol extends Protocol {
      * @return array message ids
      */
     public function search(array $params, $uid = IMAP::ST_UID) {
-        return \imap_search($this->stream, $params[0], $uid ? IMAP::ST_UID : IMAP::NIL);
+        $result = \imap_search($this->stream, $params[0], $uid ? IMAP::ST_UID : IMAP::NIL);
+        if ($result === false) {
+            return [];
+        }
+        return $result;
     }
 
     /**
