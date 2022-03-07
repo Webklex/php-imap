@@ -14,6 +14,7 @@ namespace Webklex\PHPIMAP;
 
 use Carbon\Carbon;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
+use Webklex\PHPIMAP\Exceptions\NotSupportedCapabilityException;
 use Webklex\PHPIMAP\Query\WhereQuery;
 use Webklex\PHPIMAP\Support\FolderCollection;
 use Webklex\PHPIMAP\Traits\HasEvents;
@@ -357,11 +358,15 @@ class Folder {
      * @throws Exceptions\EventNotFoundException
      * @throws Exceptions\MessageFlagException
      * @throws Exceptions\MessageNotFoundException
+     * @throws Exceptions\NotSupportedCapabilityException
      */
     public function idle(callable $callback, $timeout = 1200, $auto_reconnect = false) {
         $this->client->getConnection()->setConnectionTimeout($timeout);
 
         $this->client->reconnect();
+        if (!in_array("IDLE", $this->client->getConnection()->getCapabilities())) {
+            throw new NotSupportedCapabilityException("IMAP server does not support IDLE");
+        }
         $this->client->openFolder($this->path, true);
         $connection = $this->client->getConnection();
 
