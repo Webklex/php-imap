@@ -7,15 +7,59 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ## [UNRELEASED]
 ### Fixed
 - NaN
-
+- 
 ### Added
 - NaN
-
+- 
 ### Affected Classes
 - NaN
 
 ### Breaking changes
 - NaN
+
+
+## [3.2.0] - 2022-03-07
+### Fixed
+- Fix attribute serialization #179 (thanks @netpok)
+- Use real tls instead of starttls #180 (thanks @netpok)
+- Allow to fully overwrite default config arrays #194 (thanks @laurent-rizer)
+- Query::chunked does not loop over the last chunk #196 (thanks @laurent-rizer)
+- Fix isAttachment that did not properly take in consideration dispositions options #195 (thanks @laurent-rizer)
+- Extend date parsing error message #173
+- Fixed 'Where' method replaces the content with uppercase #148
+- Don't surround numeric search values with quotes
+- Context added to `InvalidWhereQueryCriteriaException`
+- Redundant `stream_set_timeout()` removed
+
+### Added
+- UID Cache added #204 (thanks @HelloSebastian)
+- Query::class extended with `getByUidLower`, `getByUidLowerOrEqual` , `getByUidGreaterOrEqual` , `getByUidGreater` to fetch certain ranges of uids #201 (thanks @HelloSebastian)
+- Check if IDLE is supported if `Folder::idle()` is called #199 (thanks @HelloSebastian)
+- Fallback date support added. The config option `options.fallback_date` is used as fallback date is it is set. Otherwise, an exception will be thrown #198
+- UID filter support added
+- Make boundary regex configurable #169 #150 #126 #121 #111 #152 #108 (thanks @EthraZa)
+- IMAP ID support added #174
+- Enable debug mode via config
+- Custom UID alternative support added
+- Fetch additional extensions using `Folder::query(["FEATURE_NAME"])`
+- Optionally move a message during "deletion" instead of just "flagging" it #106 (thanks @EthraZa)
+- `WhereQuery::where()` accepts now a wide range of criteria / values. #104
+
+### Affected Classes
+- [Part::class](src/Part.php)
+- [Query::class](src/Query/Query.php)
+- [Client::class](src/Client.php)
+- [Header::class](src/Header.php)
+- [Protocol::class](src/Connection/Protocols/Protocol.php)
+- [ClientManager::class](src/ClientManager.php)
+
+### Breaking changes
+- If you are using the legacy protocol to search, the results no longer return false if the search criteria could not be interpreted but instead return an empty array. This will ensure it is compatible to the rest of this library and no longer result in a potential type confusion.
+- `Folder::idle` will throw an `Webklex\PHPIMAP\Exceptions\NotSupportedCapabilityException` exception if IMAP isn't supported by the mail server
+- All protocol methods which had a `boolean` `$uid` option no longer support a boolean value. Use `IMAP::ST_UID` or `IMAP::NIL` instead. If you want to use an alternative to `UID` just use the string instead.
+- Default config option `options.sequence` changed from `IMAP::ST_MSGN` to `IMAP::ST_UID`.
+- `Folder::query()` no longer accepts a charset string. It has been replaced by an extension array, which provides the ability to automatically fetch additional features.
+
 
 ## [3.1.0-alpha] - 2022-02-03
 ### Fixed
