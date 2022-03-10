@@ -88,7 +88,7 @@ class Attribute implements ArrayAccess {
      * @param  mixed  $key
      * @return bool
      */
-    public function offsetExists($key) {
+    public function offsetExists($key): bool {
         return array_key_exists($key, $this->values);
     }
 
@@ -98,6 +98,7 @@ class Attribute implements ArrayAccess {
      * @param  mixed  $key
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key) {
         return $this->values[$key];
     }
@@ -109,7 +110,7 @@ class Attribute implements ArrayAccess {
      * @param  mixed  $value
      * @return void
      */
-    public function offsetSet($key, $value) {
+    public function offsetSet($key, $value): void {
         if (is_null($key)) {
             $this->values[] = $value;
         } else {
@@ -123,7 +124,7 @@ class Attribute implements ArrayAccess {
      * @param  string  $key
      * @return void
      */
-    public function offsetUnset($key) {
+    public function offsetUnset($key): void {
         unset($this->values[$key]);
     }
 

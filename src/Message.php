@@ -570,7 +570,7 @@ class Message {
                 $content = $this->convertEncoding($content, $encoding);
             }
 
-            $subtype = strtolower($part->subtype);
+            $subtype = strtolower($part->subtype ?? '');
             $subtype = $subtype == "plain" || $subtype == "" ? "text" : $subtype;
 
             if (isset($this->bodies[$subtype])) {
@@ -719,7 +719,7 @@ class Message {
         //     https://en.wikipedia.org/wiki/ASCII
         //
         // convertEncoding() function basically means convertToUtf8(), so when we convert ASCII string into UTF-8 it gets broken.
-        if (strtolower($from) == 'us-ascii' && $to == 'UTF-8') {
+        if (strtolower($from ?? '') == 'us-ascii' && $to == 'UTF-8') {
             return $str;
         }
 

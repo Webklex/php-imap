@@ -299,7 +299,7 @@ class Part {
      * @return bool
      */
     public function isAttachment(){
-        $valid_disposition = in_array(strtolower($this->disposition), ClientManager::get('options.dispositions'));
+        $valid_disposition = in_array(strtolower($this->disposition ?? ''), ClientManager::get('options.dispositions'));
 
         if ($this->type == IMAP::MESSAGE_TYPE_TEXT && ($this->ifdisposition == 0 || empty($this->disposition) || !$valid_disposition)) {
             if (($this->subtype == null || in_array((strtolower($this->subtype)), ["plain", "html"])) && $this->filename == null && $this->name == null) {
