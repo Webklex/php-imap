@@ -6,7 +6,8 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
+- PHP dependency updated to support php v8.0 #212 #214 (thanks @freescout-helpdesk)
+- Method return and argument types added
 
 ### Added
 - NaN
@@ -15,7 +16,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - NaN
 
 ### Breaking changes
-- NaN
+- No longer supports php >=5.5.9 but instead requires at least php v7.0.0
 
 
 ## [3.2.0] - 2022-03-07

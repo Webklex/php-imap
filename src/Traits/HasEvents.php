@@ -58,7 +58,7 @@ trait HasEvents {
      * @return Event
      * @throws EventNotFoundException
      */
-    public function getEvent($section, $event) {
+    public function getEvent($section, $event): Event {
         if (isset($this->events[$section])) {
             return $this->events[$section][$event];
         }
@@ -70,7 +70,7 @@ trait HasEvents {
      *
      * @return array
      */
-    public function getEvents(){
+    public function getEvents(): array {
         return $this->events;
     }
 

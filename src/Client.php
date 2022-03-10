@@ -174,7 +174,7 @@ class Client {
      *
      * @throws MaskNotFoundException
      */
-    public function __construct($config = []) {
+    public function __construct(array $config = []) {
         $this->setConfig($config);
         $this->setMaskFromConfig($config);
         $this->setEventsFromConfig($config);
@@ -193,7 +193,7 @@ class Client {
      *
      * @return self
      */
-    public function setConfig(array $config) {
+    public function setConfig(array $config): Client {
         $default_account = ClientManager::get('default');
         $default_config  = ClientManager::get("accounts.$default_account");
 
@@ -210,7 +210,7 @@ class Client {
      * @param array $config
      * @param array $default_config
      */
-    private function setAccountConfig($key, $config, $default_config){
+    private function setAccountConfig(string $key, array $config, array $default_config){
         $value = $this->default_account_config[$key];
         if(isset($config[$key])) {
             $value = $config[$key];
@@ -301,8 +301,8 @@ class Client {
      *
      * @return bool
      */
-    public function isConnected() {
-        return $this->connection ? $this->connection->connected() : false;
+    public function isConnected(): bool {
+        return $this->connection && $this->connection->connected();
     }
 
     /**
@@ -334,7 +334,7 @@ class Client {
      * @return $this
      * @throws ConnectionFailedException
      */
-    public function connect() {
+    public function connect(): Client {
         $this->disconnect();
         $protocol = strtolower($this->protocol);
 
@@ -397,7 +397,7 @@ class Client {
      *
      * @return $this
      */
-    public function disconnect() {
+    public function disconnect(): Client {
         if ($this->isConnected() && $this->connection !== false) {
             $this->connection->logout();
         }
@@ -416,7 +416,7 @@ class Client {
      * @throws FolderFetchingException
      * @throws Exceptions\RuntimeException
      */
-    public function getFolder($folder_name, $delimiter = null) {
+    public function getFolder(string $folder_name, $delimiter = null) {
         if ($delimiter !== false && $delimiter !== null) {
             return $this->getFolderByPath($folder_name);
         }
@@ -468,7 +468,7 @@ class Client {
      * @throws FolderFetchingException
      * @throws Exceptions\RuntimeException
      */
-    public function getFolders($hierarchical = true, $parent_folder = null) {
+    public function getFolders(bool $hierarchical = true, string $parent_folder = null): FolderCollection {
         $this->checkConnection();
         $folders = FolderCollection::make([]);
 
@@ -500,11 +500,11 @@ class Client {
      * @param string $folder_path
      * @param boolean $force_select
      *
-     * @return mixed
+     * @return array|bool
      * @throws ConnectionFailedException
      * @throws Exceptions\RuntimeException
      */
-    public function openFolder($folder_path, $force_select = false) {
+    public function openFolder(string $folder_path, bool $force_select = false) {
         if ($this->active_folder == $folder_path && $this->isConnected() && $force_select === false) {
             return true;
         }
@@ -524,7 +524,7 @@ class Client {
      * @throws Exceptions\EventNotFoundException
      * @throws Exceptions\RuntimeException
      */
-    public function createFolder($folder, $expunge = true) {
+    public function createFolder(string $folder, bool $expunge = true): Folder {
         $this->checkConnection();
         $status = $this->connection->createFolder($folder);
 
@@ -543,7 +543,7 @@ class Client {
      * Check a given folder
      * @param $folder
      *
-     * @return false|object
+     * @return array|bool
      * @throws ConnectionFailedException
      * @throws Exceptions\RuntimeException
      */
@@ -565,13 +565,13 @@ class Client {
      * Exchange identification information
      * Ref.: https://datatracker.ietf.org/doc/html/rfc2971
      *
-     * @param null|array $ids
+     * @param array|null $ids
      * @return array|bool|void|null
      *
      * @throws ConnectionFailedException
      * @throws Exceptions\RuntimeException
      */
-    public function Id($ids = null) {
+    public function Id(array $ids = null) {
         $this->checkConnection();
         return $this->connection->ID($ids);
     }
@@ -583,7 +583,7 @@ class Client {
      * @throws ConnectionFailedException
      * @throws Exceptions\RuntimeException
      */
-    public function getQuota() {
+    public function getQuota(): array {
         $this->checkConnection();
         return $this->connection->getQuota($this->username);
     }
@@ -595,7 +595,7 @@ class Client {
      * @return array
      * @throws ConnectionFailedException
      */
-    public function getQuotaRoot($quota_root = 'INBOX') {
+    public function getQuotaRoot(string $quota_root = 'INBOX'): array {
         $this->checkConnection();
         return $this->connection->getQuotaRoot($quota_root);
     }
@@ -607,7 +607,7 @@ class Client {
      * @throws ConnectionFailedException
      * @throws Exceptions\RuntimeException
      */
-    public function expunge() {
+    public function expunge(): bool {
         $this->checkConnection();
         return $this->connection->expunge();
     }
@@ -619,7 +619,7 @@ class Client {
      * @return Protocol
      * @throws ConnectionFailedException
      */
-    public function setTimeout($timeout) {
+    public function setTimeout(int $timeout): Protocol {
         $this->checkConnection();
         return $this->connection->setConnectionTimeout($timeout);
     }
@@ -630,7 +630,7 @@ class Client {
      * @return int
      * @throws ConnectionFailedException
      */
-    public function getTimeout(){
+    public function getTimeout(): int {
         $this->checkConnection();
         return $this->connection->getConnectionTimeout();
     }
@@ -640,7 +640,7 @@ class Client {
      *
      * @return string
      */
-    public function getDefaultMessageMask(){
+    public function getDefaultMessageMask(): string {
         return $this->default_message_mask;
     }
 
@@ -650,18 +650,18 @@ class Client {
      *
      * @return array
      */
-    public function getDefaultEvents($section){
+    public function getDefaultEvents($section): array {
         return $this->events[$section];
     }
 
     /**
      * Set the default message mask
-     * @param $mask
+     * @param string $mask
      *
      * @return $this
      * @throws MaskNotFoundException
      */
-    public function setDefaultMessageMask($mask) {
+    public function setDefaultMessageMask(string $mask): Client {
         if(class_exists($mask)) {
             $this->default_message_mask = $mask;
 
@@ -676,18 +676,18 @@ class Client {
      *
      * @return string
      */
-    public function getDefaultAttachmentMask(){
+    public function getDefaultAttachmentMask(): string {
         return $this->default_attachment_mask;
     }
 
     /**
      * Set the default attachment mask
-     * @param $mask
+     * @param string $mask
      *
      * @return $this
      * @throws MaskNotFoundException
      */
-    public function setDefaultAttachmentMask($mask) {
+    public function setDefaultAttachmentMask(string $mask): Client {
         if(class_exists($mask)) {
             $this->default_attachment_mask = $mask;
 
