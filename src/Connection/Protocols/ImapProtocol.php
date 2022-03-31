@@ -689,8 +689,8 @@ class ImapProtocol extends Protocol {
             $uids = $this->uid_cache;
         } else {
             try {
-                $uids = $this->fetch('UID', 1, INF);
-                $this->setUidCache($uids); // set cache for this folder
+                $this->setUidCache($this->fetch('UID', 1, INF)); // set cache for this folder
+                $uids = $this->uid_cache;
             } catch (RuntimeException $e) {}
         }
 

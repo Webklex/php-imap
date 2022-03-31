@@ -288,7 +288,7 @@ class LegacyProtocol extends Protocol {
             }
 
             $this->setUidCache($uids);
-            return $uids;
+            return $this->uid_cache;
         }
 
         return \imap_uid($this->stream, $id);
