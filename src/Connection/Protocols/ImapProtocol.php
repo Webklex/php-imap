@@ -578,7 +578,7 @@ class ImapProtocol extends Protocol {
                     $uidKey = 1;
                 } else {
                     $found = array_search('UID', $tokens[2]);
-                    if (!$found) {
+                    if ($found === false || $found === -1) {
                         continue;
                     }
 
