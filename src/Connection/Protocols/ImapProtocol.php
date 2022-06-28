@@ -66,10 +66,10 @@ class ImapProtocol extends Protocol {
             $encryption = strtolower($this->encryption);
             if (in_array($encryption, ['ssl', 'tls'])) {
                 $transport = $encryption;
-                $port = $port === null ? 993 : $port;
+                $port ??= 993;
             }
         }
-        $port = $port === null ? 143 : $port;
+        $port ??= 143;
         try {
             $this->stream = $this->createStream($transport, $host, $port, $this->connection_timeout);
             if (!$this->assumedNextLine('* OK')) {
@@ -134,7 +134,7 @@ class ImapProtocol extends Protocol {
      */
     protected function nextTaggedLine(&$tag): string {
         $line = $this->nextLine();
-        list($tag, $line) = explode(' ', $line, 2);
+        [$tag, $line] = explode(' ', $line, 2);
 
         return $line;
     }
@@ -570,8 +570,9 @@ class ImapProtocol extends Protocol {
             }
 
             // find array key of UID value; try the last elements, or search for it
+            $uidKey = null;
             if ($uid) {
-                $count = count($tokens[2]);
+                $count = is_countable($tokens[2]) ? count($tokens[2]) : 0;
                 if ($tokens[2][$count - 2] == 'UID') {
                     $uidKey = $count - 1;
                 } else if ($tokens[2][0] == 'UID') {
@@ -595,7 +596,7 @@ class ImapProtocol extends Protocol {
                     $data = $tokens[2][3];
                 } else {
                     // maybe the server send an other field we didn't wanted
-                    $count = count($tokens[2]);
+                    $count = is_countable($tokens[2]) ? count($tokens[2]) : 0;
                     // we start with 2, because 0 was already checked
                     for ($i = 2; $i < $count; $i += 2) {
                         if ($tokens[2][$i] != $items[0]) {
@@ -747,7 +748,7 @@ class ImapProtocol extends Protocol {
         }
 
         foreach ($list as $item) {
-            if (count($item) != 4 || $item[0] != 'LIST') {
+            if ((is_countable($item) ? count($item) : 0) != 4 || $item[0] != 'LIST') {
                 continue;
             }
             $result[$item[3]] = ['delimiter' => $item[2], 'flags' => $item[1]];
@@ -776,7 +777,7 @@ class ImapProtocol extends Protocol {
         $set = $this->buildSet($from, $to);
 
         $command = $this->buildUIDCommand("STORE", $uid);
-        $item = ($mode == '-' ? "-" : "+").($item === null ? "FLAGS" : $item).($silent ? '.SILENT' : "");
+        $item = ($mode == '-' ? "-" : "+").($item ?? "FLAGS").($silent ? '.SILENT' : "");
 
         $response = $this->requestAndResponse($command, [$set, $item, $flags], $silent);
 
@@ -1076,7 +1077,7 @@ class ImapProtocol extends Protocol {
      */
     public function overview(string $sequence, $uid = IMAP::ST_UID): array {
         $result = [];
-        list($from, $to) = explode(":", $sequence);
+        [$from, $to] = explode(":", $sequence);
 
         $uids = $this->getUid();
         $ids = [];

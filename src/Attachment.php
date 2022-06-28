@@ -336,7 +336,7 @@ class Attachment {
      * @throws MaskNotFoundException
      */
     public function mask($mask = null){
-        $mask = $mask !== null ? $mask : $this->mask;
+        $mask ??= $this->mask;
         if(class_exists($mask)){
             return new $mask($this);
         }

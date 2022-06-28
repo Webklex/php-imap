@@ -159,7 +159,7 @@ class Header {
     public function find($pattern) {
         if (preg_match_all($pattern, $this->raw, $matches)) {
             if (isset($matches[1])) {
-                if (count($matches[1]) > 0) {
+                if ((is_countable($matches[1]) ? count($matches[1]) : 0) > 0) {
                     return $matches[1][0];
                 }
             }
@@ -355,7 +355,7 @@ class Header {
     private function notDecoded($encoded, $decoded): bool {
         return 0 === strpos($decoded, '=?')
             && strlen($decoded) - 2 === strpos($decoded, '?=')
-            && false !== strpos($encoded, $decoded);
+            && false !== strpos($encoded, (string) $decoded);
     }
 
     /**
@@ -573,7 +573,7 @@ class Header {
                 )) {
                     $name = trim(rtrim($matches["name"]));
                     $email = trim(rtrim($matches["email"]));
-                    list($mailbox, $host) = array_pad(explode("@", $email), 2, null);
+                    [$mailbox, $host] = array_pad(explode("@", $email), 2, null);
                     $addresses[] = (object)[
                         "personal" => $name,
                         "mailbox"  => $mailbox,

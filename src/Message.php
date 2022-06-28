@@ -973,7 +973,7 @@ class Message {
     public function delete(bool $expunge = true, string $trash_path = null, bool $force_move = false) {
         $status = $this->setFlag("Deleted");
         if($force_move) {
-            $trash_path = $trash_path === null ? $this->config["common_folders"]["trash"]: $trash_path;
+            $trash_path ??= $this->config["common_folders"]["trash"];
             $status = $this->move($trash_path);
         }
         if($expunge) $this->client->expunge();
@@ -1269,7 +1269,7 @@ class Message {
      * @throws MaskNotFoundException
      */
     public function mask($mask = null){
-        $mask = $mask !== null ? $mask : $this->mask;
+        $mask ??= $this->mask;
         if(class_exists($mask)){
             return new $mask($this);
         }

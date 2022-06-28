@@ -156,7 +156,7 @@ class Query {
     public function generate_query(): string {
         $query = '';
         $this->query->each(function($statement) use (&$query) {
-            if (count($statement) == 1) {
+            if ((is_countable($statement) ? count($statement) : 0) == 1) {
                 $query .= $statement[0];
             } else {
                 if ($statement[1] === null) {
@@ -190,9 +190,7 @@ class Query {
         try {
             $available_messages = $this->client->getConnection()->search([$this->getRawQuery()], $this->sequence);
             return $available_messages !== false ? new Collection($available_messages) : new Collection();
-        } catch (RuntimeException $e) {
-            throw new GetMessagesFailedException("failed to fetch messages", 0, $e);
-        } catch (ConnectionFailedException $e) {
+        } catch (RuntimeException|ConnectionFailedException $e) {
             throw new GetMessagesFailedException("failed to fetch messages", 0, $e);
         }
     }
@@ -259,15 +257,7 @@ class Query {
     protected function make(int $uid, int $msglist, string $header, string $content, array $flags) {
         try {
             return Message::make($uid, $msglist, $this->getClient(), $header, $content, $flags, $this->getFetchOptions(), $this->sequence);
-        } catch (MessageNotFoundException $e) {
-            $this->setError($uid, $e);
-        } catch (RuntimeException $e) {
-            $this->setError($uid, $e);
-        } catch (MessageFlagException $e) {
-            $this->setError($uid, $e);
-        } catch (InvalidMessageDateException $e) {
-            $this->setError($uid, $e);
-        } catch (MessageContentFetchingException $e) {
+        } catch (MessageNotFoundException|RuntimeException|MessageFlagException|InvalidMessageDateException|MessageContentFetchingException $e) {
             $this->setError($uid, $e);
         }
 
@@ -519,9 +509,7 @@ class Query {
      * @throws MessageNotFoundException
      */
     public function getByUidGreaterOrEqual(int $uid): MessageCollection {
-        return $this->filter(function($id) use($uid){
-            return $id >= $uid;
-        });
+        return $this->filter(fn($id) => $id >= $uid);
     }
 
     /**
@@ -534,9 +522,7 @@ class Query {
      * @throws MessageNotFoundException
      */
     public function getByUidGreater(int $uid): MessageCollection {
-        return $this->filter(function($id) use($uid){
-            return $id > $uid;
-        });
+        return $this->filter(fn($id) => $id > $uid);
     }
 
     /**
@@ -549,9 +535,7 @@ class Query {
      * @throws MessageNotFoundException
      */
     public function getByUidLower(int $uid): MessageCollection {
-        return $this->filter(function($id) use($uid){
-            return $id < $uid;
-        });
+        return $this->filter(fn($id) => $id < $uid);
     }
 
     /**
@@ -564,9 +548,7 @@ class Query {
      * @throws MessageNotFoundException
      */
     public function getByUidLowerOrEqual(int $uid): MessageCollection {
-        return $this->filter(function($id) use($uid){
-            return $id <= $uid;
-        });
+        return $this->filter(fn($id) => $id <= $uid);
     }
 
     /**
@@ -579,9 +561,7 @@ class Query {
      * @throws MessageNotFoundException
      */
     public function getByUidLowerThan(int $uid): MessageCollection {
-        return $this->filter(function($id) use($uid){
-            return $id < $uid;
-        });
+        return $this->filter(fn($id) => $id < $uid);
     }
 
     /**

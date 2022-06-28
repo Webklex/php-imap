@@ -137,7 +137,7 @@ class Part {
     /**
      * @var Header $header
      */
-    private $header = null;
+    private ?Header $header = null;
 
     /**
      * Part constructor.

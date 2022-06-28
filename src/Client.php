@@ -363,9 +363,7 @@ class Client {
 
         try {
             $this->connection->connect($this->host, $this->port);
-        } catch (ErrorException $e) {
-            throw new ConnectionFailedException("connection setup failed", 0, $e);
-        } catch (Exceptions\RuntimeException $e) {
+        } catch (ErrorException|Exceptions\RuntimeException $e) {
             throw new ConnectionFailedException("connection setup failed", 0, $e);
         }
         $this->authenticate();

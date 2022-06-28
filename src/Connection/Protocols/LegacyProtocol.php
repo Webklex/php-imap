@@ -56,10 +56,10 @@ class LegacyProtocol extends Protocol {
         if ($this->encryption) {
             $encryption = strtolower($this->encryption);
             if ($encryption == "ssl") {
-                $port = $port === null ? 993 : $port;
+                $port ??= 993;
             }
         }
-        $port = $port === null ? 143 : $port;
+        $port ??= 143;
         $this->host = $host;
         $this->port = $port;
     }

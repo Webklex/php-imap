@@ -33,7 +33,7 @@ class Structure {
     /**
      * @var Header $header
      */
-    private $header = null;
+    private ?Header $header = null;
 
     /**
      * Message type (if multipart or not)

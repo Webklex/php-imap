@@ -92,7 +92,7 @@ class ClientManager {
             }
         }
 
-        return $value === null ? $default : $value;
+        return $value ?? $default;
     }
 
     /**

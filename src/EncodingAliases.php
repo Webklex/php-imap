@@ -476,7 +476,7 @@ class EncodingAliases {
         if (isset(self::$aliases[strtolower($encoding ?? '')])) {
             return self::$aliases[strtolower($encoding ?? '')];
         }
-        return $fallback !== null ? $fallback : $encoding;
+        return $fallback ?? $encoding;
     }
     
 }
