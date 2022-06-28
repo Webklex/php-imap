@@ -218,10 +218,13 @@ class Message {
         if ($this->getFetchBodyOption() === true) {
             $this->parseBody();
         }
-
-        if ($this->getFetchFlagsOption() === true && $this->fetch_options !== IMAP::FT_PEEK) {
-            $this->parseFlags();
+        if ($this->getFetchFlagsOption() !== true) {
+            return;
         }
+        if ($this->fetch_options === IMAP::FT_PEEK) {
+            return;
+        }
+        $this->parseFlags();
     }
 
     /**
@@ -296,16 +299,15 @@ class Message {
      * @throws MethodNotFoundException
      */
     public function __call(string $method, array $arguments) {
-        if(strtolower(substr($method, 0, 3)) === 'get') {
+        if (strtolower(substr($method, 0, 3)) === 'get') {
             $name = Str::snake(substr($method, 3));
             return $this->get($name);
-        }elseif (strtolower(substr($method, 0, 3)) === 'set') {
+        }
+        if (strtolower(substr($method, 0, 3)) === 'set') {
             $name = Str::snake(substr($method, 3));
-
             if(in_array($name, array_keys($this->attributes))) {
                 return $this->__set($name, array_pop($arguments));
             }
-
         }
 
         throw new MethodNotFoundException("Method ".self::class.'::'.$method.'() is not supported');
@@ -586,13 +588,16 @@ class Message {
      */
     protected function fetchAttachment(Part $part) {
         $oAttachment = new Attachment($this, $part);
-
-        if ($oAttachment->getName() !== null && $oAttachment->getSize() > 0) {
-            if ($oAttachment->getId() !== null) {
-                $this->attachments->put($oAttachment->getId(), $oAttachment);
-            } else {
-                $this->attachments->push($oAttachment);
-            }
+        if ($oAttachment->getName() === null) {
+            return;
+        }
+        if ($oAttachment->getSize() <= 0) {
+            return;
+        }
+        if ($oAttachment->getId() !== null) {
+            $this->attachments->put($oAttachment->getId(), $oAttachment);
+        } else {
+            $this->attachments->push($oAttachment);
         }
     }
 
@@ -724,12 +729,11 @@ class Message {
 
         if (function_exists('iconv') && $from != 'UTF-7' && $to != 'UTF-7') {
             return @iconv($from, $to.'//IGNORE', $str);
-        } else {
-            if (!$from) {
-                return mb_convert_encoding($str, $to);
-            }
-            return mb_convert_encoding($str, $to, $from);
         }
+        if (!$from) {
+            return mb_convert_encoding($str, $to);
+        }
+        return mb_convert_encoding($str, $to, $from);
     }
 
     /**
@@ -1222,11 +1226,16 @@ class Message {
         if (is_null($message)) {
             return false;
         }
-
-        return $this->uid == $message->uid
-            && $this->message_id->first() == $message->message_id->first()
-            && $this->subject->first() == $message->subject->first()
-            && $this->date->toDate()->eq($message->date);
+        if ($this->uid != $message->uid) {
+            return false;
+        }
+        if ($this->message_id->first() != $message->message_id->first()) {
+            return false;
+        }
+        if ($this->subject->first() != $message->subject->first()) {
+            return false;
+        }
+        return (bool) $this->date->toDate()->eq($message->date);
     }
 
     /**

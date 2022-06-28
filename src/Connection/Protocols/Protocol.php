@@ -239,15 +239,21 @@ abstract class Protocol implements ProtocolInterface {
      *
      * @return string
      */
-    public function getUIDKey($uid) {
-        if ($uid == IMAP::ST_UID || $uid == IMAP::FT_UID) {
+    public function getUIDKey($uid)
+    {
+        if ($uid == IMAP::ST_UID) {
             return "UID";
         }
-        if (strlen($uid) > 0 && !is_numeric($uid)) {
-            return (string)$uid;
+        if ($uid == IMAP::FT_UID) {
+            return "UID";
         }
-
-        return "";
+        if (strlen($uid) <= 0) {
+            return "";
+        }
+        if (is_numeric($uid)) {
+            return "";
+        }
+        return (string)$uid;
     }
 
     public function buildUIDCommand($command, $uid) {

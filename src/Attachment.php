@@ -120,19 +120,16 @@ class Attachment {
      * @throws MethodNotFoundException
      */
     public function __call(string $method, array $arguments) {
-        if(strtolower(substr($method, 0, 3)) === 'get') {
+        if (strtolower(substr($method, 0, 3)) === 'get') {
             $name = Str::snake(substr($method, 3));
-
             if(isset($this->attributes[$name])) {
                 return $this->attributes[$name];
             }
-
             return null;
-        }elseif (strtolower(substr($method, 0, 3)) === 'set') {
+        }
+        if (strtolower(substr($method, 0, 3)) === 'set') {
             $name = Str::snake(substr($method, 3));
-
             $this->attributes[$name] = array_pop($arguments);
-
             return $this->attributes[$name];
         }
 

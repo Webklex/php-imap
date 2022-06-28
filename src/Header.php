@@ -157,12 +157,14 @@ class Header {
      * @return mixed|null
      */
     public function find($pattern) {
-        if (preg_match_all($pattern, $this->raw, $matches)) {
-            if (isset($matches[1])) {
-                if ((is_countable($matches[1]) ? count($matches[1]) : 0) > 0) {
-                    return $matches[1][0];
-                }
-            }
+        if (!preg_match_all($pattern, $this->raw, $matches)) {
+            return null;
+        }
+        if (!isset($matches[1])) {
+            return null;
+        }
+        if ((is_countable($matches[1]) ? count($matches[1]) : 0) > 0) {
+            return $matches[1][0];
         }
         return null;
     }
@@ -393,19 +395,17 @@ class Header {
         try {
             if (function_exists('iconv') && $from != 'UTF-7' && $to != 'UTF-7') {
                 return iconv($from, $to, $str);
-            } else {
-                if (!$from) {
-                    return mb_convert_encoding($str, $to);
-                }
-                return mb_convert_encoding($str, $to, $from);
             }
+            if (!$from) {
+                return mb_convert_encoding($str, $to);
+            }
+            return mb_convert_encoding($str, $to, $from);
         } catch (\Exception $e) {
             if (strstr($from, '-')) {
                 $from = str_replace('-', '', $from);
                 return $this->convertEncoding($str, $from, $to);
-            } else {
-                return $str;
             }
+            return $str;
         }
     }
 
@@ -735,9 +735,8 @@ class Header {
                 } catch (\Exception $_e) {
                     if (!isset($this->config["fallback_date"])) {
                         throw new InvalidMessageDateException("Invalid message date. ID:" . $this->get("message_id") . " Date:" . $header->date . "/" . $date, 1100, $e);
-                    } else {
-                        $parsed_date = Carbon::parse($this->config["fallback_date"]);
                     }
+                    $parsed_date = Carbon::parse($this->config["fallback_date"]);
                 }
             }
 

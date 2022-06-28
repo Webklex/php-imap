@@ -141,7 +141,8 @@ class Attribute implements ArrayAccess {
     public function add($value, bool $strict = false): Attribute {
         if (is_array($value)) {
             return $this->merge($value, $strict);
-        }elseif ($value !== null) {
+        }
+        if ($value !== null) {
             $this->attach($value, $strict);
         }
 

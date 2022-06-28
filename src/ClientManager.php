@@ -135,10 +135,12 @@ class ClientManager {
      * @return array
      */
     protected function getClientConfig($name): array {
-        if ($name === null || $name === 'null') {
+        if ($name === null) {
             return ['driver' => 'null'];
         }
-
+        if ($name === 'null') {
+            return ['driver' => 'null'];
+        }
         return self::$config["accounts"][$name];
     }
 

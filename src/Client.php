@@ -488,9 +488,8 @@ class Client {
             }
 
             return $folders;
-        }else{
-            throw new FolderFetchingException("failed to fetch any folders");
         }
+        throw new FolderFetchingException("failed to fetch any folders");
     }
 
     /**

@@ -257,10 +257,14 @@ class LegacyProtocol extends Protocol {
             $flags = [];
             if (is_array($raw_flags) && isset($raw_flags[0])) {
                 $raw_flags = (array) $raw_flags[0];
-                foreach($raw_flags as $flag => $value) {
-                    if ($value === 1 && in_array($flag, ["size", "uid", "msgno", "update"]) === false){
-                        $flags[] = "\\".ucfirst($flag);
+                foreach ($raw_flags as $flag => $value) {
+                    if ($value !== 1) {
+                        continue;
                     }
+                    if (in_array($flag, ["size", "uid", "msgno", "update"]) !== false) {
+                        continue;
+                    }
+                    $flags[] = "\\".ucfirst($flag);
                 }
             }
             $result[$uid] = $flags;

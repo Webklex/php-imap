@@ -264,11 +264,12 @@ class ImapProtocol extends Protocol {
             // First two chars are still needed for the response code
             $tokens = [substr($tokens, 0, 2)];
         }
-
         // last line has response code
         if ($tokens[0] == 'OK') {
             return $lines ? $lines : true;
-        } elseif ($tokens[0] == 'NO') {
+        }
+
+        if ($tokens[0] == 'NO') {
             return false;
         }
 
@@ -337,9 +338,8 @@ class ImapProtocol extends Protocol {
         if (func_num_args() < 2) {
             if (strpos($string, "\n") !== false) {
                 return ['{' . strlen($string) . '}', $string];
-            } else {
-                return '"' . str_replace(['\\', '"'], ['\\\\', '\\"'], $string) . '"';
             }
+            return '"' . str_replace(['\\', '"'], ['\\\\', '\\"'], $string) . '"';
         }
         $result = [];
         foreach (func_get_args() as $string) {
@@ -409,7 +409,8 @@ class ImapProtocol extends Protocol {
                         preg_match('/^BAD /i', $response)) {
                         error_log("got failure response: $response");
                         return false;
-                    } else if (preg_match("/^OK /i", $response)) {
+                    }
+                    if (preg_match("/^OK /i", $response)) {
                         return true;
                     }
                 }
@@ -627,12 +628,13 @@ class ImapProtocol extends Protocol {
                 $result[$tokens[0]] = $data;
             }
         }
-
-        if ($to === null && !is_array($from)) {
-            throw new RuntimeException('the single id was not found in response');
+        if ($to !== null) {
+            return $result;
         }
-
-        return $result;
+        if (is_array($from)) {
+            return $result;
+        }
+        throw new RuntimeException('the single id was not found in response');
     }
 
     /**
@@ -743,12 +745,18 @@ class ImapProtocol extends Protocol {
     public function folders(string $reference = '', string $folder = '*'): array {
         $result = [];
         $list = $this->requestAndResponse('LIST', $this->escapeString($reference, $folder));
-        if (!$list || $list === true) {
+        if (!$list) {
+            return $result;
+        }
+        if ($list === true) {
             return $result;
         }
 
         foreach ($list as $item) {
-            if ((is_countable($item) ? count($item) : 0) != 4 || $item[0] != 'LIST') {
+            if ((is_countable($item) ? count($item) : 0) != 4) {
+                continue;
+            }
+            if ($item[0] != 'LIST') {
                 continue;
             }
             $result[$item[3]] = ['delimiter' => $item[2], 'flags' => $item[1]];
@@ -787,7 +795,10 @@ class ImapProtocol extends Protocol {
 
         $result = [];
         foreach ($response as $token) {
-            if ($token[1] != 'FETCH' || $token[2][0] != 'FLAGS') {
+            if ($token[1] != 'FETCH') {
+                continue;
+            }
+            if ($token[2][0] != 'FLAGS') {
                 continue;
             }
             $result[$token[0]] = $token[2][1];

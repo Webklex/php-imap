@@ -518,7 +518,8 @@ class WhereQuery extends Query {
     public function when($value, callable $callback, $default = null) {
         if ($value) {
             return $callback($this, $value) ?: $this;
-        } elseif ($default) {
+        }
+        if ($default) {
             return $default($this, $value) ?: $this;
         }
 
@@ -537,7 +538,8 @@ class WhereQuery extends Query {
     public function unless($value, callable $callback, $default = null) {
         if (!$value) {
             return $callback($this, $value) ?: $this;
-        } elseif ($default) {
+        }
+        if ($default) {
             return $default($this, $value) ?: $this;
         }
 
