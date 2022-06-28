@@ -48,13 +48,13 @@ class MessageMask extends Mask {
      *
      * @return string|null
      */
-    public function getCustomHTMLBody($callback = false) {
+    public function getCustomHTMLBody($callback = false): ?string {
         $body = $this->getHtmlBody();
         if($body === null) return null;
 
         if ($callback !== false) {
             $aAttachment = $this->parent->getAttachments();
-            $aAttachment->each(function($oAttachment) use(&$body, $callback) {
+            $aAttachment->each(function($oAttachment) use(&$body, $callback): void {
                 /** @var Attachment $oAttachment */
                 if(is_callable($callback)) {
                     $body = $callback($body, $oAttachment);
@@ -73,7 +73,7 @@ class MessageMask extends Mask {
      *
      * @return string|null
      */
-    public function getHTMLBodyWithEmbeddedBase64Images() {
+    public function getHTMLBodyWithEmbeddedBase64Images(): ?string {
         return $this->getCustomHTMLBody(function($body, $oAttachment){
             /** @var Attachment $oAttachment */
             if ($oAttachment->id) {

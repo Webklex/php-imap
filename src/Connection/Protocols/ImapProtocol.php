@@ -58,7 +58,7 @@ class ImapProtocol extends Protocol {
      *
      * @throws ConnectionFailedException
      */
-    public function connect(string $host, $port = null) {
+    public function connect(string $host, $port = null): void {
         $transport = 'tcp';
         $encryption = '';
 
@@ -89,7 +89,7 @@ class ImapProtocol extends Protocol {
      * @throws ConnectionFailedException
      * @throws RuntimeException
      */
-    protected function enableStartTls(){
+    protected function enableStartTls(): void {
         $response = $this->requestAndResponse('STARTTLS');
         $result = $response && stream_socket_enable_crypto($this->stream, true, $this->getCryptoMethod());
         if (!$result) {
@@ -132,7 +132,7 @@ class ImapProtocol extends Protocol {
      * @return string next line
      * @throws RuntimeException
      */
-    protected function nextTaggedLine(&$tag): string {
+    protected function nextTaggedLine(?string &$tag): string {
         $line = $this->nextLine();
         [$tag, $line] = explode(' ', $line, 2);
 
@@ -284,7 +284,7 @@ class ImapProtocol extends Protocol {
      *
      * @throws RuntimeException
      */
-    public function sendRequest(string $command, array $tokens = [], string &$tag = null) {
+    public function sendRequest(string $command, array $tokens = [], ?string &$tag = null): void {
         if (!$tag) {
             $this->noun++;
             $tag = 'TAG' . $this->noun;
@@ -1032,7 +1032,7 @@ class ImapProtocol extends Protocol {
      *
      * @throws RuntimeException
      */
-    public function idle() {
+    public function idle(): void {
         $this->sendRequest("IDLE");
         if (!$this->assumedNextLine('+ ')) {
             throw new RuntimeException('idle failed');
@@ -1108,14 +1108,14 @@ class ImapProtocol extends Protocol {
     /**
      * Enable the debug mode
      */
-    public function enableDebug(){
+    public function enableDebug(): void {
         $this->debug = true;
     }
 
     /**
      * Disable the debug mode
      */
-    public function disableDebug(){
+    public function disableDebug(): void {
         $this->debug = false;
     }
 
@@ -1128,9 +1128,9 @@ class ImapProtocol extends Protocol {
      */
     public function buildSet($from, $to = null) {
         $set = (int)$from;
-        if ($to !== null) {
-            $set .= ':' . ($to == INF ? '*' : (int)$to);
+        if ($to === null) {
+            return $set;
         }
-        return $set;
+        return $set . ':' . ($to == INF ? '*' : (int)$to);
     }
 }

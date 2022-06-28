@@ -25,10 +25,9 @@ use Webklex\PHPIMAP\IMAP;
  */
 class LegacyProtocol extends Protocol {
 
-    protected $protocol = "imap";
-    protected $host = null;
-    protected $port = null;
-    protected $encryption = null;
+    protected string $protocol = "imap";
+    protected string $host;
+    protected int $port;
 
     /**
      * Imap constructor.
@@ -50,9 +49,9 @@ class LegacyProtocol extends Protocol {
     /**
      * Save the information for a nw connection
      * @param string $host
-     * @param null $port
+     * @param int|null $port
      */
-    public function connect(string $host, $port = null) {
+    public function connect(string $host, ?int $port = null): void {
         if ($this->encryption) {
             $encryption = strtolower($this->encryption);
             if ($encryption == "ssl") {
@@ -180,7 +179,7 @@ class LegacyProtocol extends Protocol {
      * @return bool|array see examineOrselect()
      * @throws RuntimeException
      */
-    public function selectFolder(string $folder = 'INBOX') {
+    public function selectFolder(string $folder = 'INBOX'): array {
         \imap_reopen($this->stream, $folder, IMAP::OP_READONLY, 3);
         $this->uid_cache = null;
         return $this->examineFolder($folder);
@@ -193,7 +192,7 @@ class LegacyProtocol extends Protocol {
      * @return bool|array
      * @throws RuntimeException
      */
-    public function examineFolder(string $folder = 'INBOX') {
+    public function examineFolder(string $folder = 'INBOX'): array {
         if (strpos($folder, ".") === 0) {
             throw new RuntimeException("Segmentation fault prevented. Folders starts with an illegal char '.'.");
         }
@@ -461,11 +460,11 @@ class LegacyProtocol extends Protocol {
      * Ref.: https://datatracker.ietf.org/doc/html/rfc2971
      *
      * @param null $ids
-     * @return array|bool|void|null
+     * @return mixed[]|bool|void
      *
      * @throws MethodNotSupportedException
      */
-    public function ID($ids = null) {
+    public function ID($ids = null): void {
         throw new MethodNotSupportedException();
     }
 
@@ -543,7 +542,7 @@ class LegacyProtocol extends Protocol {
      *
      * @throws MethodNotSupportedException
      */
-    public function idle() {
+    public function idle(): void {
         throw new MethodNotSupportedException();
     }
 
@@ -552,7 +551,7 @@ class LegacyProtocol extends Protocol {
      *
      * @throws MethodNotSupportedException
      */
-    public function done() {
+    public function done(): void {
         throw new MethodNotSupportedException();
     }
 
@@ -574,14 +573,14 @@ class LegacyProtocol extends Protocol {
     /**
      * Enable the debug mode
      */
-    public function enableDebug(){
+    public function enableDebug(): void {
         $this->debug = true;
     }
 
     /**
      * Disable the debug mode
      */
-    public function disableDebug(){
+    public function disableDebug(): void {
         $this->debug = false;
     }
 
@@ -627,9 +626,8 @@ class LegacyProtocol extends Protocol {
 
     /**
      * @param string $protocol
-     * @return LegacyProtocol
      */
-    public function setProtocol(string $protocol): LegacyProtocol {
+    public function setProtocol(string $protocol): self {
         if (($pos = strpos($protocol, "legacy")) > 0) {
             $protocol = substr($protocol, 0, ($pos + 2) * -1);
         }

@@ -25,36 +25,27 @@ class Structure {
 
     /**
      * Raw structure
-     *
-     * @var string $raw
      */
-    public $raw = "";
+    public string $raw = "";
 
-    /**
-     * @var Header $header
-     */
     private ?Header $header = null;
 
     /**
      * Message type (if multipart or not)
-     *
-     * @var int $type
      */
-    public $type = IMAP::MESSAGE_TYPE_TEXT;
+    public int $type = IMAP::MESSAGE_TYPE_TEXT;
 
     /**
      * All available parts
      *
      * @var Part[] $parts
      */
-    public $parts = [];
+    public array $parts = [];
 
     /**
      * Config holder
-     *
-     * @var array $config
      */
-    protected $config = [];
+    protected array $config = [];
 
     /**
      * Structure constructor.
@@ -77,7 +68,7 @@ class Structure {
      * @throws MessageContentFetchingException
      * @throws InvalidMessageDateException
      */
-    protected function parse(){
+    protected function parse(): void{
         $this->findContentType();
         $this->parts = $this->find_parts();
     }
@@ -85,9 +76,9 @@ class Structure {
     /**
      * Determine the message content type
      */
-    public function findContentType(){
+    public function findContentType(): void{
         $content_type = $this->header->get("content_type");
-        $content_type = (is_array($content_type)) ? implode(' ', $content_type) : $content_type;
+        $content_type = is_array($content_type) ? implode(' ', $content_type) : $content_type;
         if(stripos($content_type, 'multipart') === 0) {
             $this->type = IMAP::MESSAGE_TYPE_MULTIPART;
         }else{
@@ -168,7 +159,7 @@ class Structure {
      * @return string|null
      * @Depricated since version 2.4.4
      */
-    public function getBoundary(){
+    public function getBoundary(): ?string{
         return $this->header->getBoundary();
     }
 }

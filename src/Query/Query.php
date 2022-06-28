@@ -155,7 +155,7 @@ class Query {
      */
     public function generate_query(): string {
         $query = '';
-        $this->query->each(function($statement) use (&$query) {
+        $this->query->each(function($statement) use (&$query): void {
             if ((is_countable($statement) ? count($statement) : 0) == 1) {
                 $query .= $statement[0];
             } else {
@@ -452,7 +452,7 @@ class Query {
      * @throws MessageFlagException
      * @throws MessageNotFoundException
      */
-    public function getMessageByMsgn($msgn, $msglist = null): Message {
+    public function getMessageByMsgn(int $msgn, $msglist = null): Message {
         return $this->getMessage($msgn, $msglist, IMAP::ST_MSGN);
     }
 
@@ -470,7 +470,7 @@ class Query {
      * @throws MessageFlagException
      * @throws MessageNotFoundException
      */
-    public function getMessageByUid($uid): Message {
+    public function getMessageByUid(int $uid): Message {
         return $this->getMessage($uid, null, IMAP::ST_UID);
     }
 

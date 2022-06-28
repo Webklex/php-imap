@@ -401,8 +401,6 @@ interface ProtocolInterface {
 
     /**
      * Set the uid cache of current active folder
-     *
-     * @param array|null $uids
      */
-    public function setUidCache($uids);
+    public function setUidCache(?array $uids);
 }

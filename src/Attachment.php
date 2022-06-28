@@ -50,26 +50,19 @@ use Webklex\PHPIMAP\Support\Masks\AttachmentMask;
  * @method string  setImgSrc(string $img_src)
  */
 class Attachment {
-
-    /**
-     * @var Message $oMessage
-     */
-    protected $oMessage;
+    protected Message $oMessage;
 
     /**
      * Used config
-     *
-     * @var array $config
      */
-    protected $config = [];
+    protected array $config = [];
 
-    /** @var Part $part */
-    protected $part;
+    protected Part $part;
 
     /**
      * Attribute holder
      *
-     * @var array $attributes
+     * @var array<string,mixed>
      */
     protected $attributes = [
         'content' => null,
@@ -85,10 +78,8 @@ class Attachment {
 
     /**
      * Default mask
-     *
-     * @var string $mask
      */
-    protected $mask = AttachmentMask::class;
+    protected string $mask = AttachmentMask::class;
 
     /**
      * Attachment constructor.
@@ -166,7 +157,7 @@ class Attachment {
     /**
      * Determine the structure type
      */
-    protected function findType() {
+    protected function findType(): void {
         switch ($this->part->type) {
             case IMAP::ATTACHMENT_TYPE_MESSAGE:
                 $this->type = 'message';
@@ -201,7 +192,7 @@ class Attachment {
     /**
      * Fetch the given attachment
      */
-    protected function fetch() {
+    protected function fetch(): void {
 
         $content = $this->part->content;
 
@@ -239,7 +230,7 @@ class Attachment {
      *
      * @return boolean
      */
-    public function save(string $path, $filename = null): bool {
+    public function save(string $path, ?string $filename = null): bool {
         $filename = $filename ?: $this->getName();
 
         return file_put_contents($path.$filename, $this->getContent()) !== false;
@@ -249,7 +240,7 @@ class Attachment {
      * Set the attachment name and try to decode it
      * @param $name
      */
-    public function setName($name) {
+    public function setName($name): void {
         $decoder = $this->config['decoder']['attachment'];
         if ($name !== null) {
             if($decoder === 'utf-8' && extension_loaded('imap')) {
@@ -263,7 +254,7 @@ class Attachment {
     /**
      * Get the attachment mime type
      *
-     * @return string|null
+     * @return string|false
      */
     public function getMimeType(){
         return (new \finfo())->buffer($this->getContent(), FILEINFO_MIME_TYPE);
@@ -274,7 +265,7 @@ class Attachment {
      *
      * @return string|null
      */
-    public function getExtension(){
+    public function getExtension(): ?string{
         $deprecated_guesser = "\Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser";
         if (class_exists($deprecated_guesser) !== false){
             /** @var \Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser $deprecated_guesser */
@@ -308,7 +299,7 @@ class Attachment {
      *
      * @return $this
      */
-    public function setMask($mask): Attachment {
+    public function setMask(string $mask): self {
         if(class_exists($mask)){
             $this->mask = $mask;
         }
@@ -332,7 +323,7 @@ class Attachment {
      * @return mixed
      * @throws MaskNotFoundException
      */
-    public function mask($mask = null){
+    public function mask($mask = null): object {
         $mask ??= $this->mask;
         if(class_exists($mask)){
             return new $mask($this);

@@ -109,10 +109,9 @@ class Attribute implements ArrayAccess {
      *
      * @param  mixed  $offset
      * @param  mixed  $value
-     * @return void
      */
     #[ReturnTypeWillChange]
-    public function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value): void {
         if (is_null($offset)) {
             $this->values[] = $value;
         } else {
@@ -124,10 +123,9 @@ class Attribute implements ArrayAccess {
      * Unset the value at a given offset.
      *
      * @param  string  $offset
-     * @return void
      */
     #[ReturnTypeWillChange]
-    public function offsetUnset($offset) {
+    public function offsetUnset($offset): void {
         unset($this->values[$offset]);
     }
 
@@ -135,10 +133,8 @@ class Attribute implements ArrayAccess {
      * Add one or more values to the attribute
      * @param array|mixed $value
      * @param boolean $strict
-     *
-     * @return Attribute
      */
-    public function add($value, bool $strict = false): Attribute {
+    public function add($value, bool $strict = false): self {
         if (is_array($value)) {
             return $this->merge($value, $strict);
         }
@@ -151,12 +147,8 @@ class Attribute implements ArrayAccess {
 
     /**
      * Merge a given array of values with the current values array
-     * @param array $values
-     * @param boolean $strict
-     *
-     * @return Attribute
      */
-    public function merge(array $values, bool $strict = false): Attribute {
+    public function merge(array $values, bool $strict = false): self {
         foreach ($values as $value) {
             $this->attach($value, $strict);
         }
@@ -184,7 +176,7 @@ class Attribute implements ArrayAccess {
      * @param $value
      * @param bool $strict
      */
-    public function attach($value, bool $strict = false) {
+    public function attach($value, bool $strict = false): void {
         if ($strict === true) {
             if ($this->contains($value) === false) {
                 $this->values[] = $value;
@@ -197,10 +189,8 @@ class Attribute implements ArrayAccess {
     /**
      * Set the attribute name
      * @param $name
-     *
-     * @return Attribute
      */
-    public function setName($name): Attribute {
+    public function setName(string $name): self {
         $this->name = $name;
 
         return $this;

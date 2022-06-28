@@ -189,11 +189,8 @@ class Client {
 
     /**
      * Set the Client configuration
-     * @param array $config
-     *
-     * @return self
      */
-    public function setConfig(array $config): Client {
+    public function setConfig(array $config): self {
         $default_account = ClientManager::get('default');
         $default_config  = ClientManager::get("accounts.$default_account");
 
@@ -210,7 +207,7 @@ class Client {
      * @param array $config
      * @param array $default_config
      */
-    private function setAccountConfig(string $key, array $config, array $default_config){
+    private function setAccountConfig(string $key, array $config, array $default_config): void {
         $value = $this->default_account_config[$key];
         if(isset($config[$key])) {
             $value = $config[$key];
@@ -224,7 +221,7 @@ class Client {
      * Look for a possible events in any available config
      * @param $config
      */
-    protected function setEventsFromConfig($config) {
+    protected function setEventsFromConfig($config): void {
         $this->events = ClientManager::get("events");
         if(isset($config['events'])){
             foreach($config['events'] as $section => $events) {
@@ -239,7 +236,7 @@ class Client {
      *
      * @throws MaskNotFoundException
      */
-    protected function setMaskFromConfig($config) {
+    protected function setMaskFromConfig($config): void {
         $default_config  = ClientManager::get("masks");
 
         if(isset($config['masks'])){
@@ -310,7 +307,7 @@ class Client {
      *
      * @throws ConnectionFailedException
      */
-    public function checkConnection() {
+    public function checkConnection(): void {
         if (!$this->isConnected()) {
             $this->connect();
         }
@@ -321,7 +318,7 @@ class Client {
      *
      * @throws ConnectionFailedException
      */
-    public function reconnect() {
+    public function reconnect(): void {
         if ($this->isConnected()) {
             $this->disconnect();
         }
@@ -334,7 +331,7 @@ class Client {
      * @return $this
      * @throws ConnectionFailedException
      */
-    public function connect(): Client {
+    public function connect(): self {
         $this->disconnect();
         $protocol = strtolower($this->protocol);
 
@@ -376,7 +373,7 @@ class Client {
      *
      * @throws ConnectionFailedException
      */
-    protected function authenticate() {
+    protected function authenticate(): void {
         try {
             if ($this->authentication == "oauth") {
                 if (!$this->connection->authenticate($this->username, $this->password)) {
@@ -395,7 +392,7 @@ class Client {
      *
      * @return $this
      */
-    public function disconnect(): Client {
+    public function disconnect(): self {
         if ($this->isConnected() && $this->connection !== false) {
             $this->connection->logout();
         }
@@ -551,10 +548,8 @@ class Client {
 
     /**
      * Get the current active folder
-     *
-     * @return string
      */
-    public function getFolderPath(){
+    public function getFolderPath(): string {
         return $this->active_folder;
     }
 
@@ -643,11 +638,10 @@ class Client {
 
     /**
      * Get the default events for a given section
-     * @param $section
      *
      * @return array
      */
-    public function getDefaultEvents($section): array {
+    public function getDefaultEvents(string $section): array {
         return $this->events[$section];
     }
 
@@ -658,7 +652,7 @@ class Client {
      * @return $this
      * @throws MaskNotFoundException
      */
-    public function setDefaultMessageMask(string $mask): Client {
+    public function setDefaultMessageMask(string $mask): self {
         if(class_exists($mask)) {
             $this->default_message_mask = $mask;
 
@@ -684,7 +678,7 @@ class Client {
      * @return $this
      * @throws MaskNotFoundException
      */
-    public function setDefaultAttachmentMask(string $mask): Client {
+    public function setDefaultAttachmentMask(string $mask): self {
         if(class_exists($mask)) {
             $this->default_attachment_mask = $mask;
 

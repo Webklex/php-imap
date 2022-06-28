@@ -27,18 +27,18 @@ class AttachmentMask extends Mask {
     /**
      * Get the attachment content base64 encoded
      *
-     * @return string|null
+     * @return string
      */
-    public function getContentBase64Encoded() {
+    public function getContentBase64Encoded(): string {
         return base64_encode($this->parent->content);
     }
 
     /**
      * Get a base64 image src string
      *
-     * @return string|null
+     * @return string
      */
-    public function getImageSrc() {
+    public function getImageSrc(): string {
         return 'data:'.$this->parent->content_type.';base64,'.$this->getContentBase64Encoded();
     }
 }

@@ -22,7 +22,7 @@ abstract class Event {
     /**
      * Dispatch the event with the given arguments.
      */
-    public static function dispatch(): Event {
+    public static function dispatch(): self {
         return new static(func_get_args());
     }
 }

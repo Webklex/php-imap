@@ -134,9 +134,6 @@ class Part {
      */
     public $content_type = null;
 
-    /**
-     * @var Header $header
-     */
     private ?Header $header = null;
 
     /**
@@ -159,7 +156,7 @@ class Part {
      *
      * @throws InvalidMessageDateException
      */
-    protected function parse(){
+    protected function parse(): void {
         if ($this->header === null) {
             $body = $this->findHeaders();
         }else{
@@ -244,7 +241,7 @@ class Part {
     /**
      * Try to parse the disposition if any is present
      */
-    private function parseDisposition(){
+    private function parseDisposition(): void {
         $content_disposition = $this->header->get("content_disposition");
         if($content_disposition !== null) {
             $this->ifdisposition = true;
@@ -255,7 +252,7 @@ class Part {
     /**
      * Try to parse the description if any is present
      */
-    private function parseDescription(){
+    private function parseDescription(): void {
         $content_description = $this->header->get("content_description");
         if($content_description !== null) {
             $this->ifdescription = true;
@@ -266,7 +263,7 @@ class Part {
     /**
      * Try to parse the encoding if any is present
      */
-    private function parseEncoding(){
+    private function parseEncoding(): void {
         $encoding = $this->header->get("content_transfer_encoding");
         if($encoding !== null) {
             switch (strtolower($encoding)) {

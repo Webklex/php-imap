@@ -20,7 +20,7 @@ class InitialTest extends TestCase {
         $this->cm = new ClientManager();
     }
 
-    public function testConfigDefaultAccount() {
+    public function testConfigDefaultAccount(): void {
         $this->assertEquals("default", ClientManager::get("default"));
     }
 }

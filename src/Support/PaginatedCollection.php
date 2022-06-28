@@ -54,15 +54,10 @@ class PaginatedCollection extends Collection {
 
     /**
      * Create a new length-aware paginator instance.
-     * @param array $items
-     * @param int $total
-     * @param int $per_page
-     * @param  int|null $current_page
-     * @param  array    $options
      *
      * @return LengthAwarePaginator
      */
-    protected function paginator(array $items, int $total, int $per_page, $current_page, array $options): LengthAwarePaginator {
+    protected function paginator(array $items, int $total, int $per_page, ?int $current_page, array $options): LengthAwarePaginator {
         return new LengthAwarePaginator($items, $total, $per_page, $current_page, $options);
     }
 
@@ -72,7 +67,7 @@ class PaginatedCollection extends Collection {
      *
      * @return int|null
      */
-    public function total($total = null) {
+    public function total($total = null): ?int {
         if($total === null) {
             return $this->total;
         }

@@ -130,11 +130,10 @@ class ClientManager {
 
     /**
      * Get the account configuration.
-     * @param string|null $name
      *
      * @return array
      */
-    protected function getClientConfig($name): array {
+    protected function getClientConfig(?string $name): array {
         if ($name === null) {
             return ['driver' => 'null'];
         }
@@ -156,10 +155,8 @@ class ClientManager {
     /**
      * Set the name of the default account.
      * @param string $name
-     *
-     * @return void
      */
-    public function setDefaultAccount(string $name) {
+    public function setDefaultAccount(string $name): void {
         self::$config['default'] = $name;
     }
 
@@ -175,7 +172,7 @@ class ClientManager {
      *
      * @return $this
      */
-    public function setConfig($config): ClientManager {
+    public function setConfig($config): self {
 
         if(is_array($config) === false) {
             $config = require $config;
@@ -225,13 +222,13 @@ class ClientManager {
      * @link   http://www.php.net/manual/en/function.array-merge-recursive.php#96201
      * @author Mark Roduner <mark.roduner@gmail.com>
      */
-    private function array_merge_recursive_distinct() {
+    private function array_merge_recursive_distinct(): array {
 
         $arrays = func_get_args();
         $base = array_shift($arrays);
 
         // From https://stackoverflow.com/a/173479
-        $isAssoc = function(array $arr) {
+        $isAssoc = function(array $arr): bool {
             if (array() === $arr) return false;
             return array_keys($arr) !== range(0, count($arr) - 1);
         };

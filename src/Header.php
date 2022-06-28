@@ -14,8 +14,14 @@ namespace Webklex\PHPIMAP;
 
 
 use Carbon\Carbon;
+use Exception;
+use stdClass;
 use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
 use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
+use function imap_mime_header_decode;
+use function imap_rfc822_parse_headers;
+use function imap_utf8;
+use function mailparse_rfc822_parse_addresses;
 
 /**
  * Class Header
@@ -85,7 +91,7 @@ class Header {
         if (strtolower(substr($method, 0, 3)) === 'get') {
             $name = preg_replace('/(.)(?=[A-Z])/u', '$1_', substr(strtolower($method), 3));
 
-            if (in_array($name, array_keys($this->attributes))) {
+            if (array_key_exists($name, $this->attributes)) {
                 return $this->attributes[$name];
             }
 
@@ -96,21 +102,18 @@ class Header {
 
     /**
      * Magic getter
-     * @param $name
      *
      * @return Attribute|null
      */
-    public function __get($name) {
+    public function __get(string $name) {
         return $this->get($name);
     }
 
     /**
      * Get a specific header attribute
-     * @param $name
-     *
-     * @return Attribute|mixed
      */
-    public function get($name) {
+    public function get(string $name): ?Attribute
+    {
         if (isset($this->attributes[$name])) {
             return $this->attributes[$name];
         }
@@ -123,16 +126,15 @@ class Header {
      * @param string $name
      * @param array|mixed $value
      * @param boolean $strict
-     *
-     * @return Attribute
      */
-    public function set(string $name, $value, bool $strict = false) {
+    public function set(string $name, $value, bool $strict = false): Attribute
+    {
         if (isset($this->attributes[$name]) && $strict === false) {
             if ($this->attributize) {
                 $this->attributes[$name]->add($value, true);
             } else {
                 if (isset($this->attributes[$name])) {
-                    if (is_array($this->attributes[$name]) == false) {
+                    if (!is_array($this->attributes[$name])) {
                         $this->attributes[$name] = [$this->attributes[$name], $value];
                     } else {
                         $this->attributes[$name][] = $value;
@@ -141,7 +143,7 @@ class Header {
                     $this->attributes[$name] = $value;
                 }
             }
-        } elseif ($this->attributize == false) {
+        } elseif (!$this->attributize) {
             $this->attributes[$name] = $value;
         } else {
             $this->attributes[$name] = new Attribute($name, $value);
@@ -174,7 +176,7 @@ class Header {
      *
      * @return string|null
      */
-    public function getBoundary() {
+    public function getBoundary(): ?string {
         $regex = $this->config["boundary"] ?? "/boundary=(.*?(?=;)|(.*))/i";
         $boundary = $this->find($regex);
 
@@ -200,7 +202,7 @@ class Header {
      *
      * @throws InvalidMessageDateException
      */
-    protected function parse() {
+    protected function parse(): void {
         $header = $this->rfc822_parse_headers($this->raw);
 
         $this->extractAddresses($header);
@@ -230,15 +232,12 @@ class Header {
     /**
      * Parse mail headers from a string
      * @link https://php.net/manual/en/function.imap-rfc822-parse-headers.php
-     * @param $raw_headers
-     *
-     * @return object
      */
-    public function rfc822_parse_headers($raw_headers) {
+    public function rfc822_parse_headers(string $raw_headers): stdClass {
         $headers = [];
         $imap_headers = [];
         if (extension_loaded('imap') && $this->config["rfc822"]) {
-            $raw_imap_headers = (array)\imap_rfc822_parse_headers($this->raw);
+            $raw_imap_headers = (array)imap_rfc822_parse_headers($this->raw);
             foreach ($raw_imap_headers as $key => $values) {
                 $key = str_replace("-", "_", $key);
                 $imap_headers[$key] = $values;
@@ -338,7 +337,7 @@ class Header {
      */
     public function mime_header_decode(string $text): array {
         if (extension_loaded('imap')) {
-            return \imap_mime_header_decode($text);
+            return imap_mime_header_decode($text);
         }
         $charset = $this->getEncoding($text);
         return [(object)[
@@ -363,13 +362,10 @@ class Header {
     /**
      * Convert the encoding
      * @param $str
-     * @param string $from
-     * @param string $to
      *
      * @return mixed|string
      */
-    public function convertEncoding($str, $from = "ISO-8859-2", $to = "UTF-8") {
-
+    public function convertEncoding($str, string $from = "ISO-8859-2", string $to = "UTF-8") {
         $from = EncodingAliases::get($from, $this->fallback_encoding);
         $to = EncodingAliases::get($to, $this->fallback_encoding);
 
@@ -400,7 +396,7 @@ class Header {
                 return mb_convert_encoding($str, $to);
             }
             return mb_convert_encoding($str, $to, $from);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             if (strstr($from, '-')) {
                 $from = str_replace('-', '', $from);
                 return $this->convertEncoding($str, $from, $to);
@@ -458,7 +454,7 @@ class Header {
             $is_utf8_base = $this->is_uft8($value);
 
             if ($decoder === 'utf-8' && extension_loaded('imap')) {
-                $value = \imap_utf8($value);
+                $value = imap_utf8($value);
                 $is_utf8_base = $this->is_uft8($value);
                 if ($is_utf8_base) {
                     $value = mb_decode_mimeheader($value);
@@ -505,7 +501,7 @@ class Header {
     /**
      * Try to extract the priority from a given raw header string
      */
-    private function findPriority() {
+    private function findPriority(): void {
         if (($priority = $this->get("x_priority")) === null) return;
         switch ((int)"$priority") {
             case IMAP::MESSAGE_PRIORITY_HIGHEST;
@@ -542,7 +538,7 @@ class Header {
 
         if (extension_loaded('mailparse') && $this->config["rfc822"]) {
             foreach ($values as $address) {
-                foreach (\mailparse_rfc822_parse_addresses($address) as $parsed_address) {
+                foreach (mailparse_rfc822_parse_addresses($address) as $parsed_address) {
                     if (isset($parsed_address['address'])) {
                         $mail_address = explode('@', $parsed_address['address']);
                         if (count($mail_address) == 2) {
@@ -588,9 +584,8 @@ class Header {
 
     /**
      * Extract a given part as address array from a given header
-     * @param object $header
      */
-    private function extractAddresses($header) {
+    private function extractAddresses(object $header): void {
         foreach (['from', 'to', 'cc', 'bcc', 'reply_to', 'sender'] as $key) {
             if (property_exists($header, $key)) {
                 $this->set($key, $this->parseAddresses($header->$key));
@@ -649,7 +644,7 @@ class Header {
     /**
      * Search and extract potential header extensions
      */
-    private function extractHeaderExtensions() {
+    private function extractHeaderExtensions(): void {
         foreach ($this->attributes as $key => $value) {
             if (is_array($value)) {
                 $value = implode(", ", $value);
@@ -698,11 +693,10 @@ class Header {
      *
      * Please report any new invalid timestamps to [#45](https://github.com/Webklex/php-imap/issues)
      *
-     * @param object $header
      *
      * @throws InvalidMessageDateException
      */
-    private function parseDate($header) {
+    private function parseDate(object $header): void {
 
         if (property_exists($header, 'date')) {
             $date = $header->date;
@@ -714,7 +708,7 @@ class Header {
             $date = trim(rtrim($date));
             try {
                 $parsed_date = Carbon::parse($date);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 switch (true) {
                     case preg_match('/([0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ UT)+$/i', $date) > 0:
                     case preg_match('/([A-Z]{2,3}\,\ [0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ UT)+$/i', $date) > 0:
@@ -732,7 +726,7 @@ class Header {
                 }
                 try {
                     $parsed_date = Carbon::parse($date);
-                } catch (\Exception $_e) {
+                } catch (Exception $_e) {
                     if (!isset($this->config["fallback_date"])) {
                         throw new InvalidMessageDateException("Invalid message date. ID:" . $this->get("message_id") . " Date:" . $header->date . "/" . $date, 1100, $e);
                     }

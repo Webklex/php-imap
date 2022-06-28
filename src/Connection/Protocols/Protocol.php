@@ -12,6 +12,7 @@
 
 namespace Webklex\PHPIMAP\Connection\Protocols;
 
+use phpDocumentor\Reflection\Types\Static_;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
 use Webklex\PHPIMAP\IMAP;
 
@@ -25,17 +26,11 @@ abstract class Protocol implements ProtocolInterface {
     /**
      * Default connection timeout in seconds
      */
-    protected $connection_timeout = 30;
+    protected int $connection_timeout = 30;
 
-    /**
-     * @var boolean
-     */
-    protected $debug = false;
+    protected bool $debug = false;
 
-    /**
-     * @var boolean
-     */
-    protected $enable_uid_cache = true;
+    protected bool $enable_uid_cache = true;
 
     /**
      * @var false|resource
@@ -44,7 +39,7 @@ abstract class Protocol implements ProtocolInterface {
 
     /**
      * Connection encryption method
-     * @var mixed $encryption
+     * @var false|string
      */
     protected $encryption = false;
 
@@ -117,7 +112,7 @@ abstract class Protocol implements ProtocolInterface {
      *
      * @return $this
      */
-    public function setCertValidation($cert_validation) {
+    public function setCertValidation(bool $cert_validation) {
         $this->cert_validation = $cert_validation;
         return $this;
     }
@@ -158,11 +153,10 @@ abstract class Protocol implements ProtocolInterface {
 
     /**
      * Prepare socket options
-     * @var string $transport
      *
      * @return array
      */
-    private function defaultSocketOptions($transport) {
+    private function defaultSocketOptions(string $transport) {
         $options = [];
         if ($this->encryption != false) {
             $options["ssl"] = [
@@ -197,7 +191,7 @@ abstract class Protocol implements ProtocolInterface {
      * @return resource|boolean The socket created.
      * @throws ConnectionFailedException
      */
-    protected function createStream($transport, $host, $port, $timeout) {
+    protected function createStream(string $transport, string $host, int $port, int $timeout) {
         $socket = "$transport://$host:$port";
         $stream = stream_socket_client($socket, $errno, $errstr, $timeout,
             STREAM_CLIENT_CONNECT,
@@ -223,10 +217,9 @@ abstract class Protocol implements ProtocolInterface {
     }
 
     /**
-     * @param int $connection_timeout
      * @return Protocol
      */
-    public function setConnectionTimeout($connection_timeout) {
+    public function setConnectionTimeout(int $connection_timeout) {
         if ($connection_timeout !== null) {
             $this->connection_timeout = $connection_timeout;
         }
@@ -239,7 +232,7 @@ abstract class Protocol implements ProtocolInterface {
      *
      * @return string
      */
-    public function getUIDKey($uid)
+    public function getUIDKey($uid):string
     {
         if ($uid == IMAP::ST_UID) {
             return "UID";
@@ -256,7 +249,7 @@ abstract class Protocol implements ProtocolInterface {
         return (string)$uid;
     }
 
-    public function buildUIDCommand($command, $uid) {
+    public function buildUIDCommand($command, $uid) : string {
         return trim($this->getUIDKey($uid)." ".$command);
     }
 
@@ -281,11 +274,11 @@ abstract class Protocol implements ProtocolInterface {
         $this->uid_cache = $uid_cache;
     }
 
-    public function enableUidCache() {
+    public function enableUidCache() :void {
         $this->enable_uid_cache = true;
     }
 
-    public function disableUidCache() {
+    public function disableUidCache() :void {
         $this->enable_uid_cache = false;
     }
 }

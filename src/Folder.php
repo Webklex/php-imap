@@ -181,10 +181,8 @@ class Folder {
     /**
      * Set children.
      * @param FolderCollection|array $children
-     *
-     * @return self
      */
-    public function setChildren($children = []): Folder {
+    public function setChildren($children = []): self {
         $this->children = $children;
 
         return $this;
@@ -203,12 +201,10 @@ class Folder {
 
     /**
      * Get simple name (without parent folders).
-     * @param $delimiter
-     * @param $full_name
      *
-     * @return mixed
+     * @return string|false
      */
-    protected function getSimpleName($delimiter, $full_name) {
+    protected function getSimpleName(string $delimiter, string $full_name): string {
         $arr = explode($delimiter, $full_name);
 
         return end($arr);
@@ -218,7 +214,7 @@ class Folder {
      * Parse attributes and set it to object properties.
      * @param $attributes
      */
-    protected function parseAttributes($attributes) {
+    protected function parseAttributes(array $attributes): void {
         $this->no_inferiors = in_array('\NoInferiors', $attributes);
         $this->no_select    = in_array('\NoSelect', $attributes);
         $this->marked       = in_array('\Marked', $attributes);
@@ -364,7 +360,7 @@ class Folder {
      * @throws Exceptions\MessageNotFoundException
      * @throws Exceptions\NotSupportedCapabilityException
      */
-    public function idle(callable $callback, int $timeout = 1200, bool $auto_reconnect = false) {
+    public function idle(callable $callback, int $timeout = 1200, bool $auto_reconnect = false): void {
         $this->client->getConnection()->setConnectionTimeout($timeout);
 
         $this->client->reconnect();
@@ -442,9 +438,9 @@ class Folder {
 
     /**
      * Set the delimiter
-     * @param $delimiter
+     * @param mixed $delimiter
      */
-    public function setDelimiter($delimiter){
+    public function setDelimiter(string $delimiter): void {
         if(in_array($delimiter, [null, '', ' ', false]) === true) {
             $delimiter = ClientManager::get('options.delimiter', '/');
         }
