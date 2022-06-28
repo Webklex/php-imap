@@ -19,4 +19,5 @@ return static function (RectorConfig $containerConfigurator): void {
 
     $containerConfigurator->import(SetList::EARLY_RETURN);
     $containerConfigurator->import(SetList::TYPE_DECLARATION);
+    $containerConfigurator->import(SetList::TYPE_DECLARATION_STRICT);
 };
