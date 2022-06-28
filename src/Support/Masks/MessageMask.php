@@ -23,7 +23,7 @@ use Webklex\PHPIMAP\Message;
 class MessageMask extends Mask {
 
     /** @var Message $parent */
-    protected $parent;
+    protected object $parent;
 
     /**
      * Get the message html body
