@@ -86,7 +86,7 @@ class Message {
     /**
      * Attribute holder
      *
-     * @var Attribute[] $attributes
+     * @var array<string,Attribute|mixed> $attributes
      */
     protected array $attributes = [];
 
@@ -313,7 +313,7 @@ class Message {
      *
      * @return Attribute|mixed|null
      */
-    public function get($name): ?Attribute {
+    public function get($name) {
         if(isset($this->attributes[$name])) {
             return $this->attributes[$name];
         }

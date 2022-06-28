@@ -1056,10 +1056,10 @@ class ImapProtocol extends Protocol {
      * @param int|string $uid set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
      * message numbers instead.
      *
-     * @return array message ids
+     * @return array|false message ids
      * @throws RuntimeException
      */
-    public function search(array $params, $uid = IMAP::ST_UID): array {
+    public function search(array $params, $uid = IMAP::ST_UID) {
         $command = $this->buildUIDCommand("SEARCH", $uid);
         $response = $this->requestAndResponse($command, $params);
         if (!$response) {
