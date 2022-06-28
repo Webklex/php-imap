@@ -36,7 +36,7 @@ trait HasEvents {
      * @param $event
      * @param $class
      */
-    public function setEvent($section, $event, $class) {
+    public function setEvent($section, $event, $class): void {
         if (isset($this->events[$section])) {
             $this->events[$section][$event] = $class;
         }
@@ -46,7 +46,7 @@ trait HasEvents {
      * Set all events
      * @param $events
      */
-    public function setEvents($events) {
+    public function setEvents($events): void {
         $this->events = $events;
     }
 

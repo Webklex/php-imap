@@ -1098,7 +1098,7 @@ class Message {
     /**
      * Get the message header
      */
-    public function getHeader(): Header {
+    public function getHeader(): ?Header {
         return $this->header;
     }
 
@@ -1162,7 +1162,7 @@ class Message {
     /**
      * Get the fetched structure
      */
-    public function getStructure(): Structure{
+    public function getStructure(): ?Structure {
         return $this->structure;
     }
 

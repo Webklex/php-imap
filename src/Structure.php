@@ -55,7 +55,7 @@ class Structure {
      * @throws MessageContentFetchingException
      * @throws InvalidMessageDateException
      */
-    public function __construct($raw_structure, Header $header) {
+    public function __construct(string $raw_structure, Header $header) {
         $this->raw = $raw_structure;
         $this->header = $header;
         $this->config = ClientManager::get('options');

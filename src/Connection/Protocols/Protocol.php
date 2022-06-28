@@ -212,7 +212,7 @@ abstract class Protocol implements ProtocolInterface {
     /**
      * @return int
      */
-    public function getConnectionTimeout() {
+    public function getConnectionTimeout(): int {
         return $this->connection_timeout;
     }
 
@@ -258,7 +258,7 @@ abstract class Protocol implements ProtocolInterface {
      *
      * @param array|null $uids
      */
-    public function setUidCache($uids) {
+    public function setUidCache($uids): void {
         if (is_null($uids)) {
             $this->uid_cache = null;
             return;

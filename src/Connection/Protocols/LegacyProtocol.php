@@ -176,7 +176,7 @@ class LegacyProtocol extends Protocol {
      * Change the current folder
      * @param string $folder change to this folder
      *
-     * @return bool|array see examineOrselect()
+     * @return array{flags: never[], exists: mixed, recent: mixed, unseen: mixed, uidnext: mixed} see examineOrselect()
      * @throws RuntimeException
      */
     public function selectFolder(string $folder = 'INBOX'): array {
@@ -189,7 +189,7 @@ class LegacyProtocol extends Protocol {
      * Examine a given folder
      * @param string $folder examine this folder
      *
-     * @return bool|array
+     * @return array{flags: never[], exists: mixed, recent: mixed, unseen: mixed, uidnext: mixed}
      * @throws RuntimeException
      */
     public function examineFolder(string $folder = 'INBOX'): array {

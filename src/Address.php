@@ -53,7 +53,7 @@ class Address {
     /**
      * Return the serialized address
      *
-     * @return array<string, mixed>
+     * @return array{personal: string, mailbox: string, host: string, mail: string, full: string}
      */
     public function __serialize(): array{
         return [
@@ -68,7 +68,7 @@ class Address {
     /**
      * Convert instance to array
      *
-     * @return array
+     * @return array{personal: string, mailbox: string, host: string, mail: string, full: string}
      */
     public function toArray(): array {
         return $this->__serialize();

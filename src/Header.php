@@ -60,10 +60,8 @@ class Header {
 
     /**
      * Convert parsed values to attributes
-     *
-     * @var bool
      */
-    protected $attributize = false;
+    protected bool $attributize;
 
     /**
      * Header constructor.

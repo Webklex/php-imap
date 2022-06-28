@@ -23,8 +23,7 @@ use ReturnTypeWillChange;
  */
 class Attribute implements ArrayAccess {
 
-    /** @var string $name */
-    protected $name;
+    protected string $name;
 
     /**
      * Value holder

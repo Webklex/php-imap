@@ -40,44 +40,34 @@ use Webklex\PHPIMAP\Support\MessageCollection;
  */
 class Query {
 
-    /** @var Collection $query */
-    protected $query;
+    protected Collection $query;
 
-    /** @var string $raw_query */
-    protected $raw_query;
+    protected string $raw_query;
 
-    /** @var string[] $extensions */
-    protected $extensions;
+    protected array $extensions;
 
-    /** @var Client $client */
-    protected $client;
+    protected ?Client $client = null;
 
-    /** @var int $limit */
-    protected $limit = null;
+    protected ?int $limit = null;
 
-    /** @var int $page */
-    protected $page = 1;
+    protected int $page = 1;
 
-    /** @var int $fetch_options */
-    protected $fetch_options = null;
+    protected ?int $fetch_options = null;
 
-    /** @var int $fetch_body */
-    protected $fetch_body = true;
+    protected bool $fetch_body = true;
 
-    /** @var int $fetch_flags */
+    /** @var bool|int $fetch_flags */
     protected $fetch_flags = true;
 
     /** @var int|string $sequence */
     protected $sequence = IMAP::NIL;
 
-    /** @var string $fetch_order */
-    protected $fetch_order;
+    protected string $fetch_order;
 
     /** @var string $date_format */
     protected $date_format;
 
-    /** @var bool $soft_fail */
-    protected $soft_fail = false;
+    protected bool $soft_fail = false;
 
     /** @var array $errors */
     protected $errors = [];
@@ -207,9 +197,8 @@ class Query {
 
     /**
      * Fetch a given id collection
-     * @param Collection $available_messages
      *
-     * @return array
+     * @return array{uids: mixed[], flags: mixed[], headers: mixed[], contents: mixed[], extensions: mixed}
      * @throws ConnectionFailedException
      * @throws RuntimeException
      */
@@ -372,7 +361,7 @@ class Query {
      * @throws ReflectionException
      * @throws RuntimeException
      */
-    public function chunked(callable $callback, int $chunk_size = 10, int $start_chunk = 1) {
+    public function chunked(callable $callback, int $chunk_size = 10, int $start_chunk = 1): void {
         $available_messages = $this->search();
         if (($available_messages_count = $available_messages->count()) > 0) {
             $old_limit = $this->limit;
@@ -509,7 +498,7 @@ class Query {
      * @throws MessageNotFoundException
      */
     public function getByUidGreaterOrEqual(int $uid): MessageCollection {
-        return $this->filter(fn($id) => $id >= $uid);
+        return $this->filter(fn($id): bool => $id >= $uid);
     }
 
     /**
@@ -522,7 +511,7 @@ class Query {
      * @throws MessageNotFoundException
      */
     public function getByUidGreater(int $uid): MessageCollection {
-        return $this->filter(fn($id) => $id > $uid);
+        return $this->filter(fn($id): bool => $id > $uid);
     }
 
     /**
@@ -535,7 +524,7 @@ class Query {
      * @throws MessageNotFoundException
      */
     public function getByUidLower(int $uid): MessageCollection {
-        return $this->filter(fn($id) => $id < $uid);
+        return $this->filter(fn($id): bool => $id < $uid);
     }
 
     /**
@@ -548,7 +537,7 @@ class Query {
      * @throws MessageNotFoundException
      */
     public function getByUidLowerOrEqual(int $uid): MessageCollection {
-        return $this->filter(fn($id) => $id <= $uid);
+        return $this->filter(fn($id): bool => $id <= $uid);
     }
 
     /**
@@ -561,7 +550,7 @@ class Query {
      * @throws MessageNotFoundException
      */
     public function getByUidLowerThan(int $uid): MessageCollection {
-        return $this->filter(fn($id) => $id < $uid);
+        return $this->filter(fn($id): bool => $id < $uid);
     }
 
     /**
@@ -695,7 +684,7 @@ class Query {
     /**
      * @return int
      */
-    public function getLimit() {
+    public function getLimit(): ?int {
         return $this->limit;
     }
 
@@ -744,14 +733,14 @@ class Query {
     /**
      * @return int
      */
-    public function getFetchOptions() {
+    public function getFetchOptions(): ?int {
         return $this->fetch_options;
     }
 
     /**
      * @return boolean
      */
-    public function getFetchBody() {
+    public function getFetchBody(): bool {
         return $this->fetch_body;
     }
 
@@ -941,7 +930,7 @@ class Query {
      * @var integer $uid
      *
      */
-    public function error(int $uid) {
+    public function error(int $uid): ?\Exception {
         return $this->getError($uid);
     }
 

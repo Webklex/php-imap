@@ -125,24 +125,18 @@ class Client {
 
     /**
      * Active folder path.
-     *
-     * @var string
      */
-    protected $active_folder = null;
+    protected ?string $active_folder = null;
 
     /**
      * Default message mask
-     *
-     * @var string $default_message_mask
      */
-    protected $default_message_mask = MessageMask::class;
+    protected string $default_message_mask = MessageMask::class;
 
     /**
      * Default attachment mask
-     *
-     * @var string $default_attachment_mask
      */
-    protected $default_attachment_mask = AttachmentMask::class;
+    protected string $default_attachment_mask = AttachmentMask::class;
 
     /**
      * Used default account values
@@ -549,7 +543,7 @@ class Client {
     /**
      * Get the current active folder
      */
-    public function getFolderPath(): string {
+    public function getFolderPath(): ?string {
         return $this->active_folder;
     }
 

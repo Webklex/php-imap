@@ -24,23 +24,21 @@ class Mask {
 
     /**
      * Available attributes
-     *
-     * @var array $attributes
      */
-    protected $attributes = [];
+    protected array $attributes = [];
 
     /**
      * Parent instance
      *
      * @var object $parent
      */
-    protected $parent;
+    protected object $parent;
 
     /**
      * Mask constructor.
      * @param $parent
      */
-    public function __construct($parent) {
+    public function __construct(object $parent) {
         $this->parent = $parent;
 
         if(method_exists($this->parent, 'getAttributes')){
@@ -53,7 +51,7 @@ class Mask {
     /**
      * Boot method made to be used by any custom mask
      */
-    protected function boot(){}
+    protected function boot(): void{}
 
     /**
      * Call dynamic attribute setter and getter methods and inherit the parent calls
@@ -118,10 +116,8 @@ class Mask {
 
     /**
      * Get the parent instance
-     *
-     * @return object
      */
-    public function getParent(){
+    public function getParent(): object {
         return $this->parent;
     }
 

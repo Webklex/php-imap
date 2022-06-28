@@ -29,10 +29,8 @@ class Folder {
 
     /**
      * Client instance
-     *
-     * @var Client
      */
-    protected $client;
+    protected Client $client;
 
     /**
      * Folder full path
@@ -95,10 +93,8 @@ class Folder {
     /**
      * Indicates if folder containg any "children".
      * Not provided by all IMAP servers.
-     *
-     * @var boolean
      */
-    public $has_children;
+    public bool $has_children;
 
     /**
      * Indicates if folder refers to other.
@@ -171,8 +167,6 @@ class Folder {
 
     /**
      * Determine if folder has children.
-     *
-     * @return bool
      */
     public function hasChildren(): bool {
         return $this->has_children;
