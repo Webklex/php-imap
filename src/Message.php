@@ -119,7 +119,7 @@ class Message {
      */
     public bool $fetch_flags = true;
 
-    public ?Header $header = null;
+    public Header $header;
 
     /**
      * Raw message body
@@ -1098,7 +1098,7 @@ class Message {
     /**
      * Get the message header
      */
-    public function getHeader(): ?Header {
+    public function getHeader(): Header {
         return $this->header;
     }
 
