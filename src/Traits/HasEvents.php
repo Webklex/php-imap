@@ -26,17 +26,14 @@ trait HasEvents {
     /**
      * Event holder
      *
-     * @var array $events
+     * @var array<string, array<string, string>> $events
      */
     protected $events = [];
 
     /**
      * Set a specific event
-     * @param $section
-     * @param $event
-     * @param $class
      */
-    public function setEvent($section, $event, $class): void {
+    public function setEvent(string $section, string $event, string $class): void {
         if (isset($this->events[$section])) {
             $this->events[$section][$event] = $class;
         }
@@ -44,9 +41,16 @@ trait HasEvents {
 
     /**
      * Set all events
-     * @param $events
+     * @param array<string, array<string, string>> $events
      */
     public function setEvents($events): void {
+        foreach($events as $section => $sectionEvents) {
+            assert(is_string($section));
+            foreach($sectionEvents as $event => $class) {
+                assert(is_string($event));
+                assert(is_string($class) && is_a($class, Event::class, true));
+            }
+        }
         $this->events = $events;
     }
 
@@ -55,10 +59,10 @@ trait HasEvents {
      * @param $section
      * @param $event
      *
-     * @return Event
+     * @return string
      * @throws EventNotFoundException
      */
-    public function getEvent($section, $event): Event {
+    public function getEvent($section, $event): string {
         if (isset($this->events[$section])) {
             return $this->events[$section][$event];
         }
@@ -68,7 +72,7 @@ trait HasEvents {
     /**
      * Get all events
      *
-     * @return array
+     * @return array<string, array<string, string>>
      */
     public function getEvents(): array {
         return $this->events;
