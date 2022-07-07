@@ -596,7 +596,8 @@ class ImapProtocol extends Protocol {
                 } elseif ($uid && $tokens[2][2] == $items[0]) {
                     $data = $tokens[2][3];
                 } else {
-                    // maybe the server send an other field we didn't wanted
+                    $expectedResponse = false;
+                    // maybe the server send another field we didn't want
                     $count = is_countable($tokens[2]) ? count($tokens[2]) : 0;
                     // we start with 2, because 0 was already checked
                     for ($i = 2; $i < $count; $i += 2) {
@@ -604,7 +605,11 @@ class ImapProtocol extends Protocol {
                             continue;
                         }
                         $data = $tokens[2][$i + 1];
+                        $expectedResponse = true;
                         break;
+                    }
+                    if (!$expectedResponse) {
+                        continue;
                     }
                 }
             } else {
