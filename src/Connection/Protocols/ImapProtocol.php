@@ -705,16 +705,12 @@ class ImapProtocol extends Protocol {
      * @throws MessageNotFoundException
      */
     public function getUid($id = null) {
-        $uids = [];
-
-        if ($this->enable_uid_cache && $this->uid_cache) {
-            $uids = $this->uid_cache;
-        } else {
+        if (!$this->enable_uid_cache || $this->uid_cache === null || ($this->uid_cache && count($this->uid_cache) <= 0)) {
             try {
-                $uids = $this->fetch('UID', 1, INF);
-                $this->setUidCache($uids); // set cache for this folder
+                $this->setUidCache($this->fetch('UID', 1, INF)); // set cache for this folder
             } catch (RuntimeException $e) {}
         }
+        $uids = $this->uid_cache;
 
         if ($id == null) {
             return $uids;
