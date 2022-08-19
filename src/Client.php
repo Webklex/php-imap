@@ -317,7 +317,7 @@ class Client {
     }
 
     /**
-     * Force a reconnect
+     * Force the connection to reconnect
      *
      * @throws ConnectionFailedException
      */
@@ -620,8 +620,12 @@ class Client {
      * @throws ConnectionFailedException
      */
     public function setTimeout(int $timeout): Protocol {
-        $this->checkConnection();
-        return $this->connection->setConnectionTimeout($timeout);
+        $this->timeout = $timeout;
+        if ($this->isConnected()) {
+            $this->connection->setConnectionTimeout($timeout);
+            $this->reconnect();
+        }
+        return $this->connection;
     }
 
     /**
