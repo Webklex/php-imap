@@ -104,13 +104,15 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function nextLine(): string {
-        $line = fgets($this->stream);
-
-        if ($line === false) {
-            throw new RuntimeException('failed to read - connection closed?');
+        $line = "";
+        while (($next_char = fread($this->stream, 1)) !== false && $next_char !== "\n") {
+            $line .= $next_char;
         }
-
-        return $line;
+        if ($line === "") {
+            throw new RuntimeException('empty response');
+        }
+        if ($this->debug) echo "<< ".$line."\n";
+        return $line . "\n";
     }
 
     /**
@@ -137,6 +139,19 @@ class ImapProtocol extends Protocol {
         list($tag, $line) = explode(' ', $line, 2);
 
         return $line;
+    }
+
+    /**
+     * Get the next line and check if it contains a given string and split the tag
+     * @param string $start
+     * @param $tag
+     *
+     * @return bool
+     * @throws RuntimeException
+     */
+    protected function assumedNextTaggedLine(string $start, &$tag): bool {
+        $line = $this->nextTaggedLine($tag);
+        return strpos($line, $start) >= 0;
     }
 
     /**
@@ -238,7 +253,6 @@ class ImapProtocol extends Protocol {
         } else {
             $tokens = $line;
         }
-        if ($this->debug) echo "<< ".$line."\n";
 
         // if tag is wanted tag we might be at the end of a multiline response
         return $tag == $wantedTag;
@@ -249,7 +263,7 @@ class ImapProtocol extends Protocol {
      * @param string $tag request tag
      * @param bool $dontParse if true every line is returned unparsed instead of the decoded tokens
      *
-     * @return void|null|bool|array tokens if success, false if error, null if bad request
+     * @return array|bool|null tokens if success, false if error, null if bad request
      * @throws RuntimeException
      */
     public function readResponse(string $tag, bool $dontParse = false) {
@@ -293,9 +307,7 @@ class ImapProtocol extends Protocol {
 
         foreach ($tokens as $token) {
             if (is_array($token)) {
-                if (fwrite($this->stream, $line . ' ' . $token[0] . "\r\n") === false) {
-                    throw new RuntimeException('failed to write - connection closed?');
-                }
+                $this->write($line . ' ' . $token[0]);
                 if (!$this->assumedNextLine('+ ')) {
                     throw new RuntimeException('failed to send literal string');
                 }
@@ -304,9 +316,19 @@ class ImapProtocol extends Protocol {
                 $line .= ' ' . $token;
             }
         }
-        if ($this->debug) echo ">> ".$line."\n";
+        $this->write($line);
+    }
 
-        if (fwrite($this->stream, $line . "\r\n") === false) {
+    /**
+     * Write data to the current stream
+     * @param string $data
+     * @return void
+     * @throws RuntimeException
+     */
+    public function write(string $data) {
+        if ($this->debug) echo ">> ".$data ."\n";
+
+        if (fwrite($this->stream, $data . "\r\n") === false) {
             throw new RuntimeException('failed to write - connection closed?');
         }
     }
@@ -317,7 +339,7 @@ class ImapProtocol extends Protocol {
      * @param array $tokens parameters as in sendRequest()
      * @param bool $dontParse if true unparsed lines are returned instead of tokens
      *
-     * @return void|null|bool|array response as in readResponse()
+     * @return array|bool|null response as in readResponse()
      * @throws RuntimeException
      */
     public function requestAndResponse(string $command, array $tokens = [], bool $dontParse = false) {
