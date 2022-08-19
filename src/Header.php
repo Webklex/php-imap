@@ -713,9 +713,15 @@ class Header {
 
             $date = trim(rtrim($date));
             try {
+                if(strpos($date, '&nbsp;') !== false){
+                    $date = str_replace('&nbsp;', ' ', $date);
+                }
                 $parsed_date = Carbon::parse($date);
             } catch (\Exception $e) {
                 switch (true) {
+                    case preg_match('/([0-9]{4}\.[0-9]{1,2}\.[0-9]{1,2}\-[0-9]{1,2}\.[0-9]{1,2}.[0-9]{1,2})+$/i', $date) > 0:
+                        $date = Carbon::createFromFormat("Y.m.d-H.i.s", $date);
+                        break;
                     case preg_match('/([0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ UT)+$/i', $date) > 0:
                     case preg_match('/([A-Z]{2,3}\,\ [0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ UT)+$/i', $date) > 0:
                         $date .= 'C';
