@@ -1050,8 +1050,9 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function done(): bool {
-        if (fwrite($this->stream, "DONE\r\n") === false) {
-            throw new RuntimeException('failed to write - connection closed?');
+        $this->write("DONE");
+        if (!$this->assumedNextTaggedLine('OK', $tags)) {
+            throw new RuntimeException('done failed');
         }
         return true;
     }

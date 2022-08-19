@@ -351,8 +351,8 @@ class Folder {
     /**
      * Idle the current connection
      * @param callable $callback
-     * @param integer $timeout max 1740 seconds - recommended by rfc2177 §3
-     * @param boolean $auto_reconnect try to reconnect on connection close
+     * @param integer $timeout max 1740 seconds - recommended by rfc2177 §3. Should not be lower than the servers "* OK Still here" message interval
+     * @param boolean $auto_reconnect try to reconnect on connection close (@deprecated is no longer required)
      *
      * @throws ConnectionFailedException
      * @throws Exceptions\InvalidMessageDateException
@@ -364,25 +364,24 @@ class Folder {
      * @throws Exceptions\MessageNotFoundException
      * @throws Exceptions\NotSupportedCapabilityException
      */
-    public function idle(callable $callback, int $timeout = 1200, bool $auto_reconnect = false) {
-        $this->client->getConnection()->setConnectionTimeout($timeout);
-
-        $this->client->reconnect();
+    public function idle(callable $callback, int $timeout = 300, bool $auto_reconnect = false) {
+        $this->client->setTimeout($timeout);
         if (!in_array("IDLE", $this->client->getConnection()->getCapabilities())) {
             throw new NotSupportedCapabilityException("IMAP server does not support IDLE");
         }
         $this->client->openFolder($this->path, true);
         $connection = $this->client->getConnection();
+        $connection->idle();
 
         $sequence = ClientManager::get('options.sequence', IMAP::ST_MSGN);
-        $connection->idle();
 
         while (true) {
             try {
                 $line = $connection->nextLine();
+
                 if (($pos = strpos($line, "EXISTS")) !== false) {
-                    $msgn = (int) substr($line, 2, $pos -2);
                     $connection->done();
+                    $msgn = (int) substr($line, 2, $pos -2);
 
                     $this->client->openFolder($this->path, true);
                     $message = $this->query()->getMessageByMsgn($msgn);
@@ -391,20 +390,26 @@ class Folder {
 
                     $event = $this->getEvent("message", "new");
                     $event::dispatch($message);
-
+                    $connection->idle();
+                } elseif (strpos($line, "OK") === false) {
+                    $connection->done();
                     $connection->idle();
                 }
             }catch (Exceptions\RuntimeException $e) {
+                if(strpos($e->getMessage(), "empty response") >= 0 && $connection->connected()) {
+                    $connection->done();
+                    $connection->idle();
+                    continue;
+                }
                 if(strpos($e->getMessage(), "connection closed") === false) {
                     throw $e;
                 }
-                if ($auto_reconnect === true) {
-                    $this->client->reconnect();
-                    $this->client->openFolder($this->path, true);
 
-                    $connection = $this->client->getConnection();
-                    $connection->idle();
-                }
+                $this->client->reconnect();
+                $this->client->openFolder($this->path, true);
+
+                $connection = $this->client->getConnection();
+                $connection->idle();
             }
         }
     }
