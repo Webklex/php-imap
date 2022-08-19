@@ -6,6 +6,20 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
+- NaN
+
+### Added
+- NaN
+
+### Affected Classes
+- NaN
+
+### Breaking changes
+- NaN
+
+
+## [4.0.0] - 2022-08-19
+### Fixed
 - PHP dependency updated to support php v8.0 #212 #214 (thanks @freescout-helpdesk)
 - Method return and argument types added
 - Imap `DONE` method refactored
@@ -16,9 +30,6 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - IMAP Connection debugging improved
 - `Folder::idle()` method reworked and several issues fixed #170 #229 #237 #249 #258
 - Datetime conversion rules extended #189 #173
-
-### Added
-- NaN
 
 ### Affected Classes
 - [Client::class](src/Client.php)
