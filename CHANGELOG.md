@@ -12,7 +12,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - NaN
 
 ### Affected Classes
-- NaN
+- [ImapProtocol::class](src/Connection/Protocols/ImapProtocol.php)
 
 ### Breaking changes
 - NaN
