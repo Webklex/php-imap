@@ -891,7 +891,7 @@ class ImapProtocol extends Protocol {
         $set = $this->buildSet($from, $to);
         $command = $this->buildUIDCommand("MOVE", $uid);
 
-        return $this->requestAndResponse($command, [$set, $this->escapeString($folder)], true);
+        return (bool)$this->requestAndResponse($command, [$set, $this->escapeString($folder)], true);
     }
 
     /**
@@ -943,7 +943,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function createFolder(string $folder): bool {
-        return $this->requestAndResponse('CREATE', [$this->escapeString($folder)], true);
+        return (bool)$this->requestAndResponse('CREATE', [$this->escapeString($folder)], true);
     }
 
     /**
@@ -955,7 +955,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function renameFolder(string $old, string $new): bool {
-        return $this->requestAndResponse('RENAME', $this->escapeString($old, $new), true);
+        return (bool)$this->requestAndResponse('RENAME', $this->escapeString($old, $new), true);
     }
 
     /**
@@ -966,7 +966,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function deleteFolder(string $folder): bool {
-        return $this->requestAndResponse('DELETE', [$this->escapeString($folder)], true);
+        return (bool)$this->requestAndResponse('DELETE', [$this->escapeString($folder)], true);
     }
 
     /**
@@ -977,7 +977,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function subscribeFolder(string $folder): bool {
-        return $this->requestAndResponse('SUBSCRIBE', [$this->escapeString($folder)], true);
+        return (bool)$this->requestAndResponse('SUBSCRIBE', [$this->escapeString($folder)], true);
     }
 
     /**
@@ -988,7 +988,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function unsubscribeFolder(string $folder): bool {
-        return $this->requestAndResponse('UNSUBSCRIBE', [$this->escapeString($folder)], true);
+        return (bool)$this->requestAndResponse('UNSUBSCRIBE', [$this->escapeString($folder)], true);
     }
 
     /**
@@ -998,7 +998,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function expunge(): bool {
-        return $this->requestAndResponse('EXPUNGE');
+        return (bool)$this->requestAndResponse('EXPUNGE');
     }
 
     /**
@@ -1008,7 +1008,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function noop(): bool {
-        return $this->requestAndResponse('NOOP');
+        return (bool)$this->requestAndResponse('NOOP');
     }
 
     /**

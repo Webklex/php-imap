@@ -6,7 +6,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
+- Type casting added to several ImapProtocol return values #261
 
 ### Added
 - NaN

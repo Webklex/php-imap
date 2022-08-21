@@ -412,7 +412,7 @@ class LegacyProtocol extends Protocol {
      */
     public function copyManyMessages(array $messages, string $folder, $uid = IMAP::ST_UID) {
         foreach($messages as $msg) {
-            if ($this->copyMessage($folder, $msg, null, $uid) == false) {
+            if (!$this->copyMessage($folder, $msg, null, $uid)) {
                 return false;
             }
         }
@@ -421,7 +421,7 @@ class LegacyProtocol extends Protocol {
     }
 
     /**
-     * Move a message set from current folder to an other folder
+     * Move a message set from current folder to another folder
      * @param string $folder destination folder
      * @param $from
      * @param int|null $to if null only one message ($from) is fetched, else it's the
@@ -444,7 +444,7 @@ class LegacyProtocol extends Protocol {
      */
     public function moveManyMessages(array $messages, string $folder, $uid = IMAP::ST_UID) {
         foreach($messages as $msg) {
-            if ($this->moveMessage($folder, $msg, null, $uid) == false) {
+            if (!$this->moveMessage($folder, $msg, null, $uid)) {
                 return false;
             }
         }
