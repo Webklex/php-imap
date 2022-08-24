@@ -1028,7 +1028,7 @@ class Message {
         $event = $this->getEvent("flag", "new");
         $event::dispatch($this, $flag);
 
-        return $status;
+        return (bool)$status;
     }
 
     /**
@@ -1056,7 +1056,7 @@ class Message {
         $event = $this->getEvent("flag", "deleted");
         $event::dispatch($this, $flag);
 
-        return $status;
+        return (bool)$status;
     }
 
     /**
