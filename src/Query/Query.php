@@ -120,10 +120,8 @@ class Query {
      * @return string
      */
     protected function parse_value($value): string {
-        switch (true) {
-            case $value instanceof Carbon:
-                $value = $value->format($this->date_format);
-                break;
+        if ($value instanceof Carbon) {
+            $value = $value->format($this->date_format);
         }
 
         return (string)$value;
@@ -189,7 +187,7 @@ class Query {
 
         try {
             $available_messages = $this->client->getConnection()->search([$this->getRawQuery()], $this->sequence);
-            return $available_messages !== false ? new Collection($available_messages) : new Collection();
+            return new Collection($available_messages);
         } catch (RuntimeException $e) {
             throw new GetMessagesFailedException("failed to fetch messages", 0, $e);
         } catch (ConnectionFailedException $e) {
