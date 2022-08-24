@@ -742,7 +742,7 @@ class ImapProtocol extends Protocol {
         $ids = $this->getUid();
         foreach ($ids as $k => $v) {
             if ($v == $id) {
-                return $k;
+                return (int)$k;
             }
         }
 
@@ -834,7 +834,7 @@ class ImapProtocol extends Protocol {
         }
         $tokens[] = $this->escapeString($message);
 
-        return $this->requestAndResponse('APPEND', $tokens, true);
+        return (bool) $this->requestAndResponse('APPEND', $tokens, true);
     }
 
     /**
@@ -852,7 +852,7 @@ class ImapProtocol extends Protocol {
     public function copyMessage(string $folder, $from, $to = null, $uid = IMAP::ST_UID): bool {
         $set = $this->buildSet($from, $to);
         $command = $this->buildUIDCommand("COPY", $uid);
-        return $this->requestAndResponse($command, [$set, $this->escapeString($folder)], true);
+        return (bool)$this->requestAndResponse($command, [$set, $this->escapeString($folder)], true);
     }
 
     /**
