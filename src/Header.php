@@ -336,7 +336,8 @@ class Header {
      */
     public function mime_header_decode(string $text): array {
         if (extension_loaded('imap')) {
-            return \imap_mime_header_decode($text);
+            $result = \imap_mime_header_decode($text);
+            return is_array($result) ? $result : [];
         }
         $charset = $this->getEncoding($text);
         return [(object)[
@@ -425,7 +426,8 @@ class Header {
         } elseif (property_exists($structure, 'charset')) {
             return EncodingAliases::get($structure->charset, $this->fallback_encoding);
         } elseif (is_string($structure) === true) {
-            return mb_detect_encoding($structure);
+            $result = mb_detect_encoding($structure);
+            return $result === false ? $this->fallback_encoding : $result;
         }
 
         return $this->fallback_encoding;
