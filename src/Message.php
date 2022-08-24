@@ -55,6 +55,7 @@ use Webklex\PHPIMAP\Traits\HasEvents;
  * @method Attribute getPriority()
  * @method Attribute getSubject()
  * @method Attribute getMessageId()
+ * @method Attribute getMessageNo()
  * @method Attribute getReferences()
  * @method Attribute getDate()
  * @method Attribute getFrom()

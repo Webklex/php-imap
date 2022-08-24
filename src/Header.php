@@ -347,7 +347,7 @@ class Header {
     }
 
     /**
-     * Check if a given pair of strings has ben decoded
+     * Check if a given pair of strings has been decoded
      * @param $encoded
      * @param $decoded
      *

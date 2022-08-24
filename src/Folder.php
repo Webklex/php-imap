@@ -278,7 +278,7 @@ class Folder {
      */
     public function appendMessage(string $message, array $options = null, $internal_date = null): bool {
         /**
-         * Check if $internal_date is parsed. If it is null it should not be set. Otherwise the message can't be stored.
+         * Check if $internal_date is parsed. If it is null it should not be set. Otherwise, the message can't be stored.
          * If this parameter is set, it will set the INTERNALDATE on the appended message. The parameter should be a
          * date string that conforms to the rfc2060 specifications for a date_time value or be a Carbon object.
          */
@@ -377,6 +377,7 @@ class Folder {
 
         while (true) {
             try {
+                // This polymorphic call is fine - Protocol::idle() will throw an exception beforehand
                 $line = $connection->nextLine();
 
                 if (($pos = strpos($line, "EXISTS")) !== false) {

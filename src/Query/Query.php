@@ -711,6 +711,7 @@ class Query {
     }
 
     /**
+     * Get the set fetch limit
      * @return int
      */
     public function getLimit() {

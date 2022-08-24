@@ -202,7 +202,7 @@ class Part {
     }
 
     /**
-     * Find all available headers and return the left over body segment
+     * Find all available headers and return the leftover body segment
      *
      * @return string
      * @throws InvalidMessageDateException

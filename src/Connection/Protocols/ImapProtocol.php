@@ -563,7 +563,7 @@ class ImapProtocol extends Protocol {
      *
      * @return string|array if only one item of one message is fetched it's returned as string
      *                      if items of one message are fetched it's returned as (name => value)
-     *                      if one items of messages are fetched it's returned as (msgno => value)
+     *                      if one item of messages are fetched it's returned as (msgno => value)
      *                      if items of messages are fetched it's returned as (msgno => (name => value))
      * @throws RuntimeException
      */
