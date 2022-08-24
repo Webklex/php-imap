@@ -1069,9 +1069,7 @@ class ImapProtocol extends Protocol {
     public function search(array $params, $uid = IMAP::ST_UID): array {
         $command = $this->buildUIDCommand("SEARCH", $uid);
         $response = $this->requestAndResponse($command, $params);
-        if (!$response) {
-            return $response;
-        }
+        if (!$response) return [];
 
         foreach ($response as $ids) {
             if ($ids[0] == 'SEARCH') {
