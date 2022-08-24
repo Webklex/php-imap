@@ -11,6 +11,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Several statements optimized and redundant check removed
 - Check if the Protocol supports the fetch method if extensions are present
 - Typos fixed
+- Detect `NONEXISTENT` errors while selecting or examining a folder #266
 
 ### Added
 - NaN
