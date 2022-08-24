@@ -105,8 +105,8 @@ class ClientManager {
     public function account(string $name = null): Client {
         $name = $name ?: $this->getDefaultAccount();
 
-        // If the connection has not been resolved yet we will resolve it now as all
-        // of the connections are resolved when they are actually needed so we do
+        // If the connection has not been resolved we will resolve it now as all
+        // the connections are resolved when they are actually needed, so we do
         // not make any unnecessary connection to the various queue end-points.
         if (!isset($this->accounts[$name])) {
             $this->accounts[$name] = $this->resolve($name);
@@ -139,7 +139,7 @@ class ClientManager {
             return ['driver' => 'null'];
         }
 
-        return self::$config["accounts"][$name];
+        return is_array(self::$config["accounts"][$name]) ? self::$config["accounts"][$name] : [];
     }
 
     /**
@@ -187,7 +187,7 @@ class ClientManager {
 
         if(is_array($config)){
             if(isset($config['default'])){
-                if(isset($config['accounts']) && $config['default'] != false){
+                if(isset($config['accounts']) && $config['default']){
 
                     $default_config = $vendor_config['accounts']['default'];
                     if(isset($config['accounts'][$config['default']])){
