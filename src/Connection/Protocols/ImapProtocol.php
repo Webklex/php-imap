@@ -600,7 +600,12 @@ class ImapProtocol extends Protocol {
                 } else if ($tokens[2][0] == 'UID') {
                     $uidKey = 1;
                 } else {
-                    $uidKey = array_search('UID', $tokens[2]) + 1;
+                    $found = array_search('UID', $tokens[2]);
+                    if ($found === false || $found === -1) {
+                        continue;
+                    }
+
+                    $uidKey = $found + 1;
                 }
             }
 
