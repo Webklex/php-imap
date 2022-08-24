@@ -667,7 +667,8 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function content($uids, string $rfc = "RFC822", $uid = IMAP::ST_UID): array {
-        return $this->fetch(["$rfc.TEXT"], $uids, null, $uid);
+        $result = $this->fetch(["$rfc.TEXT"], $uids, null, $uid);
+        return is_array($result) ? $result : [];
     }
 
     /**
@@ -681,7 +682,8 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function headers($uids, string $rfc = "RFC822", $uid = IMAP::ST_UID): array{
-        return $this->fetch(["$rfc.HEADER"], $uids, null, $uid);
+        $result = $this->fetch(["$rfc.HEADER"], $uids, null, $uid);
+        return $result === "" ? [] : $result;
     }
 
     /**
@@ -694,7 +696,8 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function flags($uids, $uid = IMAP::ST_UID): array {
-        return $this->fetch(["FLAGS"], $uids, null, $uid);
+        $result = $this->fetch(["FLAGS"], $uids, null, $uid);
+        return is_array($result) ? $result : [];
     }
 
     /**
@@ -1019,7 +1022,8 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function getQuota($username): array {
-        return $this->requestAndResponse("GETQUOTA", ['"#user/'.$username.'"']);
+        $result = $this->requestAndResponse("GETQUOTA", ['"#user/'.$username.'"']);
+        return is_array($result) ? $result : [];
     }
 
     /**
@@ -1030,7 +1034,8 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function getQuotaRoot(string $quota_root = 'INBOX'): array {
-        return $this->requestAndResponse("QUOTA", [$quota_root]);
+        $result = $this->requestAndResponse("QUOTA", [$quota_root]);
+        return is_array($result) ? $result : [];
     }
 
     /**
