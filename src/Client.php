@@ -655,7 +655,10 @@ class Client {
      * @return array
      */
     public function getDefaultEvents($section): array {
-        return $this->events[$section];
+        if (isset($this->events[$section])) {
+            return is_array($this->events[$section]) ? $this->events[$section] : [];
+        }
+        return [];
     }
 
     /**
