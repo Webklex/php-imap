@@ -7,6 +7,10 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ## [UNRELEASED]
 ### Fixed
 - Type casting added to several ImapProtocol return values #261
+- Remove IMAP::OP_READONLY flag from imap_reopen if POP3 or NNTP protocol is selected #135 (thanks @xianzhe18)
+- Several statements optimized and redundant check removed
+- Check if the Protocol supports the fetch method if extensions are present
+- Typos fixed
 
 ### Added
 - NaN
