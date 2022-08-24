@@ -217,7 +217,7 @@ class Part {
 
         $this->header = new Header($headers);
 
-        return (string) $body;
+        return $body;
     }
 
     /**
