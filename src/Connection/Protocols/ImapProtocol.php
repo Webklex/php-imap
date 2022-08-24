@@ -123,8 +123,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     protected function assumedNextLine(string $start): bool {
-        $line = $this->nextLine();
-        return strpos($line, $start) === 0;
+        return strpos($this->nextLine(), $start) === 0;
     }
 
     /**
