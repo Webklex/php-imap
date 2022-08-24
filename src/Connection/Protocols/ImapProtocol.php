@@ -516,8 +516,8 @@ class ImapProtocol extends Protocol {
                 case '[UIDNEXT':
                     $result['uidnext'] = (int)$tokens[2];
                     break;
-                case '[NONEXISTENT':
-                    throw new RuntimeException("folder doesnt exist");
+                case '[NONEXISTENT]':
+                    throw new RuntimeException("folder doesn't exist");
                 default:
                     // ignore
                     break;
