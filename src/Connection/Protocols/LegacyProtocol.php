@@ -181,7 +181,15 @@ class LegacyProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function selectFolder(string $folder = 'INBOX') {
-        \imap_reopen($this->stream, $folder, IMAP::OP_READONLY, 3);
+        $flags = IMAP::OP_READONLY;
+        if (in_array($this->protocol, ["pop3", "nntp"])) {
+            $flags = IMAP::NIL;
+        }
+        if ($this->stream === false) {
+            throw new RuntimeException("failed to reopen stream.");
+        }
+
+        \imap_reopen($this->stream, $folder, $flags, 3);
         $this->uid_cache = null;
         return $this->examineFolder($folder);
     }
