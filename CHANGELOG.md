@@ -6,27 +6,35 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
+- NaN
+
+### Added
+- NaN
+
+### Affected Classes
+- NaN
+
+### Breaking changes
+- NaN
+
+
+## [4.0.1] - 2022-08-25
+### Fixed
 - Type casting added to several ImapProtocol return values #261
 - Remove IMAP::OP_READONLY flag from imap_reopen if POP3 or NNTP protocol is selected #135 (thanks @xianzhe18)
-- Several statements optimized and redundant check removed
+- Several statements optimized and redundant checks removed
 - Check if the Protocol supports the fetch method if extensions are present
-- Typos fixed
 - Detect `NONEXISTENT` errors while selecting or examining a folder #266
 - Missing type cast added to `PaginatedCollection::paginate` #267 (thanks @rogerb87)
 - Fix multiline header unfolding #250 (thanks @sulgie-eitea)
 - Fix problem with illegal offset error #226 (thanks @szymekjanaczek)
-
-### Added
-- NaN
+- Typos fixed
 
 ### Affected Classes
 - [Query::class](src/Query/Query.php)
 - [ImapProtocol::class](src/Connection/Protocols/ImapProtocol.php)
 - [LegacyProtocol::class](src/Connection/Protocols/LegacyProtocol.php)
 - [PaginatedCollection::class](src/Support/PaginatedCollection.php)
-
-### Breaking changes
-- NaN
 
 
 ## [4.0.0] - 2022-08-19
