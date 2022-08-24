@@ -219,9 +219,9 @@ class Query {
         }
 
         $uids = $available_messages->forPage($this->page, $this->limit)->toArray();
-        $extensions = [];
-        if (empty($this->getExtensions()) === false) {
-            $extensions = $this->client->getConnection()->fetch($this->getExtensions(), $uids, null, $this->sequence);
+        $extensions = $this->getExtensions();
+        if (empty($extensions) === false && method_exists($this->client->getConnection(), "fetch")) {
+            $extensions = $this->client->getConnection()->fetch($extensions, $uids, null, $this->sequence);
         }
         $flags = $this->client->getConnection()->flags($uids, $this->sequence);
         $headers = $this->client->getConnection()->headers($uids, "RFC822", $this->sequence);
