@@ -12,12 +12,16 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Check if the Protocol supports the fetch method if extensions are present
 - Typos fixed
 - Detect `NONEXISTENT` errors while selecting or examining a folder #266
+- Missing type cast added to `PaginatedCollection::paginate` #267 (thanks @rogerb87)
 
 ### Added
 - NaN
 
 ### Affected Classes
+- [Query::class](src/Query/Query.php)
 - [ImapProtocol::class](src/Connection/Protocols/ImapProtocol.php)
+- [LegacyProtocol::class](src/Connection/Protocols/LegacyProtocol.php)
+- [PaginatedCollection::class](src/Support/PaginatedCollection.php)
 
 ### Breaking changes
 - NaN
