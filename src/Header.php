@@ -132,7 +132,7 @@ class Header {
                 $this->attributes[$name]->add($value, true);
             } else {
                 if (isset($this->attributes[$name])) {
-                    if (is_array($this->attributes[$name]) == false) {
+                    if (!is_array($this->attributes[$name])) {
                         $this->attributes[$name] = [$this->attributes[$name], $value];
                     } else {
                         $this->attributes[$name][] = $value;
@@ -141,7 +141,7 @@ class Header {
                     $this->attributes[$name] = $value;
                 }
             }
-        } elseif ($this->attributize == false) {
+        } elseif (!$this->attributize) {
             $this->attributes[$name] = $value;
         } else {
             $this->attributes[$name] = new Attribute($name, $value);
