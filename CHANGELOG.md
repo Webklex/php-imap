@@ -13,6 +13,8 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Typos fixed
 - Detect `NONEXISTENT` errors while selecting or examining a folder #266
 - Missing type cast added to `PaginatedCollection::paginate` #267 (thanks @rogerb87)
+- Fix multiline header unfolding #250 (thanks @sulgie-eitea)
+- Fix problem with illegal offset error #226 (thanks @szymekjanaczek)
 
 ### Added
 - NaN
