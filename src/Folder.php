@@ -433,7 +433,8 @@ class Folder {
      * @throws Exceptions\RuntimeException
      */
     public function examine(): array {
-        return $this->client->getConnection()->examineFolder($this->path);
+        $result = $this->client->getConnection()->examineFolder($this->path);
+        return is_array($result) ? $result : [];
     }
 
     /**
