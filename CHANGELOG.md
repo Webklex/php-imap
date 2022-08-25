@@ -6,7 +6,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
+- RFC 822 3.1.1. long header fields regular expression fixed #268 #269 (thanks @)
 
 ### Added
 - NaN
