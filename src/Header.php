@@ -242,7 +242,7 @@ class Header {
                 $imap_headers[$key] = $values;
             }
         }
-        $lines = explode("\r\n", preg_replace("/\r\n\s*/", ' ', $raw_headers));
+        $lines = explode("\r\n", preg_replace("/\r\n\s/", ' ', $raw_headers));
         $prev_header = null;
         foreach ($lines as $line) {
             if (substr($line, 0, 1) === "\n") {
