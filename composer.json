@@ -25,6 +25,7 @@
         "ext-mbstring": "*",
         "ext-iconv": "*",
         "ext-fileinfo": "*",
+        "ext-imap": "*",
         "nesbot/carbon": ">=1.0",
         "symfony/http-foundation": ">=2.8.0",
         "illuminate/pagination": ">=5.0.0"

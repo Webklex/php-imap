@@ -16,6 +16,8 @@ use ErrorException;
 use Webklex\PHPIMAP\Client;
 use Webklex\PHPIMAP\Exceptions\AuthFailedException;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
+use Webklex\PHPIMAP\Exceptions\ImapBadRequestException;
+use Webklex\PHPIMAP\Exceptions\ImapServerErrorException;
 use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
 use Webklex\PHPIMAP\Exceptions\MessageNotFoundException;
 use Webklex\PHPIMAP\Exceptions\RuntimeException;
@@ -30,6 +32,10 @@ interface ProtocolInterface {
 
     /**
      * Public destructor
+     *
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
      */
     public function __destruct();
 
@@ -49,10 +55,14 @@ interface ProtocolInterface {
      *
      * @param string $user username
      * @param string $password password
-     * @return bool success
+     *
+     * @return array success
+     *
      * @throws AuthFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
      */
-    public function login(string $user, string $password): bool;
+    public function login(string $user, string $password): array;
 
     /**
      * Authenticate your current session.
@@ -67,9 +77,13 @@ interface ProtocolInterface {
     /**
      * Logout of the current server session
      *
-     * @return bool success
+     * @return array success
+     *
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
      */
-    public function logout(): bool;
+    public function logout(): array;
 
     /**
      * Check if the current session is connected
@@ -191,10 +205,10 @@ interface ProtocolInterface {
      * @param array|null $flags flags for new message
      * @param string|null $date date for new message
      *
-     * @return bool success
+     * @return array success
      * @throws RuntimeException
      */
-    public function appendMessage(string $folder, string $message, $flags = null, $date = null): bool;
+    public function appendMessage(string $folder, string $message, $flags = null, $date = null): array;
 
     /**
      * Copy message set from current folder to other folder
@@ -206,10 +220,10 @@ interface ProtocolInterface {
      * @param int|string $uid set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
      * message numbers instead.
      *
-     * @return bool success
+     * @return array success
      * @throws RuntimeException
      */
-    public function copyMessage(string $folder, $from, $to = null, $uid = IMAP::ST_UID): bool;
+    public function copyMessage(string $folder, $from, $to = null, $uid = IMAP::ST_UID): array;
 
     /**
      * Copy multiple messages to the target folder
@@ -218,10 +232,10 @@ interface ProtocolInterface {
      * @param int|string $uid set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
      * message numbers instead.
      *
-     * @return array|bool Tokens if operation successful, false if an error occurred
+     * @return array Tokens if operation successful, false if an error occurred
      * @throws RuntimeException
      */
-    public function copyManyMessages(array $messages, string $folder, $uid = IMAP::ST_UID);
+    public function copyManyMessages(array $messages, string $folder, $uid = IMAP::ST_UID): array;
 
     /**
      * Move a message set from current folder to another folder
@@ -232,9 +246,9 @@ interface ProtocolInterface {
      * @param int|string $uid set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
      * message numbers instead.
      *
-     * @return bool success
+     * @return array success
      */
-    public function moveMessage(string $folder, $from, $to = null, $uid = IMAP::ST_UID): bool;
+    public function moveMessage(string $folder, $from, $to = null, $uid = IMAP::ST_UID): array;
 
     /**
      * Move multiple messages to the target folder
@@ -244,10 +258,10 @@ interface ProtocolInterface {
      * @param int|string $uid set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
      * message numbers instead.
      *
-     * @return array|bool Tokens if operation successful, false if an error occurred
+     * @return array Tokens if operation successful, false if an error occurred
      * @throws RuntimeException
      */
-    public function moveManyMessages(array $messages, string $folder, $uid = IMAP::ST_UID);
+    public function moveManyMessages(array $messages, string $folder, $uid = IMAP::ST_UID): array;
 
     /**
      * Exchange identification information
@@ -264,47 +278,56 @@ interface ProtocolInterface {
      * Create a new folder
      *
      * @param string $folder folder name
-     * @return bool success
+     * @return array success
      * @throws RuntimeException
      */
-    public function createFolder(string $folder): bool;
+    public function createFolder(string $folder): array;
 
     /**
      * Rename an existing folder
      *
      * @param string $old old name
      * @param string $new new name
-     * @return bool success
+     * @return array success
      * @throws RuntimeException
      */
-    public function renameFolder(string $old, string $new): bool;
+    public function renameFolder(string $old, string $new): array;
 
     /**
      * Delete a folder
      *
      * @param string $folder folder name
-     * @return bool success
+     * @return array success
+     *
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
      * @throws RuntimeException
      */
-    public function deleteFolder(string $folder): bool;
+    public function deleteFolder(string $folder): array;
 
     /**
      * Subscribe to a folder
      *
      * @param string $folder folder name
-     * @return bool success
+     * @return array success
+     *
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
      * @throws RuntimeException
      */
-    public function subscribeFolder(string $folder): bool;
+    public function subscribeFolder(string $folder): array;
 
     /**
      * Unsubscribe from a folder
-     * @param string $folder folder name
      *
-     * @return bool success
+     * @param string $folder folder name
+     * @return array success
+     *
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
      * @throws RuntimeException
      */
-    public function unsubscribeFolder(string $folder): bool;
+    public function unsubscribeFolder(string $folder): array;
 
     /**
      * Send idle command
@@ -322,10 +345,13 @@ interface ProtocolInterface {
     /**
      * Apply session saved changes to the server
      *
-     * @return bool success
+     * @return array success
+     *
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
      * @throws RuntimeException
      */
-    public function expunge(): bool;
+    public function expunge(): array;
 
     /**
      * Retrieve the quota level settings, and usage statics per mailbox
@@ -349,10 +375,13 @@ interface ProtocolInterface {
     /**
      * Send noop command
      *
-     * @return bool success
+     * @return array success
+     *
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
      * @throws RuntimeException
      */
-    public function noop(): bool;
+    public function noop(): array;
 
     /**
      * Do a search request
