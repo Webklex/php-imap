@@ -1372,7 +1372,6 @@ class Message {
      */
     public function setUid(int $uid): Message {
         $this->uid = $uid;
-        $this->msgn = $this->client->getConnection()->getMessageNumber($this->uid);
         $this->msglist = null;
 
         return $this;
