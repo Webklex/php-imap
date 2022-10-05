@@ -170,12 +170,7 @@ class Attribute implements ArrayAccess {
      * @return bool
      */
     public function contains($value): bool {
-        foreach ($this->values as $v) {
-            if ($v === $value) {
-                return true;
-            }
-        }
-        return false;
+        return in_array($value, $this->values, true);
     }
 
     /**

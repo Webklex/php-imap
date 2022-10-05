@@ -120,10 +120,8 @@ class Query {
      * @return string
      */
     protected function parse_value($value): string {
-        switch (true) {
-            case $value instanceof Carbon:
-                $value = $value->format($this->date_format);
-                break;
+        if ($value instanceof Carbon) {
+            $value = $value->format($this->date_format);
         }
 
         return (string)$value;
@@ -189,7 +187,7 @@ class Query {
 
         try {
             $available_messages = $this->client->getConnection()->search([$this->getRawQuery()], $this->sequence);
-            return $available_messages !== false ? new Collection($available_messages) : new Collection();
+            return new Collection($available_messages);
         } catch (RuntimeException $e) {
             throw new GetMessagesFailedException("failed to fetch messages", 0, $e);
         } catch (ConnectionFailedException $e) {
@@ -221,9 +219,9 @@ class Query {
         }
 
         $uids = $available_messages->forPage($this->page, $this->limit)->toArray();
-        $extensions = [];
-        if (empty($this->getExtensions()) === false) {
-            $extensions = $this->client->getConnection()->fetch($this->getExtensions(), $uids, null, $this->sequence);
+        $extensions = $this->getExtensions();
+        if (empty($extensions) === false && method_exists($this->client->getConnection(), "fetch")) {
+            $extensions = $this->client->getConnection()->fetch($extensions, $uids, null, $this->sequence);
         }
         $flags = $this->client->getConnection()->flags($uids, $this->sequence);
         $headers = $this->client->getConnection()->headers($uids, "RFC822", $this->sequence);
@@ -713,6 +711,7 @@ class Query {
     }
 
     /**
+     * Get the set fetch limit
      * @return int
      */
     public function getLimit() {

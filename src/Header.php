@@ -132,7 +132,7 @@ class Header {
                 $this->attributes[$name]->add($value, true);
             } else {
                 if (isset($this->attributes[$name])) {
-                    if (is_array($this->attributes[$name]) == false) {
+                    if (!is_array($this->attributes[$name])) {
                         $this->attributes[$name] = [$this->attributes[$name], $value];
                     } else {
                         $this->attributes[$name][] = $value;
@@ -141,7 +141,7 @@ class Header {
                     $this->attributes[$name] = $value;
                 }
             }
-        } elseif ($this->attributize == false) {
+        } elseif (!$this->attributize) {
             $this->attributes[$name] = $value;
         } else {
             $this->attributes[$name] = new Attribute($name, $value);
@@ -242,7 +242,7 @@ class Header {
                 $imap_headers[$key] = $values;
             }
         }
-        $lines = explode("\r\n", str_replace("\r\n\t", ' ', $raw_headers));
+        $lines = explode("\r\n", preg_replace("/\r\n\s/", ' ', $raw_headers));
         $prev_header = null;
         foreach ($lines as $line) {
             if (substr($line, 0, 1) === "\n") {
@@ -336,7 +336,8 @@ class Header {
      */
     public function mime_header_decode(string $text): array {
         if (extension_loaded('imap')) {
-            return \imap_mime_header_decode($text);
+            $result = \imap_mime_header_decode($text);
+            return is_array($result) ? $result : [];
         }
         $charset = $this->getEncoding($text);
         return [(object)[
@@ -346,7 +347,7 @@ class Header {
     }
 
     /**
-     * Check if a given pair of strings has ben decoded
+     * Check if a given pair of strings has been decoded
      * @param $encoded
      * @param $decoded
      *
@@ -425,7 +426,8 @@ class Header {
         } elseif (property_exists($structure, 'charset')) {
             return EncodingAliases::get($structure->charset, $this->fallback_encoding);
         } elseif (is_string($structure) === true) {
-            return mb_detect_encoding($structure);
+            $result = mb_detect_encoding($structure);
+            return $result === false ? $this->fallback_encoding : $result;
         }
 
         return $this->fallback_encoding;
@@ -713,9 +715,15 @@ class Header {
 
             $date = trim(rtrim($date));
             try {
+                if(strpos($date, '&nbsp;') !== false){
+                    $date = str_replace('&nbsp;', ' ', $date);
+                }
                 $parsed_date = Carbon::parse($date);
             } catch (\Exception $e) {
                 switch (true) {
+                    case preg_match('/([0-9]{4}\.[0-9]{1,2}\.[0-9]{1,2}\-[0-9]{1,2}\.[0-9]{1,2}.[0-9]{1,2})+$/i', $date) > 0:
+                        $date = Carbon::createFromFormat("Y.m.d-H.i.s", $date);
+                        break;
                     case preg_match('/([0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ UT)+$/i', $date) > 0:
                     case preg_match('/([A-Z]{2,3}\,\ [0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ UT)+$/i', $date) > 0:
                         $date .= 'C';

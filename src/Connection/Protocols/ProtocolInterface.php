@@ -90,7 +90,7 @@ interface ProtocolInterface {
      * Change the current folder
      *
      * @param string $folder change to this folder
-     * @return bool|array see examineOrselect()
+     * @return bool|array see examineOrSelect()
      * @throws RuntimeException
      */
     public function selectFolder(string $folder = 'INBOX');
@@ -224,7 +224,7 @@ interface ProtocolInterface {
     public function copyManyMessages(array $messages, string $folder, $uid = IMAP::ST_UID);
 
     /**
-     * Move a message set from current folder to an other folder
+     * Move a message set from current folder to another folder
      * @param string $folder destination folder
      * @param $from
      * @param int|null $to if null only one message ($from) is fetched, else it's the

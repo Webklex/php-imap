@@ -55,10 +55,10 @@ trait HasEvents {
      * @param $section
      * @param $event
      *
-     * @return Event
+     * @return Event|string
      * @throws EventNotFoundException
      */
-    public function getEvent($section, $event): Event {
+    public function getEvent($section, $event) {
         if (isset($this->events[$section])) {
             return $this->events[$section][$event];
         }

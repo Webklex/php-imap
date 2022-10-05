@@ -6,8 +6,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- PHP dependency updated to support php v8.0 #212 #214 (thanks @freescout-helpdesk)
-- Method return and argument types added
+- NaN
 
 ### Added
 - NaN
@@ -16,7 +15,57 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - NaN
 
 ### Breaking changes
-- No longer supports php >=5.5.9 but instead requires at least php v7.0.0
+- NaN
+
+
+## [4.0.2] - 2022-08-26
+### Fixed
+- RFC 822 3.1.1. long header fields regular expression fixed #268 #269 (thanks @hbraehne)
+
+
+## [4.0.1] - 2022-08-25
+### Fixed
+- Type casting added to several ImapProtocol return values #261
+- Remove IMAP::OP_READONLY flag from imap_reopen if POP3 or NNTP protocol is selected #135 (thanks @xianzhe18)
+- Several statements optimized and redundant checks removed
+- Check if the Protocol supports the fetch method if extensions are present
+- Detect `NONEXISTENT` errors while selecting or examining a folder #266
+- Missing type cast added to `PaginatedCollection::paginate` #267 (thanks @rogerb87)
+- Fix multiline header unfolding #250 (thanks @sulgie-eitea)
+- Fix problem with illegal offset error #226 (thanks @szymekjanaczek)
+- Typos fixed
+
+### Affected Classes
+- [Query::class](src/Query/Query.php)
+- [ImapProtocol::class](src/Connection/Protocols/ImapProtocol.php)
+- [LegacyProtocol::class](src/Connection/Protocols/LegacyProtocol.php)
+- [PaginatedCollection::class](src/Support/PaginatedCollection.php)
+
+
+## [4.0.0] - 2022-08-19
+### Fixed
+- PHP dependency updated to support php v8.0 #212 #214 (thanks @freescout-helpdesk)
+- Method return and argument types added
+- Imap `DONE` method refactored
+- UID cache loop fixed
+- `HasEvent::getEvent` return value set to mixed to allow multiple event types
+- Protocol line reader changed to `fread` (stream_context timeout issue fixed)
+- Issue setting the client timeout fixed
+- IMAP Connection debugging improved
+- `Folder::idle()` method reworked and several issues fixed #170 #229 #237 #249 #258
+- Datetime conversion rules extended #189 #173
+
+### Affected Classes
+- [Client::class](src/Client.php)
+- [Folder::class](src/Folder.php)
+- [ImapProtocol::class](src/Connection/Protocols/ImapProtocol.php)
+- [HasEvents::class](src/Traits/HasEvents.php)
+
+### Breaking changes
+- No longer supports php >=5.5.9 but instead requires at least php v7.0.0.
+- `HasEvent::getEvent` returns a mixed result. Either an `Event` or a class string representing the event class.
+- The error message, if the connection fails to read the next line, is now `empty response` instead of `failed to read - connection closed?`.
+- The `$auto_reconnect` used with `Folder::indle()` is deprecated and doesn't serve any purpose anymore.
 
 
 ## [3.2.0] - 2022-03-07

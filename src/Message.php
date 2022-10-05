@@ -55,6 +55,7 @@ use Webklex\PHPIMAP\Traits\HasEvents;
  * @method Attribute getPriority()
  * @method Attribute getSubject()
  * @method Attribute getMessageId()
+ * @method Attribute getMessageNo()
  * @method Attribute getReferences()
  * @method Attribute getDate()
  * @method Attribute getFrom()
@@ -1028,7 +1029,7 @@ class Message {
         $event = $this->getEvent("flag", "new");
         $event::dispatch($this, $flag);
 
-        return $status;
+        return (bool)$status;
     }
 
     /**
@@ -1056,7 +1057,7 @@ class Message {
         $event = $this->getEvent("flag", "deleted");
         $event::dispatch($this, $flag);
 
-        return $status;
+        return (bool)$status;
     }
 
     /**

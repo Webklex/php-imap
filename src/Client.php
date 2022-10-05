@@ -317,7 +317,7 @@ class Client {
     }
 
     /**
-     * Force a reconnect
+     * Force the connection to reconnect
      *
      * @throws ConnectionFailedException
      */
@@ -620,8 +620,12 @@ class Client {
      * @throws ConnectionFailedException
      */
     public function setTimeout(int $timeout): Protocol {
-        $this->checkConnection();
-        return $this->connection->setConnectionTimeout($timeout);
+        $this->timeout = $timeout;
+        if ($this->isConnected()) {
+            $this->connection->setConnectionTimeout($timeout);
+            $this->reconnect();
+        }
+        return $this->connection;
     }
 
     /**
@@ -651,7 +655,10 @@ class Client {
      * @return array
      */
     public function getDefaultEvents($section): array {
-        return $this->events[$section];
+        if (isset($this->events[$section])) {
+            return is_array($this->events[$section]) ? $this->events[$section] : [];
+        }
+        return [];
     }
 
     /**

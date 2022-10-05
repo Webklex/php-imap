@@ -202,7 +202,7 @@ class Part {
     }
 
     /**
-     * Find all available headers and return the left over body segment
+     * Find all available headers and return the leftover body segment
      *
      * @return string
      * @throws InvalidMessageDateException
@@ -217,7 +217,7 @@ class Part {
 
         $this->header = new Header($headers);
 
-        return (string) $body;
+        return $body;
     }
 
     /**
