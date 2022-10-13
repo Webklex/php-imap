@@ -22,7 +22,6 @@ use Webklex\PHPIMAP\Exceptions\MessageNotFoundException;
 use Webklex\PHPIMAP\Exceptions\RuntimeException;
 use Webklex\PHPIMAP\Header;
 use Webklex\PHPIMAP\IMAP;
-use function imap_last_error;
 
 /**
  * Class ImapProtocol
@@ -293,10 +292,10 @@ class ImapProtocol extends Protocol {
         if ($tokens[0] == 'OK') {
             return $lines ?: [true];
         } elseif ($tokens[0] == 'NO') {
-            throw new ImapServerErrorException(imap_last_error() ?? '');
+            throw new ImapServerErrorException();
         }
 
-        throw new ImapBadRequestException(imap_last_error() ?? '');
+        throw new ImapBadRequestException();
     }
 
     /**
