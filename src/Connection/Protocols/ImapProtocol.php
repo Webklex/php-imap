@@ -508,13 +508,16 @@ class ImapProtocol extends Protocol {
             switch ($tokens[1]) {
                 case 'EXISTS':
                 case 'RECENT':
-                    $result[strtolower($tokens[1])] = $tokens[0];
+                    $result[strtolower($tokens[1])] = (int)$tokens[0];
                     break;
                 case '[UIDVALIDITY':
                     $result['uidvalidity'] = (int)$tokens[2];
                     break;
                 case '[UIDNEXT':
                     $result['uidnext'] = (int)$tokens[2];
+                    break;
+                case '[UNSEEN':
+                    $result['unseen'] = (int)$tokens[2];
                     break;
                 case '[NONEXISTENT]':
                     throw new RuntimeException("folder doesn't exist");
