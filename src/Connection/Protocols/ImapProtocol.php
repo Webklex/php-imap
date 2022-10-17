@@ -616,7 +616,6 @@ class ImapProtocol extends Protocol {
             if ($to === null && !is_array($from) && ($uid ? $tokens[2][$uidKey] != $from : $tokens[0] != $from)) {
                 continue;
             }
-            $data = "";
 
             // if we only want one item we return that one directly
             if (count($items) == 1) {
@@ -625,6 +624,7 @@ class ImapProtocol extends Protocol {
                 } elseif ($uid && $tokens[2][2] == $items[0]) {
                     $data = $tokens[2][3];
                 } else {
+                    $expectedResponse = 0;
                     // maybe the server send an other field we didn't wanted
                     $count = count($tokens[2]);
                     // we start with 2, because 0 was already checked
@@ -633,7 +633,11 @@ class ImapProtocol extends Protocol {
                             continue;
                         }
                         $data = $tokens[2][$i + 1];
+                        $expectedResponse = 1;
                         break;
+                    }
+                    if (!$expectedResponse) {
+                        continue;
                     }
                 }
             } else {
