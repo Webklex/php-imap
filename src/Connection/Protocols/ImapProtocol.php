@@ -150,7 +150,7 @@ class ImapProtocol extends Protocol {
      */
     protected function assumedNextTaggedLine(string $start, &$tag): bool {
         $line = $this->nextTaggedLine($tag);
-        return strpos($line, $start) >= 0;
+        return strpos($line, $start) !== false;
     }
 
     /**
