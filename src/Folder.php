@@ -15,6 +15,7 @@ namespace Webklex\PHPIMAP;
 use Carbon\Carbon;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
 use Webklex\PHPIMAP\Exceptions\NotSupportedCapabilityException;
+use Webklex\PHPIMAP\Exceptions\RuntimeException;
 use Webklex\PHPIMAP\Query\WhereQuery;
 use Webklex\PHPIMAP\Support\FolderCollection;
 use Webklex\PHPIMAP\Traits\HasEvents;
@@ -107,6 +108,9 @@ class Folder {
      * @var boolean
      */
     public $referral;
+
+    /** @var array */
+    public $status;
 
     /**
      * Folder constructor.
@@ -424,6 +428,16 @@ class Folder {
      */
     public function getStatus(): array {
         return $this->examine();
+    }
+
+    /**
+     * @throws RuntimeException
+     * @throws ConnectionFailedException
+     */
+    public function loadStatus(): Folder
+    {
+        $this->status = $this->getStatus();
+        return $this;
     }
 
     /**
