@@ -189,7 +189,7 @@ class LegacyProtocol extends Protocol {
             throw new RuntimeException("failed to reopen stream.");
         }
 
-        \imap_reopen($this->stream, $folder, $flags, 3);
+        \imap_reopen($this->stream, $this->getAddress().$folder, $flags, 3);
         $this->uid_cache = null;
         return $this->examineFolder($folder);
     }
