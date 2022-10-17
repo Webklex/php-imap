@@ -22,7 +22,7 @@ Official documentation: [php-imap.com](https://www.php-imap.com/)
 
 Laravel wrapper: [webklex/laravel-imap](https://github.com/Webklex/laravel-imap)
 
-Discord: [discord.gg/jCcZWCSq][link-discord]
+Discord: [discord.gg/rd4cN9h6][link-discord]
 
 ## Table of Contents
 - [Documentations](#documentations)
@@ -118,7 +118,7 @@ echo 'your php code...';
 ## Features & pull requests
 Everyone can contribute to this project. Every pull request will be considered but it can also happen to be declined.  
 To prevent unnecessary work, please consider to create a [feature issue](https://github.com/Webklex/php-imap/issues/new?template=feature_request.md)  
-first, if you're planning to do bigger changes. Of course you can also create a new [feature issue](https://github.com/Webklex/php-imap/issues/new?template=feature_request.md)
+first, if you're planning to do bigger changes. Of course, you can also create a new [feature issue](https://github.com/Webklex/php-imap/issues/new?template=feature_request.md)
 if you're just wishing a feature ;)
 
 
@@ -164,4 +164,4 @@ The MIT License (MIT). Please see [License File][link-license] for more informat
 [link-jetbrains]: https://www.jetbrains.com
 [link-hits]: https://hits.webklex.com
 [link-snyk]: https://snyk.io/vuln/composer:webklex%2Fphp-imap
-[link-discord]: https://discord.gg/jCcZWCSq
+[link-discord]: https://discord.gg/rd4cN9h6
