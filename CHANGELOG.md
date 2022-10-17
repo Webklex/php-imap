@@ -6,10 +6,13 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
+- Fix assumedNextTaggedLine bug #288 (thanks @Blear)
+- Fix empty response error for blank lines #274 (thanks @bierpub)
+- Fix empty body #233 (thanks @latypoff)
+- Fix imap_reopen folder argument #234 (thanks @latypoff)
 
 ### Added
-- NaN
+- Added possibility of loading a Folder status #298 (thanks @szymekjanaczek)
 
 ### Affected Classes
 - NaN
