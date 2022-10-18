@@ -6,6 +6,17 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
+- NaN
+
+### Added
+- NaN
+
+### Breaking changes
+- NaN
+
+
+## [4.1.0] - 2022-10-18
+### Fixed
 - Fix assumedNextTaggedLine bug #288 (thanks @Blear)
 - Fix empty response error for blank lines #274 (thanks @bierpub)
 - Fix empty body #233 (thanks @latypoff)
@@ -13,12 +24,6 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Added
 - Added possibility of loading a Folder status #298 (thanks @szymekjanaczek)
-
-### Affected Classes
-- NaN
-
-### Breaking changes
-- NaN
 
 
 ## [4.0.2] - 2022-08-26
