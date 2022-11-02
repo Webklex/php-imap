@@ -11,11 +11,19 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Added
 - NaN
 
-### Affected Classes
-- NaN
-
 ### Breaking changes
 - NaN
+
+
+## [4.1.0] - 2022-10-18
+### Fixed
+- Fix assumedNextTaggedLine bug #288 (thanks @Blear)
+- Fix empty response error for blank lines #274 (thanks @bierpub)
+- Fix empty body #233 (thanks @latypoff)
+- Fix imap_reopen folder argument #234 (thanks @latypoff)
+
+### Added
+- Added possibility of loading a Folder status #298 (thanks @szymekjanaczek)
 
 
 ## [4.0.2] - 2022-08-26
