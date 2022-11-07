@@ -570,7 +570,7 @@ class Client {
 
         if($expunge) $this->expunge();
 
-        $folder = $this->getFolder($folder);
+        $folder = $this->getFolderByPath($folder);
         if($status && $folder) {
             $event = $this->getEvent("folder", "new");
             $event::dispatch($folder);
