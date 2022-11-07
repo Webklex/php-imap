@@ -137,7 +137,7 @@ class ImapProtocol extends Protocol {
         $line = $this->nextLine();
         list($tag, $line) = explode(' ', $line, 2);
 
-        return $line;
+        return $line ?? '';
     }
 
     /**
