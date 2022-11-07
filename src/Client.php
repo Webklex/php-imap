@@ -411,7 +411,7 @@ class Client {
      * @param string $folder_name
      * @param string|bool|null $delimiter
      *
-     * @return mixed
+     * @return Folder|null
      * @throws ConnectionFailedException
      * @throws FolderFetchingException
      * @throws Exceptions\RuntimeException
@@ -434,7 +434,7 @@ class Client {
      * Get a folder instance by a folder name
      * @param $folder_name
      *
-     * @return mixed
+     * @return Folder|null
      * @throws ConnectionFailedException
      * @throws FolderFetchingException
      * @throws Exceptions\RuntimeException
@@ -447,7 +447,7 @@ class Client {
      * Get a folder instance by a folder path
      * @param $folder_path
      *
-     * @return mixed
+     * @return Folder|null
      * @throws ConnectionFailedException
      * @throws FolderFetchingException
      * @throws Exceptions\RuntimeException
