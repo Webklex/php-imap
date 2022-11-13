@@ -13,7 +13,6 @@
 namespace Webklex\PHPIMAP;
 
 use Illuminate\Support\Str;
-use Symfony\Component\Mime\MimeTypes;
 use Webklex\PHPIMAP\Exceptions\MaskNotFoundException;
 use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
 use Webklex\PHPIMAP\Support\Masks\AttachmentMask;
@@ -279,8 +278,20 @@ class Attachment {
      * @return string|null
      */
     public function getExtension(){
-        $extensions = MimeTypes::getDefault()->getExtensions($this->getMimeType());
-        return $extensions[0] ?? null;
+        $guesser = "\Symfony\Component\Mime\MimeTypes";
+        if (class_exists($guesser) !== false) {
+            /** @var Symfony\Component\Mime\MimeTypes $guesser */
+            $extensions = $guesser::getDefault()->getExtensions($this->getMimeType());
+            return $extensions[0] ?? null;
+        }
+
+        $deprecated_guesser = "\Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser";
+        if (class_exists($deprecated_guesser) !== false){
+            /** @var \Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser $deprecated_guesser */
+            return $deprecated_guesser::getInstance()->guess($this->getMimeType());
+        }
+
+        return null;
     }
 
     /**
