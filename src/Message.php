@@ -1367,12 +1367,9 @@ class Message {
      * @param int $uid
      *
      * @return $this
-     * @throws Exceptions\MessageNotFoundException
-     * @throws Exceptions\ConnectionFailedException
      */
     public function setUid(int $uid): Message {
         $this->uid = $uid;
-        $this->msgn = $this->client->getConnection()->getMessageNumber($this->uid);
         $this->msglist = null;
 
         return $this;
