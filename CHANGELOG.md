@@ -6,7 +6,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
+- Fix for extension recognition #325 (thanks @pwoszczyk)
 
 ### Added
 - NaN
