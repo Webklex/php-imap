@@ -11,6 +11,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Leading white-space in response causes an infinite loop #321 (thanks @thin-k-design)
 - Fix error when creating folders with special chars #319 (thanks @thin-k-design)
 - `Client::getFoldersWithStatus()` recursive loading fixed #312 (thanks @szymekjanaczek)
+- Fix Folder name encoding error in `Folder::appendMessage()` #306 #307 (thanks @@rskrzypczak)
 
 ### Added
 - NaN
