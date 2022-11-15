@@ -7,6 +7,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ## [UNRELEASED]
 ### Fixed
 - Fix for extension recognition #325 (thanks @pwoszczyk)
+- Missing null check added #327 (thanks @spanjeta)
 
 ### Added
 - NaN
