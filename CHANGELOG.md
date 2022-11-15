@@ -8,6 +8,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Fixed
 - Fix for extension recognition #325 (thanks @pwoszczyk)
 - Missing null check added #327 (thanks @spanjeta)
+- Leading white-space in response causes an infinite loop #321 (thanks @thin-k-design)
 
 ### Added
 - NaN
