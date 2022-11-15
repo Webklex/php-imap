@@ -10,6 +10,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Missing null check added #327 (thanks @spanjeta)
 - Leading white-space in response causes an infinite loop #321 (thanks @thin-k-design)
 - Fix error when creating folders with special chars #319 (thanks @thin-k-design)
+- `Client::getFoldersWithStatus()` recursive loading fixed #312 (thanks @szymekjanaczek)
 
 ### Added
 - NaN
