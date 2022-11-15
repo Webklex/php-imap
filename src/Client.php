@@ -521,7 +521,7 @@ class Client {
                 if ($hierarchical && $folder->hasChildren()) {
                     $pattern = $folder->full_name.$folder->delimiter.'%';
 
-                    $children = $this->getFolders(true, $pattern);
+                    $children = $this->getFoldersWithStatus(true, $pattern);
                     $folder->setChildren($children);
                 }
 
