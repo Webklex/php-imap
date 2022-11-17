@@ -108,7 +108,7 @@ class ImapProtocol extends Protocol {
         while (($next_char = fread($this->stream, 1)) !== false && $next_char !== "\n") {
             $line .= $next_char;
         }
-        if ($line === "") {
+        if ($line === "" && $next_char === false) {
             throw new RuntimeException('empty response');
         }
         if ($this->debug) echo "<< ".$line."\n";
@@ -150,7 +150,7 @@ class ImapProtocol extends Protocol {
      */
     protected function assumedNextTaggedLine(string $start, &$tag): bool {
         $line = $this->nextTaggedLine($tag);
-        return strpos($line, $start) >= 0;
+        return strpos($line, $start) !== false;
     }
 
     /**
@@ -169,6 +169,7 @@ class ImapProtocol extends Protocol {
         while (($pos = strpos($line, ' ')) !== false) {
             $token = substr($line, 0, $pos);
             if (!strlen($token)) {
+                $line = substr($line, $pos + 1);
                 continue;
             }
             while ($token[0] == '(') {
@@ -508,13 +509,16 @@ class ImapProtocol extends Protocol {
             switch ($tokens[1]) {
                 case 'EXISTS':
                 case 'RECENT':
-                    $result[strtolower($tokens[1])] = $tokens[0];
+                    $result[strtolower($tokens[1])] = (int)$tokens[0];
                     break;
                 case '[UIDVALIDITY':
                     $result['uidvalidity'] = (int)$tokens[2];
                     break;
                 case '[UIDNEXT':
                     $result['uidnext'] = (int)$tokens[2];
+                    break;
+                case '[UNSEEN':
+                    $result['unseen'] = (int)$tokens[2];
                     break;
                 case '[NONEXISTENT]':
                     throw new RuntimeException("folder doesn't exist");
@@ -613,7 +617,6 @@ class ImapProtocol extends Protocol {
             if ($to === null && !is_array($from) && ($uid ? $tokens[2][$uidKey] != $from : $tokens[0] != $from)) {
                 continue;
             }
-            $data = "";
 
             // if we only want one item we return that one directly
             if (count($items) == 1) {
@@ -622,6 +625,7 @@ class ImapProtocol extends Protocol {
                 } elseif ($uid && $tokens[2][2] == $items[0]) {
                     $data = $tokens[2][3];
                 } else {
+                    $expectedResponse = 0;
                     // maybe the server send an other field we didn't wanted
                     $count = count($tokens[2]);
                     // we start with 2, because 0 was already checked
@@ -630,7 +634,11 @@ class ImapProtocol extends Protocol {
                             continue;
                         }
                         $data = $tokens[2][$i + 1];
+                        $expectedResponse = 1;
                         break;
+                    }
+                    if (!$expectedResponse) {
+                        continue;
                     }
                 }
             } else {

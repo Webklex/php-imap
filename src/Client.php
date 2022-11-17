@@ -411,7 +411,7 @@ class Client {
      * @param string $folder_name
      * @param string|bool|null $delimiter
      *
-     * @return mixed
+     * @return Folder|null
      * @throws ConnectionFailedException
      * @throws FolderFetchingException
      * @throws Exceptions\RuntimeException
@@ -434,7 +434,7 @@ class Client {
      * Get a folder instance by a folder name
      * @param $folder_name
      *
-     * @return mixed
+     * @return Folder|null
      * @throws ConnectionFailedException
      * @throws FolderFetchingException
      * @throws Exceptions\RuntimeException
@@ -447,7 +447,7 @@ class Client {
      * Get a folder instance by a folder path
      * @param $folder_path
      *
-     * @return mixed
+     * @return Folder|null
      * @throws ConnectionFailedException
      * @throws FolderFetchingException
      * @throws Exceptions\RuntimeException
@@ -496,6 +496,46 @@ class Client {
     }
 
     /**
+     * Get folders list.
+     * If hierarchical order is set to true, it will make a tree of folders, otherwise it will return flat array.
+     *
+     * @param boolean $hierarchical
+     * @param string|null $parent_folder
+     *
+     * @return FolderCollection
+     * @throws ConnectionFailedException
+     * @throws FolderFetchingException
+     * @throws Exceptions\RuntimeException
+     */
+    public function getFoldersWithStatus(bool $hierarchical = true, string $parent_folder = null): FolderCollection {
+        $this->checkConnection();
+        $folders = FolderCollection::make([]);
+
+        $pattern = $parent_folder.($hierarchical ? '%' : '*');
+        $items = $this->connection->folders('', $pattern);
+
+        if(is_array($items)){
+            foreach ($items as $folder_name => $item) {
+                $folder = new Folder($this, $folder_name, $item["delimiter"], $item["flags"]);
+
+                if ($hierarchical && $folder->hasChildren()) {
+                    $pattern = $folder->full_name.$folder->delimiter.'%';
+
+                    $children = $this->getFoldersWithStatus(true, $pattern);
+                    $folder->setChildren($children);
+                }
+
+                $folder->loadStatus();
+                $folders->push($folder);
+            }
+
+            return $folders;
+        }else{
+            throw new FolderFetchingException("failed to fetch any folders");
+        }
+    }
+
+    /**
      * Open a given folder.
      * @param string $folder_path
      * @param boolean $force_select
@@ -530,7 +570,7 @@ class Client {
 
         if($expunge) $this->expunge();
 
-        $folder = $this->getFolder($folder);
+        $folder = $this->getFolderByPath($folder);
         if($status && $folder) {
             $event = $this->getEvent("folder", "new");
             $event::dispatch($folder);

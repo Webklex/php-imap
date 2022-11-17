@@ -278,15 +278,20 @@ class Attachment {
      * @return string|null
      */
     public function getExtension(){
+        $guesser = "\Symfony\Component\Mime\MimeTypes";
+        if (class_exists($guesser) !== false) {
+            /** @var Symfony\Component\Mime\MimeTypes $guesser */
+            $extensions = $guesser::getDefault()->getExtensions($this->getMimeType());
+            return $extensions[0] ?? null;
+        }
+
         $deprecated_guesser = "\Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser";
         if (class_exists($deprecated_guesser) !== false){
             /** @var \Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser $deprecated_guesser */
             return $deprecated_guesser::getInstance()->guess($this->getMimeType());
         }
-        $guesser = "\Symfony\Component\Mime\MimeTypes";
-        /** @var Symfony\Component\Mime\MimeTypes $guesser */
-        $extensions = $guesser::getDefault()->getExtensions($this->getMimeType());
-        return $extensions[0] ?? null;
+
+        return null;
     }
 
     /**

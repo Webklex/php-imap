@@ -11,11 +11,29 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Added
 - NaN
 
-### Affected Classes
-- NaN
-
 ### Breaking changes
 - NaN
+
+
+## [4.1.1] - 2022-11-16
+### Fixed
+- Fix for extension recognition #325 (thanks @pwoszczyk)
+- Missing null check added #327 (thanks @spanjeta)
+- Leading white-space in response causes an infinite loop #321 (thanks @thin-k-design)
+- Fix error when creating folders with special chars #319 (thanks @thin-k-design)
+- `Client::getFoldersWithStatus()` recursive loading fixed #312 (thanks @szymekjanaczek)
+- Fix Folder name encoding error in `Folder::appendMessage()` #306 #307 (thanks @rskrzypczak)
+
+
+## [4.1.0] - 2022-10-18
+### Fixed
+- Fix assumedNextTaggedLine bug #288 (thanks @Blear)
+- Fix empty response error for blank lines #274 (thanks @bierpub)
+- Fix empty body #233 (thanks @latypoff)
+- Fix imap_reopen folder argument #234 (thanks @latypoff)
+
+### Added
+- Added possibility of loading a Folder status #298 (thanks @szymekjanaczek)
 
 
 ## [4.0.2] - 2022-08-26
