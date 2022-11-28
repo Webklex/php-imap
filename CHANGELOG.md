@@ -6,8 +6,8 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
-- 
+- Attachment ID can return an empty value #318
+
 ### Added
 - NaN
 

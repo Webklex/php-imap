@@ -213,6 +213,8 @@ class Attachment {
 
         if (($id = $this->part->id) !== null) {
             $this->id = str_replace(['<', '>'], '', $id);
+        }else{
+            $this->id = hash("sha256", (string)microtime(true));
         }
 
         $this->size = $this->part->bytes;
