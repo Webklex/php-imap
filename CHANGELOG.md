@@ -6,13 +6,19 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- Attachment ID can return an empty value #318
+- NaN
 
 ### Added
 - NaN
 
 ### Breaking changes
 - NaN
+
+
+## [4.1.2] - 2022-12-14
+### Fixed
+- Attachment ID can return an empty value #318
+- Additional message date format added #345 (thanks @amorebietakoUdala)
 
 
 ## [4.1.1] - 2022-11-16
