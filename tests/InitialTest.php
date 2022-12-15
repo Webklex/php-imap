@@ -16,11 +16,11 @@ use \Webklex\PHPIMAP\ClientManager;
 class InitialTest extends TestCase {
     protected $cm;
 
-    public function setUp() {
+    public function setUp(): void {
         $this->cm = new ClientManager();
     }
 
     public function testConfigDefaultAccount() {
-        $this->assertEquals("default", ClientManager::get("default"));
+        self::assertSame("default", ClientManager::get("default"));
     }
 }
