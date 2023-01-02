@@ -214,7 +214,7 @@ class Header {
         $headers = [];
         $imap_headers = [];
         if (extension_loaded('imap') && $this->config["rfc822"]) {
-            $raw_imap_headers = (array)\imap_rfc822_parse_headers($this->raw);
+            $raw_imap_headers = (array)\imap_rfc822_parse_headers($raw_headers);
             foreach ($raw_imap_headers as $key => $values) {
                 $key = str_replace("-", "_", $key);
                 $imap_headers[$key] = $values;
@@ -594,11 +594,9 @@ class Header {
             } else {
                 $personalParts = $this->mime_header_decode($address->personal);
 
-                if (is_array($personalParts)) {
-                    $address->personal = '';
-                    foreach ($personalParts as $p) {
-                        $address->personal .= $this->convertEncoding($p->text, $this->getEncoding($p));
-                    }
+                $address->personal = '';
+                foreach ($personalParts as $p) {
+                    $address->personal .= $this->convertEncoding($p->text, $this->getEncoding($p));
                 }
 
                 if (str_starts_with($address->personal, "'")) {
@@ -629,14 +627,40 @@ class Header {
             if (($key == "user_agent") === false) {
                 if (($pos = strpos($value, ";")) !== false) {
                     $original = substr($value, 0, $pos);
-                    $this->set($key, trim(rtrim($original)), true);
+                    $this->set($key, trim(rtrim($original)));
 
                     // Get all potential extensions
                     $extensions = explode(";", substr($value, $pos + 1));
+                    $previousKey = null;
+                    $previousValue = '';
+
                     foreach ($extensions as $extension) {
                         if (($pos = strpos($extension, "=")) !== false) {
                             $key = substr($extension, 0, $pos);
                             $key = trim(rtrim(strtolower($key)));
+
+                            $matches = [];
+
+                            if (preg_match('/^(?P<key_name>\w+)\*/', $key, $matches) !== 0) {
+                                $key = $matches['key_name'];
+                                $previousKey = $key;
+
+                                $value = substr($extension, $pos + 1);
+                                $value = str_replace('"', "", $value);
+                                $previousValue .= trim(rtrim($value));
+
+                                continue;
+                            }
+
+                            if (
+                                $previousKey !== null
+                                && $previousKey !== $key
+                                && isset($this->attributes[$previousKey]) === false
+                            ) {
+                                $this->set($previousKey, $previousValue);
+
+                                $previousValue = '';
+                            }
 
                             if (isset($this->attributes[$key]) === false) {
                                 $value = substr($extension, $pos + 1);
@@ -645,7 +669,12 @@ class Header {
 
                                 $this->set($key, $value);
                             }
+
+                            $previousKey = $key;
                         }
+                    }
+                    if ($previousValue !== '') {
+                        $this->set($previousKey, $previousValue);
                     }
                 }
             }
