@@ -205,6 +205,19 @@ class Client {
     }
 
     /**
+     * Get the current config
+     *
+     * @return array
+     */
+    public function getConfig(): array {
+        $config = [];
+        foreach($this->default_account_config as $key => $value) {
+            $config[$key] = $this->$key;
+        }
+        return $config;
+    }
+
+    /**
      * Set a specific account config
      * @param string $key
      * @param array $config
@@ -218,6 +231,21 @@ class Client {
             $value = $default_config[$key];
         }
         $this->$key = $value;
+    }
+
+    /**
+     * Get the current account config
+     *
+     * @return array
+     */
+    public function getAccountConfig(): array {
+        $config = [];
+        foreach($this->default_account_config as $key => $value) {
+            if(property_exists($this, $key)) {
+                $config[$key] = $this->$key;
+            }
+        }
+        return $config;
     }
 
     /**
