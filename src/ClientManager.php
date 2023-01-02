@@ -96,6 +96,22 @@ class ClientManager {
     }
 
     /**
+     * Get the mask for a given section
+     * @param string $section section name such as "message" or "attachment"
+     *
+     * @return string|null
+     */
+    public static function getMask(string $section): ?string {
+        $default_masks = ClientManager::get("masks");
+        if (isset($default_masks[$section])) {
+            if (class_exists($default_masks[$section])) {
+                return $default_masks[$section];
+            }
+        }
+        return null;
+    }
+
+    /**
      * Resolve a account instance.
      * @param string|null $name
      *
