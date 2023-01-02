@@ -188,6 +188,26 @@ class Client {
     }
 
     /**
+     * Clone the current Client instance
+     *
+     * @return Client
+     */
+    public function clone(): Client {
+        $client = new self();
+        $client->events = $this->events;
+        $client->timeout = $this->timeout;
+        $client->active_folder = $this->active_folder;
+        $client->default_account_config = $this->default_account_config;
+        $config = $this->getAccountConfig();
+        foreach($config as $key => $value) {
+            $client->setAccountConfig($key, $config, $this->default_account_config);
+        }
+        $client->default_message_mask = $this->default_message_mask;
+        $client->default_attachment_mask = $this->default_message_mask;
+        return $client;
+    }
+
+    /**
      * Set the Client configuration
      * @param array $config
      *
