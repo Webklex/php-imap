@@ -48,9 +48,7 @@ class ImapProtocol extends Protocol {
     }
 
     /**
-     * @throws ImapBadRequestException
-     * @throws ImapServerErrorException
-     * @throws RuntimeException
+     * Handle the class destruction / tear down
      */
     public function __destruct() {
         $this->logout();
@@ -382,12 +380,12 @@ class ImapProtocol extends Protocol {
 
     /**
      * Escape one or more literals i.e. for sendRequest
-     * @param string|array $string the literal/-s
+     * @param array|string $string the literal/-s
      *
      * @return string|array escape literals, literals with newline ar returned
      *                      as array('{size}', 'string');
      */
-    public function escapeString($string) {
+    public function escapeString(array|string $string): array|string {
         if (func_num_args() < 2) {
             if (str_contains($string, "\n")) {
                 return ['{' . strlen($string) . '}', $string];
@@ -423,7 +421,7 @@ class ImapProtocol extends Protocol {
     /**
      * Login to a new session.
      *
-     * @param string $user     username
+     * @param string $user username
      * @param string $password password
      *
      * @return Response
@@ -460,7 +458,7 @@ class ImapProtocol extends Protocol {
                 $is_plus = $this->readLine($response, $tokens, '+', true);
                 if ($is_plus) {
                     // try to log the challenge somewhere where it can be found
-                    error_log("got an extra server challenge: $response");
+                    error_log("got an extra server challenge: $tokens");
                     // respond with an empty response.
                     $response->stack($this->sendRequest(''));
                 } else {
@@ -510,18 +508,7 @@ class ImapProtocol extends Protocol {
      */
     public function reset(): void {
         $this->stream = null;
-        $this->uid_cache = null;
-
-        return $result;
-    }
-
-    /**
-     * Check if the current session is connected
-     *
-     * @return bool
-     */
-    public function connected(): bool {
-        return (boolean) $this->stream;
+        $this->uid_cache = [];
     }
 
     /**
@@ -532,6 +519,7 @@ class ImapProtocol extends Protocol {
      * @throws ImapBadRequestException
      * @throws ImapServerErrorException
      * @throws RuntimeException
+     * @throws ResponseException
      */
     public function getCapabilities(): Response {
         $response = $this->requestAndResponse('CAPABILITY');
@@ -616,8 +604,8 @@ class ImapProtocol extends Protocol {
 
     /**
      * Fetch one or more items of one or more messages
-     * @param string|array $items items to fetch [RFC822.HEADER, FLAGS, RFC822.TEXT, etc]
-     * @param int|array $from message for items or start message if $to !== null
+     * @param array|string $items items to fetch [RFC822.HEADER, FLAGS, RFC822.TEXT, etc]
+     * @param array|int $from message for items or start message if $to !== null
      * @param int|null $to if null only one message ($from) is fetched, else it's the
      *                             last message, INF means last message available
      * @param int|string $uid set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
@@ -729,7 +717,7 @@ class ImapProtocol extends Protocol {
 
     /**
      * Fetch message headers
-     * @param array|int $uids
+     * @param int|array $uids
      * @param string $rfc
      * @param int|string $uid set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
      * message numbers instead.
@@ -743,7 +731,7 @@ class ImapProtocol extends Protocol {
 
     /**
      * Fetch message headers
-     * @param array|int $uids
+     * @param int|array $uids
      * @param string $rfc
      * @param int|string $uid set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
      * message numbers instead.
@@ -757,7 +745,7 @@ class ImapProtocol extends Protocol {
 
     /**
      * Fetch message flags
-     * @param array|int $uids
+     * @param int|array $uids
      * @param int|string $uid set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
      * message numbers instead.
      *
@@ -825,7 +813,7 @@ class ImapProtocol extends Protocol {
      * Get a list of available folders
      *
      * @param string $reference mailbox reference for list
-     * @param string $folder    mailbox name match with wildcards
+     * @param string $folder mailbox name match with wildcards
      *
      * @return Response folders that matched $folder as array(name => array('delimiter' => .., 'flags' => ..))
      *
@@ -853,15 +841,15 @@ class ImapProtocol extends Protocol {
     /**
      * Manage flags
      *
-     * @param array $flags         flags to set, add or remove - see $mode
-     * @param int $from            message for items or start message if $to !== null
-     * @param null $to             if null only one message ($from) is fetched, else it's the
+     * @param array|string $flags flags to set, add or remove - see $mode
+     * @param int $from message for items or start message if $to !== null
+     * @param int|null $to if null only one message ($from) is fetched, else it's the
      *                             last message, INF means last message available
-     * @param null $mode           '+' to add flags, '-' to remove flags, everything else sets the flags as given
-     * @param bool $silent         if false the return values are the new flags for the wanted messages
-     * @param int $uid             set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
+     * @param string|null $mode '+' to add flags, '-' to remove flags, everything else sets the flags as given
+     * @param bool $silent if false the return values are the new flags for the wanted messages
+     * @param int|string $uid set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
      *                             message numbers instead.
-     * @param null $item           command used to store a flag
+     * @param string|null $item command used to store a flag
      *
      * @return Response new flags if $silent is false, else true or false depending on success
      * @throws ImapBadRequestException
@@ -898,10 +886,10 @@ class ImapProtocol extends Protocol {
     /**
      * Append a new message to given folder
      *
-     * @param string $folder  name of target folder
+     * @param string $folder name of target folder
      * @param string $message full message content
-     * @param null $flags     flags for new message
-     * @param null $date      date for new message
+     * @param array|null $flags flags for new message
+     * @param string|null $date date for new message
      *
      * @return Response
      *
@@ -926,11 +914,11 @@ class ImapProtocol extends Protocol {
     /**
      * Copy a message set from current folder to another folder
      *
-     * @param string $folder  destination folder
+     * @param string $folder destination folder
      * @param $from
-     * @param null $to        if null only one message ($from) is fetched, else it's the
+     * @param int|null $to if null only one message ($from) is fetched, else it's the
      *                        last message, INF means last message available
-     * @param int $uid        set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
+     * @param int|string $uid set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
      *                        message numbers instead.
      *
      * @return Response
@@ -950,8 +938,8 @@ class ImapProtocol extends Protocol {
      * Copy multiple messages to the target folder
      *
      * @param array $messages List of message identifiers
-     * @param string $folder  Destination folder
-     * @param int $uid        set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
+     * @param string $folder Destination folder
+     * @param int|string $uid set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
      *                        message numbers instead.
      *
      * @return Response Tokens if operation successful, false if an error occurred
@@ -972,11 +960,11 @@ class ImapProtocol extends Protocol {
     /**
      * Move a message set from current folder to another folder
      *
-     * @param string $folder   destination folder
+     * @param string $folder destination folder
      * @param $from
-     * @param null $to         if null only one message ($from) is fetched, else it's the
+     * @param int|null $to if null only one message ($from) is fetched, else it's the
      *                         last message, INF means last message available
-     * @param int $uid         set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
+     * @param int|string $uid set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
      *                         message numbers instead.
      *
      * @return Response
@@ -996,8 +984,8 @@ class ImapProtocol extends Protocol {
      * Move multiple messages to the target folder
      *
      * @param array $messages List of message identifiers
-     * @param string $folder  Destination folder
-     * @param int $uid        set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
+     * @param string $folder Destination folder
+     * @param int|string $uid set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
      *                        message numbers instead.
      *
      * @return Response
@@ -1126,7 +1114,7 @@ class ImapProtocol extends Protocol {
     /**
      * Send noop command
      *
-     * @return array success
+     * @return Response
      * @throws ImapBadRequestException
      * @throws ImapServerErrorException
      * @throws RuntimeException
@@ -1198,7 +1186,7 @@ class ImapProtocol extends Protocol {
      * Search for matching messages
      *
      * @param array $params
-     * @param int $uid set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
+     * @param int|string $uid set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
      *                 message numbers instead.
      *
      * @return Response message ids
@@ -1254,15 +1242,19 @@ class ImapProtocol extends Protocol {
 
     /**
      * Enable the debug mode
+     *
+     * @return void
      */
-    public function enableDebug(){
+    public function enableDebug(): void {
         $this->debug = true;
     }
 
     /**
      * Disable the debug mode
+     *
+     * @return void
      */
-    public function disableDebug(){
+    public function disableDebug(): void {
         $this->debug = false;
     }
 
@@ -1273,7 +1265,7 @@ class ImapProtocol extends Protocol {
      *
      * @return int|string
      */
-    public function buildSet($from, $to = null) {
+    public function buildSet($from, $to = null): int|string {
         $set = (int)$from;
         if ($to !== null) {
             $set .= ':' . ($to == INF ? '*' : (int)$to);

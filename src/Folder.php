@@ -404,9 +404,8 @@ class Folder {
 
     /**
      * Idle the current connection
-     * @param callable $callback
+     * @param callable $callback function(Message $message) gets called if a new message is received
      * @param integer $timeout max 1740 seconds - recommended by rfc2177 §3. Should not be lower than the servers "* OK Still here" message interval
-     * @param boolean $auto_reconnect try to reconnect on connection close (@deprecated is no longer required)
      *
      * @throws ConnectionFailedException
      * @throws RuntimeException

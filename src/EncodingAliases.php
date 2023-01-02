@@ -466,7 +466,7 @@ class EncodingAliases {
     ];        
     
     /**
-     * Returns proper encoding mapping, if exsists. If it doesn't, return unchanged $encoding
+     * Returns proper encoding mapping, if exists. If it doesn't, return unchanged $encoding
      * @param string|null $encoding
      * @param string|null $fallback
      *

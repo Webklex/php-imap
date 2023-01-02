@@ -1316,7 +1316,7 @@ class Message {
     }
 
     /**
-     * Check if a message matches an other by comparing basic attributes
+     * Check if a message matches another by comparing basic attributes
      *
      * @param null|Message $message
      * @return boolean

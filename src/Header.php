@@ -61,7 +61,6 @@ class Header {
     public function __construct(string $raw_header) {
         $this->raw = $raw_header;
         $this->config = ClientManager::get('options');
-        $this->attributize = $attributize;
         $this->parse();
     }
 
@@ -670,7 +669,7 @@ class Header {
     /**
      * Exception handling for invalid dates
      *
-     * Currently known invalid formats:
+     * Known bad and "invalid" formats:
      * ^ Datetime                                   ^ Problem                           ^ Cause
      * | Mon, 20 Nov 2017 20:31:31 +0800 (GMT+8:00) | Double timezone specification     | A Windows feature
      * | Thu, 8 Nov 2018 08:54:58 -0200 (-02)       |

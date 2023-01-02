@@ -370,6 +370,7 @@ class Client {
 
     /**
      * Determine if connection was established and connect if not.
+     * Returns true if the connection was closed and has been reopened.
      *
      * @throws ConnectionFailedException
      * @throws AuthFailedException
@@ -659,7 +660,7 @@ class Client {
 
     /**
      * Create a new Folder
-     * @param string $folder
+     * @param string $folder_path
      * @param boolean $expunge
      *
      * @return Folder

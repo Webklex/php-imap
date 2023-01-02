@@ -417,7 +417,7 @@ class Query {
     /**
      * Paginate the current query
      * @param int $per_page Results you which to receive per page
-     * @param int|null $page The current page you are on (e.g. 0, 1, 2, ...) use `null` to enable auto mode
+     * @param null $page The current page you are on (e.g. 0, 1, 2, ...) use `null` to enable auto mode
      * @param string $page_name The page name / uri parameter used for the generated links and the auto mode
      *
      * @return LengthAwarePaginator

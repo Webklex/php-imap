@@ -239,9 +239,9 @@ class LegacyProtocol extends Protocol {
 
     /**
      * Fetch message content
-     * @param array|int $uids
+     * @param int|array $uids
      * @param string $rfc
-     * @param int $uid set to IMAP::ST_UID if you pass message unique identifiers instead of numbers.
+     * @param int|string $uid set to IMAP::ST_UID if you pass message unique identifiers instead of numbers.
      *
      * @return Response
      */
@@ -262,9 +262,9 @@ class LegacyProtocol extends Protocol {
 
     /**
      * Fetch message headers
-     * @param array|int $uids
+     * @param int|array $uids
      * @param string $rfc
-     * @param int $uid set to IMAP::ST_UID if you pass message unique identifiers instead of numbers.
+     * @param int|string $uid set to IMAP::ST_UID if you pass message unique identifiers instead of numbers.
      *
      * @return Response
      */
@@ -285,8 +285,8 @@ class LegacyProtocol extends Protocol {
 
     /**
      * Fetch message flags
-     * @param array|int $uids
-     * @param int $uid set to IMAP::ST_UID if you pass message unique identifiers instead of numbers.
+     * @param int|array $uids
+     * @param int|string $uid set to IMAP::ST_UID if you pass message unique identifiers instead of numbers.
      *
      * @return Response
      */
@@ -311,7 +311,8 @@ class LegacyProtocol extends Protocol {
                 $result[$id] = $flags;
             }
 
-        return $result;
+            return $result;
+        });
     }
 
     /**
@@ -365,7 +366,7 @@ class LegacyProtocol extends Protocol {
     /**
      * Get a message overview
      * @param string $sequence uid sequence
-     * @param int $uid set to IMAP::ST_UID if you pass message unique identifiers instead of numbers.
+     * @param int|string $uid set to IMAP::ST_UID if you pass message unique identifiers instead of numbers.
      *
      * @return Response
      */
@@ -404,14 +405,14 @@ class LegacyProtocol extends Protocol {
 
     /**
      * Manage flags
-     * @param array $flags flags to set, add or remove - see $mode
+     * @param array|string $flags flags to set, add or remove - see $mode
      * @param int $from message for items or start message if $to !== null
      * @param int|null $to if null only one message ($from) is fetched, else it's the
      *                             last message, INF means last message available
      * @param string|null $mode '+' to add flags, '-' to remove flags, everything else sets the flags as given
      * @param bool $silent if false the return values are the new flags for the wanted messages
-     * @param int $uid set to IMAP::ST_UID if you pass message unique identifiers instead of numbers.
-     * @param null $item unused attribute
+     * @param int|string $uid set to IMAP::ST_UID if you pass message unique identifiers instead of numbers.
+     * @param string|null $item unused attribute
      *
      * @return Response new flags if $silent is false, else true or false depending on success
      */
@@ -447,7 +448,7 @@ class LegacyProtocol extends Protocol {
      * @param string $folder name of target folder
      * @param string $message full message content
      * @param array|null $flags flags for new message
-     * @param string $date date for new message
+     * @param mixed $date date for new message
      *
      * @return Response
      */
@@ -479,7 +480,7 @@ class LegacyProtocol extends Protocol {
      * @param $from
      * @param int|null $to if null only one message ($from) is fetched, else it's the
      *                         last message, INF means last message available
-     * @param int $uid set to IMAP::ST_UID if you pass message unique identifiers instead of numbers.
+     * @param int|string $uid set to IMAP::ST_UID if you pass message unique identifiers instead of numbers.
      *
      * @return Response
      */
@@ -500,7 +501,7 @@ class LegacyProtocol extends Protocol {
      * Copy multiple messages to the target folder
      * @param array $messages List of message identifiers
      * @param string $folder Destination folder
-     * @param int $uid set to IMAP::ST_UID if you pass message unique identifiers instead of numbers.
+     * @param int|string $uid set to IMAP::ST_UID if you pass message unique identifiers instead of numbers.
      *
      * @return Response Tokens if operation successful, false if an error occurred
      */
@@ -529,7 +530,7 @@ class LegacyProtocol extends Protocol {
      * @param $from
      * @param int|null $to if null only one message ($from) is fetched, else it's the
      *                         last message, INF means last message available
-     * @param int $uid set to IMAP::ST_UID if you pass message unique identifiers instead of numbers.
+     * @param int|string $uid set to IMAP::ST_UID if you pass message unique identifiers instead of numbers.
      *
      * @return Response success
      */
@@ -548,7 +549,7 @@ class LegacyProtocol extends Protocol {
      * Move multiple messages to the target folder
      * @param array $messages List of message identifiers
      * @param string $folder Destination folder
-     * @param int $uid set to IMAP::ST_UID if you pass message unique identifiers instead of numbers.
+     * @param int|string $uid set to IMAP::ST_UID if you pass message unique identifiers instead of numbers.
      *
      * @return Response Tokens if operation successful, false if an error occurred
      * @throws ImapBadRequestException
@@ -690,7 +691,7 @@ class LegacyProtocol extends Protocol {
     /**
      * Search for matching messages
      * @param array $params
-     * @param int $uid set to IMAP::ST_UID if you pass message unique identifiers instead of numbers.
+     * @param int|string $uid set to IMAP::ST_UID if you pass message unique identifiers instead of numbers.
      *
      * @return Response message ids
      */
@@ -723,8 +724,8 @@ class LegacyProtocol extends Protocol {
      *
      * @return array|false|string|string[]|null
      */
-    protected function decodeFolderName($name) {
-        preg_match('#\{(.*)\}(.*)#', $name, $preg);
+    protected function decodeFolderName($name): array|bool|string|null {
+        preg_match('#\{(.*)}(.*)#', $name, $preg);
         return mb_convert_encoding($preg[2], "UTF-8", "UTF7-IMAP");
     }
 
