@@ -1544,4 +1544,14 @@ class Message {
             $this->setMsgn($uid, $msglist);
         }
     }
+
+    /**
+     * Safe the entire message in a file
+     * @param $filename
+     *
+     * @return bool|int
+     */
+    public function save($filename): bool|int {
+        return file_put_contents($filename, $this->header->raw."\r\n\r\n".$this->structure->raw);
+    }
 }
