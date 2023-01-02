@@ -95,7 +95,7 @@ class Structure {
     }
 
     /**
-     * Find all available headers and return the left over body segment
+     * Find all available headers and return the leftover body segment
      * @var string $context
      * @var integer $part_number
      *
@@ -131,7 +131,7 @@ class Structure {
         $final_parts = [];
         foreach($base_parts as $ctx) {
             $ctx = substr($ctx, 2);
-            if ($ctx !== "--" && $ctx != "") {
+            if ($ctx !== "--" && $ctx != "" && $ctx != "\r\n") {
                 $parts = $this->parsePart($ctx, $part_number);
                 foreach ($parts as $part) {
                     $final_parts[] = $part;
@@ -160,15 +160,5 @@ class Structure {
         }
 
         return [new Part($this->raw, $this->header)];
-    }
-
-    /**
-     * Try to find a boundary if possible
-     *
-     * @return string|null
-     * @Depricated since version 2.4.4
-     */
-    public function getBoundary(){
-        return $this->header->getBoundary();
     }
 }
