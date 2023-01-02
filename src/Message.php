@@ -370,10 +370,26 @@ class Message {
      * @param $name
      *
      * @return Attribute|mixed|null
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws MessageNotFoundException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
-    public function get($name) {
-        if(isset($this->attributes[$name])) {
+    public function get($name): mixed {
+        if (isset($this->attributes[$name]) && $this->attributes[$name] !== null) {
             return $this->attributes[$name];
+        }
+
+        switch ($name){
+            case "uid":
+                $this->attributes[$name] = $this->client->getConnection()->getUid($this->msgn)->validate()->integer();
+                return $this->attributes[$name];
+            case "msgn":
+                $this->attributes[$name] = $this->client->getConnection()->getMessageNumber($this->uid)->validate()->integer();
+                return $this->attributes[$name];
         }
 
         return $this->header->get($name);
@@ -1476,7 +1492,7 @@ class Message {
      */
     public function setUid(int $uid): Message {
         $this->uid = $uid;
-        $this->msgn = $this->client->getConnection()->getMessageNumber($this->uid);
+        $this->msgn = null;
         $this->msglist = null;
 
         return $this;
@@ -1492,7 +1508,7 @@ class Message {
     public function setMsgn(int $msgn, int $msglist = null): Message {
         $this->msgn = $msgn;
         $this->msglist = $msglist;
-        $this->uid = $this->client->getConnection()->getUid($this->msgn);
+        $this->uid = null;
 
         return $this;
     }
