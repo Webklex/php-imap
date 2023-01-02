@@ -427,8 +427,8 @@ class Message {
     public function parseRawFlags(array $raw_flags): void {
         $this->flags = FlagCollection::make([]);
 
-        foreach($raw_flags as $flag) {
-            if (strpos($flag, "\\") === 0){
+        foreach ($raw_flags as $flag) {
+            if (str_starts_with($flag, "\\")) {
                 $flag = substr($flag, 1);
             }
             $flag_key = strtolower($flag);

@@ -266,30 +266,17 @@ class Part {
     /**
      * Try to parse the encoding if any is present
      */
-    private function parseEncoding(){
-        $encoding = $this->header->get("content_transfer_encoding");
-        if($encoding !== null) {
-            switch (strtolower($encoding)) {
-                case "quoted-printable":
-                    $this->encoding = IMAP::MESSAGE_ENC_QUOTED_PRINTABLE;
-                    break;
-                case "base64":
-                    $this->encoding = IMAP::MESSAGE_ENC_BASE64;
-                    break;
-                case "7bit":
-                    $this->encoding = IMAP::MESSAGE_ENC_7BIT;
-                    break;
-                case "8bit":
-                    $this->encoding = IMAP::MESSAGE_ENC_8BIT;
-                    break;
-                case "binary":
-                    $this->encoding = IMAP::MESSAGE_ENC_BINARY;
-                    break;
-                default:
-                    $this->encoding = IMAP::MESSAGE_ENC_OTHER;
-                    break;
-
-            }
+    private function parseEncoding(): void {
+        $encoding = $this->header->get("content_transfer_encoding")->first();
+        if($encoding) {
+            $this->encoding = match (strtolower($encoding)) {
+                "quoted-printable" => IMAP::MESSAGE_ENC_QUOTED_PRINTABLE,
+                "base64" => IMAP::MESSAGE_ENC_BASE64,
+                "7bit" => IMAP::MESSAGE_ENC_7BIT,
+                "8bit" => IMAP::MESSAGE_ENC_8BIT,
+                "binary" => IMAP::MESSAGE_ENC_BINARY,
+                default => IMAP::MESSAGE_ENC_OTHER,
+            };
         }
     }
 

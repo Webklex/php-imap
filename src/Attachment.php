@@ -169,36 +169,18 @@ class Attachment {
     /**
      * Determine the structure type
      */
-    protected function findType() {
-        switch ($this->part->type) {
-            case IMAP::ATTACHMENT_TYPE_MESSAGE:
-                $this->type = 'message';
-                break;
-            case IMAP::ATTACHMENT_TYPE_APPLICATION:
-                $this->type = 'application';
-                break;
-            case IMAP::ATTACHMENT_TYPE_AUDIO:
-                $this->type = 'audio';
-                break;
-            case IMAP::ATTACHMENT_TYPE_IMAGE:
-                $this->type = 'image';
-                break;
-            case IMAP::ATTACHMENT_TYPE_VIDEO:
-                $this->type = 'video';
-                break;
-            case IMAP::ATTACHMENT_TYPE_MODEL:
-                $this->type = 'model';
-                break;
-            case IMAP::ATTACHMENT_TYPE_TEXT:
-                $this->type = 'text';
-                break;
-            case IMAP::ATTACHMENT_TYPE_MULTIPART:
-                $this->type = 'multipart';
-                break;
-            default:
-                $this->type = 'other';
-                break;
-        }
+    protected function findType(): void {
+        $this->type = match ($this->part->type) {
+            IMAP::ATTACHMENT_TYPE_MESSAGE => 'message',
+            IMAP::ATTACHMENT_TYPE_APPLICATION => 'application',
+            IMAP::ATTACHMENT_TYPE_AUDIO => 'audio',
+            IMAP::ATTACHMENT_TYPE_IMAGE => 'image',
+            IMAP::ATTACHMENT_TYPE_VIDEO => 'video',
+            IMAP::ATTACHMENT_TYPE_MODEL => 'model',
+            IMAP::ATTACHMENT_TYPE_TEXT => 'text',
+            IMAP::ATTACHMENT_TYPE_MULTIPART => 'multipart',
+            default => 'other',
+        };
     }
 
     /**

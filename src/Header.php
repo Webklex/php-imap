@@ -238,17 +238,17 @@ class Header {
         $lines = explode("\r\n", preg_replace("/\r\n\s/", ' ', $raw_headers));
         $prev_header = null;
         foreach ($lines as $line) {
-            if (substr($line, 0, 1) === "\n") {
+            if (str_starts_with($line, "\n")) {
                 $line = substr($line, 1);
             }
 
-            if (substr($line, 0, 1) === "\t") {
+            if (str_starts_with($line, "\t")) {
                 $line = substr($line, 1);
                 $line = trim(rtrim($line));
                 if ($prev_header !== null) {
                     $headers[$prev_header][] = $line;
                 }
-            } elseif (substr($line, 0, 1) === " ") {
+            } elseif (str_starts_with($line, " ")) {
                 $line = substr($line, 1);
                 $line = trim(rtrim($line));
                 if ($prev_header !== null) {
@@ -347,9 +347,9 @@ class Header {
      * @return bool
      */
     private function notDecoded($encoded, $decoded): bool {
-        return 0 === strpos($decoded, '=?')
+        return str_starts_with($decoded, '=?')
             && strlen($decoded) - 2 === strpos($decoded, '?=')
-            && false !== strpos($encoded, $decoded);
+            && str_contains($encoded, $decoded);
     }
 
     /**
@@ -394,7 +394,7 @@ class Header {
                 return mb_convert_encoding($str, $to, $from);
             }
         } catch (\Exception $e) {
-            if (strstr($from, '-')) {
+            if (str_contains($from, '-')) {
                 $from = str_replace('-', '', $from);
                 return $this->convertEncoding($str, $from, $to);
             } else {
@@ -433,7 +433,7 @@ class Header {
      * @return bool
      */
     private function is_uft8($value): bool {
-        return strpos(strtolower($value), '=?utf-8?') === 0;
+        return str_starts_with(strtolower($value), '=?utf-8?');
     }
 
     /**
@@ -500,28 +500,17 @@ class Header {
     /**
      * Try to extract the priority from a given raw header string
      */
-    private function findPriority() {
-        if (($priority = $this->get("x_priority")) === null) return;
-        switch ((int)"$priority") {
-            case IMAP::MESSAGE_PRIORITY_HIGHEST;
-                $priority = IMAP::MESSAGE_PRIORITY_HIGHEST;
-                break;
-            case IMAP::MESSAGE_PRIORITY_HIGH;
-                $priority = IMAP::MESSAGE_PRIORITY_HIGH;
-                break;
-            case IMAP::MESSAGE_PRIORITY_NORMAL;
-                $priority = IMAP::MESSAGE_PRIORITY_NORMAL;
-                break;
-            case IMAP::MESSAGE_PRIORITY_LOW;
-                $priority = IMAP::MESSAGE_PRIORITY_LOW;
-                break;
-            case IMAP::MESSAGE_PRIORITY_LOWEST;
-                $priority = IMAP::MESSAGE_PRIORITY_LOWEST;
-                break;
-            default:
-                $priority = IMAP::MESSAGE_PRIORITY_UNKNOWN;
-                break;
-        }
+    private function findPriority(): void {
+        $priority = $this->get("x_priority");
+
+        $priority = match ((int)"$priority") {
+            IMAP::MESSAGE_PRIORITY_HIGHEST => IMAP::MESSAGE_PRIORITY_HIGHEST,
+            IMAP::MESSAGE_PRIORITY_HIGH => IMAP::MESSAGE_PRIORITY_HIGH,
+            IMAP::MESSAGE_PRIORITY_NORMAL => IMAP::MESSAGE_PRIORITY_NORMAL,
+            IMAP::MESSAGE_PRIORITY_LOW => IMAP::MESSAGE_PRIORITY_LOW,
+            IMAP::MESSAGE_PRIORITY_LOWEST => IMAP::MESSAGE_PRIORITY_LOWEST,
+            default => IMAP::MESSAGE_PRIORITY_UNKNOWN,
+        };
 
         $this->set("priority", $priority);
     }
@@ -627,7 +616,7 @@ class Header {
                     }
                 }
 
-                if (strpos($address->personal, "'") === 0) {
+                if (str_starts_with($address->personal, "'")) {
                     $address->personal = str_replace("'", "", $address->personal);
                 }
             }
@@ -708,7 +697,7 @@ class Header {
 
             $date = trim(rtrim($date));
             try {
-                if(strpos($date, '&nbsp;') !== false){
+                if (str_contains($date, '&nbsp;')) {
                     $date = str_replace('&nbsp;', ' ', $date);
                 }
                 $parsed_date = Carbon::parse($date);

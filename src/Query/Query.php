@@ -188,9 +188,7 @@ class Query {
         try {
             $available_messages = $this->client->getConnection()->search([$this->getRawQuery()], $this->sequence);
             return new Collection($available_messages);
-        } catch (RuntimeException $e) {
-            throw new GetMessagesFailedException("failed to fetch messages", 0, $e);
-        } catch (ConnectionFailedException $e) {
+        } catch (RuntimeException|ConnectionFailedException $e) {
             throw new GetMessagesFailedException("failed to fetch messages", 0, $e);
         }
     }
@@ -257,15 +255,7 @@ class Query {
     protected function make(int $uid, int $msglist, string $header, string $content, array $flags) {
         try {
             return Message::make($uid, $msglist, $this->getClient(), $header, $content, $flags, $this->getFetchOptions(), $this->sequence);
-        } catch (MessageNotFoundException $e) {
-            $this->setError($uid, $e);
-        } catch (RuntimeException $e) {
-            $this->setError($uid, $e);
-        } catch (MessageFlagException $e) {
-            $this->setError($uid, $e);
-        } catch (InvalidMessageDateException $e) {
-            $this->setError($uid, $e);
-        } catch (MessageContentFetchingException $e) {
+        } catch (RuntimeException|MessageFlagException|InvalidMessageDateException|MessageContentFetchingException $e) {
             $this->setError($uid, $e);
         }
 
@@ -283,20 +273,12 @@ class Query {
      * @return string
      */
     protected function getMessageKey(string $message_key, int $msglist, Message $message): string {
-        switch ($message_key) {
-            case 'number':
-                $key = $message->getMessageNo();
-                break;
-            case 'list':
-                $key = $msglist;
-                break;
-            case 'uid':
-                $key = $message->getUid();
-                break;
-            default:
-                $key = $message->getMessageId();
-                break;
-        }
+        $key = match ($message_key) {
+            'number' => $message->getMessageNo(),
+            'list' => $msglist,
+            'uid' => $message->getUid(),
+            default => $message->getMessageId(),
+        };
         return (string)$key;
     }
 

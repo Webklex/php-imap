@@ -84,7 +84,7 @@ class WhereQuery extends Query {
             $name = substr($name, 3);
         }
 
-        if (strpos(strtolower($name), "where") === false) {
+        if (!str_contains(strtolower($name), "where")) {
             $method = 'where' . ucfirst($name);
         } else {
             $method = lcfirst($name);
@@ -106,7 +106,7 @@ class WhereQuery extends Query {
      */
     protected function validate_criteria($criteria): string {
         $command = strtoupper($criteria);
-        if (substr($command, 0, 7) === "CUSTOM ") {
+        if (str_starts_with($command, "CUSTOM ")) {
             return substr($criteria, 7);
         }
         if (in_array($command, $this->available_criteria) === false) {

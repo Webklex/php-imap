@@ -347,7 +347,7 @@ class Client {
                 throw new ConnectionFailedException("connection setup failed", 0, new ProtocolNotSupportedException($protocol." is an unsupported protocol"));
             }
             $this->connection = new LegacyProtocol($this->validate_cert, $this->encryption);
-            if (strpos($protocol, "legacy-") === 0) {
+            if (str_starts_with($protocol, "legacy-")) {
                 $protocol = substr($protocol, 7);
             }
             $this->connection->setProtocol($protocol);
@@ -363,9 +363,7 @@ class Client {
 
         try {
             $this->connection->connect($this->host, $this->port);
-        } catch (ErrorException $e) {
-            throw new ConnectionFailedException("connection setup failed", 0, $e);
-        } catch (Exceptions\RuntimeException $e) {
+        } catch (ErrorException|RuntimeException $e) {
             throw new ConnectionFailedException("connection setup failed", 0, $e);
         }
         $this->authenticate();
@@ -419,7 +417,7 @@ class Client {
     public function getFolder(string $folder_name, ?string $delimiter = null): ?Folder {
         // Set delimiter to false to force selection via getFolderByName (maybe useful for uncommon folder names)
         $delimiter = is_null($delimiter) ? ClientManager::get('options.delimiter', "/") : $delimiter;
-        if (strpos($folder_name, (string)$delimiter) !== false) {
+        if (str_contains($folder_name, (string)$delimiter)) {
             return $this->getFolderByPath($folder_name);
         }
 
