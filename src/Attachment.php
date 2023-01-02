@@ -281,7 +281,8 @@ class Attachment {
             return $deprecated_guesser::getInstance()->guess($this->getMimeType());
         }
 
-        return null;
+        $extensions = explode(".", $this->part->filename ?: $this->part->name);
+        return end($extensions);
     }
 
     /**
