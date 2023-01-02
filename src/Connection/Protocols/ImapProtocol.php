@@ -34,14 +34,14 @@ class ImapProtocol extends Protocol {
      * Request noun
      * @var int
      */
-    protected $noun = 0;
+    protected int $noun = 0;
 
     /**
      * Imap constructor.
      * @param bool $cert_validation set to false to skip SSL certificate validation
      * @param mixed $encryption Connection encryption method
      */
-    public function __construct(bool $cert_validation = true, $encryption = false) {
+    public function __construct(bool $cert_validation = true, mixed $encryption = false) {
         $this->setCertValidation($cert_validation);
         $this->encryption = $encryption;
     }
@@ -62,7 +62,7 @@ class ImapProtocol extends Protocol {
      *
      * @throws ConnectionFailedException
      */
-    public function connect(string $host, $port = null) {
+    public function connect(string $host, int $port = null): bool {
         $transport = 'tcp';
         $encryption = '';
 
@@ -85,6 +85,7 @@ class ImapProtocol extends Protocol {
         } catch (Exception $e) {
             throw new ConnectionFailedException('connection failed', 0, $e);
         }
+        return true;
     }
 
     /**

@@ -41,46 +41,46 @@ use Webklex\PHPIMAP\Support\MessageCollection;
 class Query {
 
     /** @var Collection $query */
-    protected $query;
+    protected Collection $query;
 
     /** @var string $raw_query */
-    protected $raw_query;
+    protected string $raw_query;
 
     /** @var string[] $extensions */
-    protected $extensions;
+    protected array $extensions;
 
     /** @var Client $client */
-    protected $client;
+    protected Client $client;
 
-    /** @var int $limit */
-    protected $limit = null;
+    /** @var ?int $limit */
+    protected ?int $limit = null;
 
     /** @var int $page */
-    protected $page = 1;
+    protected int $page = 1;
 
-    /** @var int $fetch_options */
-    protected $fetch_options = null;
+    /** @var ?int $fetch_options */
+    protected ?int $fetch_options = null;
 
-    /** @var int $fetch_body */
-    protected $fetch_body = true;
+    /** @var boolean $fetch_body */
+    protected bool $fetch_body = true;
 
-    /** @var int $fetch_flags */
-    protected $fetch_flags = true;
+    /** @var boolean $fetch_flags */
+    protected bool $fetch_flags = true;
 
     /** @var int|string $sequence */
-    protected $sequence = IMAP::NIL;
+    protected mixed $sequence = IMAP::NIL;
 
     /** @var string $fetch_order */
-    protected $fetch_order;
+    protected string $fetch_order;
 
     /** @var string $date_format */
-    protected $date_format;
+    protected string $date_format;
 
     /** @var bool $soft_fail */
-    protected $soft_fail = false;
+    protected bool $soft_fail = false;
 
     /** @var array $errors */
-    protected $errors = [];
+    protected array $errors = [];
 
     /**
      * Query constructor.
@@ -110,7 +110,7 @@ class Query {
     /**
      * Instance boot method for additional functionality
      */
-    protected function boot() {
+    protected function boot(): void {
     }
 
     /**
@@ -119,7 +119,7 @@ class Query {
      *
      * @return string
      */
-    protected function parse_value($value): string {
+    protected function parse_value(mixed $value): string {
         if ($value instanceof Carbon) {
             $value = $value->format($this->date_format);
         }
@@ -129,12 +129,12 @@ class Query {
 
     /**
      * Check if a given date is a valid carbon object and if not try to convert it
-     * @param string|Carbon $date
+     * @param mixed $date
      *
      * @return Carbon
      * @throws MessageSearchValidationException
      */
-    protected function parse_date($date): Carbon {
+    protected function parse_date(mixed $date): Carbon {
         if ($date instanceof Carbon) return $date;
 
         try {
@@ -252,7 +252,7 @@ class Query {
      * @throws GetMessagesFailedException
      * @throws ReflectionException
      */
-    protected function make(int $uid, int $msglist, string $header, string $content, array $flags) {
+    protected function make(int $uid, int $msglist, string $header, string $content, array $flags): ?Message {
         try {
             return Message::make($uid, $msglist, $this->getClient(), $header, $content, $flags, $this->getFetchOptions(), $this->sequence);
         } catch (RuntimeException|MessageFlagException|InvalidMessageDateException|MessageContentFetchingException $e) {
@@ -362,7 +362,7 @@ class Query {
      * @throws ReflectionException
      * @throws RuntimeException
      */
-    public function chunked(callable $callback, int $chunk_size = 10, int $start_chunk = 1) {
+    public function chunked(callable $callback, int $chunk_size = 10, int $start_chunk = 1): void {
         $available_messages = $this->search();
         if (($available_messages_count = $available_messages->count()) > 0) {
             $old_limit = $this->limit;
@@ -410,8 +410,8 @@ class Query {
     /**
      * Get a new Message instance
      * @param int $uid
-     * @param int|null $msglist
-     * @param int|string|null $sequence
+     * @param null $msglist
+     * @param null $sequence
      *
      * @return Message
      * @throws ConnectionFailedException
@@ -430,7 +430,7 @@ class Query {
     /**
      * Get a message by its message number
      * @param $msgn
-     * @param int|null $msglist
+     * @param null $msglist
      *
      * @return Message
      * @throws ConnectionFailedException
@@ -603,7 +603,7 @@ class Query {
      *
      * @return int|string
      */
-    public function getSequence() {
+    public function getSequence(): int|string {
         return $this->sequence;
     }
 
@@ -694,9 +694,9 @@ class Query {
 
     /**
      * Get the set fetch limit
-     * @return int
+     * @return ?int
      */
-    public function getLimit() {
+    public function getLimit(): ?int {
         return $this->limit;
     }
 
@@ -743,16 +743,16 @@ class Query {
     }
 
     /**
-     * @return int
+     * @return ?int
      */
-    public function getFetchOptions() {
+    public function getFetchOptions(): ?int {
         return $this->fetch_options;
     }
 
     /**
      * @return boolean
      */
-    public function getFetchBody() {
+    public function getFetchBody(): bool {
         return $this->fetch_body;
     }
 
@@ -774,17 +774,17 @@ class Query {
     }
 
     /**
-     * @return int
+     * @return bool
      */
-    public function getFetchFlags() {
+    public function getFetchFlags(): bool {
         return $this->fetch_flags;
     }
 
     /**
-     * @param int $fetch_flags
+     * @param bool $fetch_flags
      * @return Query
      */
-    public function setFetchFlags(int $fetch_flags): Query {
+    public function setFetchFlags(bool $fetch_flags): Query {
         $this->fetch_flags = $fetch_flags;
         return $this;
     }
@@ -879,7 +879,7 @@ class Query {
      *
      * @throws GetMessagesFailedException
      */
-    protected function handleException(int $uid) {
+    protected function handleException(int $uid): void {
         if ($this->soft_fail === false && $this->hasError($uid)) {
             $error = $this->getError($uid);
             throw new GetMessagesFailedException($error->getMessage(), 0, $error);
@@ -891,17 +891,17 @@ class Query {
      * @param integer $uid
      * @param Exception $error
      */
-    protected function setError(int $uid, Exception $error) {
+    protected function setError(int $uid, Exception $error): void {
         $this->errors[$uid] = $error;
     }
 
     /**
      * Check if there are any errors / exceptions present
      * @return boolean
-     * @var integer|null $uid
+     * @var ?integer $uid
      *
      */
-    public function hasErrors($uid = null): bool {
+    public function hasErrors(?int $uid = null): bool {
         if ($uid !== null) {
             return $this->hasError($uid);
         }
@@ -942,17 +942,17 @@ class Query {
      * @var integer $uid
      *
      */
-    public function error(int $uid) {
+    public function error(int $uid): ?Exception {
         return $this->getError($uid);
     }
 
     /**
      * Get a specific error / exception
-     * @return Exception|null
+     * @return ?Exception
      * @var integer $uid
      *
      */
-    public function getError(int $uid) {
+    public function getError(int $uid): ?Exception {
         if ($this->hasError($uid)) {
             return $this->errors[$uid];
         }

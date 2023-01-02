@@ -25,17 +25,16 @@ use Webklex\PHPIMAP\IMAP;
  */
 class LegacyProtocol extends Protocol {
 
-    protected $protocol = "imap";
-    protected $host = null;
-    protected $port = null;
-    protected $encryption = null;
+    protected string $protocol = "imap";
+    protected string $host = "localhost";
+    protected int $port = 993;
 
     /**
      * Imap constructor.
      * @param bool $cert_validation set to false to skip SSL certificate validation
      * @param mixed $encryption Connection encryption method
      */
-    public function __construct(bool $cert_validation = true, $encryption = false) {
+    public function __construct(bool $cert_validation = true, mixed $encryption = false) {
         $this->setCertValidation($cert_validation);
         $this->encryption = $encryption;
     }
@@ -50,9 +49,9 @@ class LegacyProtocol extends Protocol {
     /**
      * Save the information for a nw connection
      * @param string $host
-     * @param null $port
+     * @param int|null $port
      */
-    public function connect(string $host, $port = null) {
+    public function connect(string $host, int $port = null) {
         if ($this->encryption) {
             $encryption = strtolower($this->encryption);
             if ($encryption == "ssl") {

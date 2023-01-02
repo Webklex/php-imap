@@ -48,7 +48,7 @@ interface ProtocolInterface {
      * @throws ConnectionFailedException
      * @throws RuntimeException
      */
-    public function connect(string $host, $port = null);
+    public function connect(string $host, ?int $port = null);
 
     /**
      * Login to a new session.
