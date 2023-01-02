@@ -54,7 +54,7 @@ class Client {
      *
      * @var int
      */
-    public $port;
+    public int $port;
 
     /**
      * Service protocol.
@@ -287,8 +287,7 @@ class Client {
      *
      * @throws MaskNotFoundException
      */
-    protected function setMaskFromConfig($config) {
-        $default_config  = ClientManager::get("masks");
+    protected function setMaskFromConfig($config): void {
 
         if(isset($config['masks'])){
             if(isset($config['masks']['message'])) {
