@@ -38,16 +38,16 @@ class Client {
     /**
      * Connection resource
      *
-     * @var boolean|Protocol|ProtocolInterface
+     * @var ?ProtocolInterface
      */
-    public $connection = false;
+    public ?ProtocolInterface $connection = null;
 
     /**
      * Server hostname.
      *
      * @var string
      */
-    public $host;
+    public string $host;
 
     /**
      * Server port.
@@ -59,9 +59,9 @@ class Client {
     /**
      * Service protocol.
      *
-     * @var int
+     * @var string
      */
-    public $protocol;
+    public string $protocol;
 
     /**
      * Server encryption.
@@ -69,20 +69,20 @@ class Client {
      *
      * @var string
      */
-    public $encryption;
+    public string $encryption;
 
     /**
      * If server has to validate cert.
      *
      * @var bool
      */
-    public $validate_cert = true;
+    public bool $validate_cert = true;
 
     /**
      * Proxy settings
      * @var array
      */
-    protected $proxy = [
+    protected array $proxy = [
         'socket' => null,
         'request_fulluri' => false,
         'username' => null,
@@ -93,63 +93,63 @@ class Client {
      * Connection timeout
      * @var int $timeout
      */
-    public $timeout;
+    public int $timeout;
 
     /**
-     * Account username/
+     * Account username
      *
-     * @var mixed
+     * @var string
      */
-    public $username;
+    public string $username;
 
     /**
      * Account password.
      *
      * @var string
      */
-    public $password;
+    public string $password;
 
     /**
      * Additional data fetched from the server.
      *
-     * @var string
+     * @var array
      */
-    public $extensions;
+    public array $extensions;
 
     /**
      * Account authentication method.
      *
-     * @var string
+     * @var ?string
      */
-    public $authentication;
+    public ?string $authentication;
 
     /**
      * Active folder path.
      *
-     * @var string
+     * @var ?string
      */
-    protected $active_folder = null;
+    protected ?string $active_folder = null;
 
     /**
      * Default message mask
      *
      * @var string $default_message_mask
      */
-    protected $default_message_mask = MessageMask::class;
+    protected string $default_message_mask = MessageMask::class;
 
     /**
      * Default attachment mask
      *
      * @var string $default_attachment_mask
      */
-    protected $default_attachment_mask = AttachmentMask::class;
+    protected string $default_attachment_mask = AttachmentMask::class;
 
     /**
      * Used default account values
      *
      * @var array $default_account_config
      */
-    protected $default_account_config = [
+    protected array $default_account_config = [
         'host' => 'localhost',
         'port' => 993,
         'protocol'  => 'imap',
@@ -210,7 +210,7 @@ class Client {
      * @param array $config
      * @param array $default_config
      */
-    private function setAccountConfig(string $key, array $config, array $default_config){
+    private function setAccountConfig(string $key, array $config, array $default_config): void {
         $value = $this->default_account_config[$key];
         if(isset($config[$key])) {
             $value = $config[$key];
@@ -224,7 +224,7 @@ class Client {
      * Look for a possible events in any available config
      * @param $config
      */
-    protected function setEventsFromConfig($config) {
+    protected function setEventsFromConfig($config): void {
         $this->events = ClientManager::get("events");
         if(isset($config['events'])){
             foreach($config['events'] as $section => $events) {
@@ -291,7 +291,7 @@ class Client {
      * @return bool|Protocol|ProtocolInterface
      * @throws ConnectionFailedException
      */
-    public function getConnection() {
+    public function getConnection(): ProtocolInterface {
         $this->checkConnection();
         return $this->connection;
     }
@@ -321,7 +321,7 @@ class Client {
      *
      * @throws ConnectionFailedException
      */
-    public function reconnect() {
+    public function reconnect(): void {
         if ($this->isConnected()) {
             $this->disconnect();
         }
@@ -409,18 +409,14 @@ class Client {
     /**
      * Get a folder instance by a folder name
      * @param string $folder_name
-     * @param string|bool|null $delimiter
+     * @param string|null $delimiter
      *
      * @return Folder|null
      * @throws ConnectionFailedException
      * @throws FolderFetchingException
      * @throws Exceptions\RuntimeException
      */
-    public function getFolder(string $folder_name, $delimiter = null) {
-        if ($delimiter !== false && $delimiter !== null) {
-            return $this->getFolderByPath($folder_name);
-        }
-
+    public function getFolder(string $folder_name, ?string $delimiter = null): ?Folder {
         // Set delimiter to false to force selection via getFolderByName (maybe useful for uncommon folder names)
         $delimiter = is_null($delimiter) ? ClientManager::get('options.delimiter', "/") : $delimiter;
         if (strpos($folder_name, (string)$delimiter) !== false) {
@@ -439,7 +435,7 @@ class Client {
      * @throws FolderFetchingException
      * @throws Exceptions\RuntimeException
      */
-    public function getFolderByName($folder_name) {
+    public function getFolderByName($folder_name): ?Folder {
         return $this->getFolders(false)->where("name", $folder_name)->first();
     }
 
@@ -452,7 +448,7 @@ class Client {
      * @throws FolderFetchingException
      * @throws Exceptions\RuntimeException
      */
-    public function getFolderByPath($folder_path) {
+    public function getFolderByPath($folder_path): ?Folder {
         return $this->getFolders(false)->where("path", $folder_path)->first();
     }
 
@@ -544,9 +540,9 @@ class Client {
      * @throws ConnectionFailedException
      * @throws Exceptions\RuntimeException
      */
-    public function openFolder(string $folder_path, bool $force_select = false) {
+    public function openFolder(string $folder_path, bool $force_select = false): array {
         if ($this->active_folder == $folder_path && $this->isConnected() && $force_select === false) {
-            return true;
+            return [];
         }
         $this->checkConnection();
         $this->active_folder = $folder_path;
@@ -564,7 +560,7 @@ class Client {
      * @throws Exceptions\EventNotFoundException
      * @throws Exceptions\RuntimeException
      */
-    public function createFolder(string $folder, bool $expunge = true): Folder {
+    public function createFolder(string $folder_path, bool $expunge = true): Folder {
         $this->checkConnection();
         $status = $this->connection->createFolder($folder);
 
@@ -581,13 +577,13 @@ class Client {
 
     /**
      * Check a given folder
-     * @param $folder
+     * @param string $folder_path
      *
-     * @return array|bool
+     * @return array
      * @throws ConnectionFailedException
      * @throws Exceptions\RuntimeException
      */
-    public function checkFolder($folder) {
+    public function checkFolder(string $folder_path): array {
         $this->checkConnection();
         return $this->connection->examineFolder($folder);
     }
@@ -597,7 +593,7 @@ class Client {
      *
      * @return string
      */
-    public function getFolderPath(){
+    public function getFolderPath(): string {
         return $this->active_folder;
     }
 
@@ -606,12 +602,12 @@ class Client {
      * Ref.: https://datatracker.ietf.org/doc/html/rfc2971
      *
      * @param array|null $ids
-     * @return array|bool|void|null
+     * @return array
      *
      * @throws ConnectionFailedException
      * @throws Exceptions\RuntimeException
      */
-    public function Id(array $ids = null) {
+    public function Id(array $ids = null): array {
         $this->checkConnection();
         return $this->connection->ID($ids);
     }
@@ -643,11 +639,11 @@ class Client {
     /**
      * Delete all messages marked for deletion
      *
-     * @return bool
+     * @return array
      * @throws ConnectionFailedException
      * @throws Exceptions\RuntimeException
      */
-    public function expunge(): bool {
+    public function expunge(): array {
         $this->checkConnection();
         return $this->connection->expunge();
     }

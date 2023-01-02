@@ -26,18 +26,18 @@ class ClientManager {
      *
      * @var array $config
      */
-    public static $config = [];
+    public static array $config = [];
 
     /**
      * @var array $accounts
      */
-    protected $accounts = [];
+    protected array $accounts = [];
 
     /**
      * ClientManager constructor.
      * @param array|string $config
      */
-    public function __construct($config = []) {
+    public function __construct(array|string $config = []) {
         $this->setConfig($config);
     }
 
@@ -69,11 +69,11 @@ class ClientManager {
     /**
      * Get a dotted config parameter
      * @param string $key
-     * @param null   $default
+     * @param null $default
      *
      * @return mixed|null
      */
-    public static function get(string $key, $default = null) {
+    public static function get(string $key, $default = null): mixed {
         $parts = explode('.', $key);
         $value = null;
         foreach($parts as $part) {
@@ -134,8 +134,8 @@ class ClientManager {
      *
      * @return array
      */
-    protected function getClientConfig($name): array {
-        if ($name === null || $name === 'null') {
+    protected function getClientConfig(?string $name): array {
+        if ($name === null || $name === 'null' || $name === "") {
             return ['driver' => 'null'];
         }
 
@@ -157,7 +157,7 @@ class ClientManager {
      *
      * @return void
      */
-    public function setDefaultAccount(string $name) {
+    public function setDefaultAccount(string $name): void {
         self::$config['default'] = $name;
     }
 
@@ -173,7 +173,7 @@ class ClientManager {
      *
      * @return $this
      */
-    public function setConfig($config): ClientManager {
+    public function setConfig(array|string $config): ClientManager {
 
         if(is_array($config) === false) {
             $config = require $config;
@@ -223,7 +223,7 @@ class ClientManager {
      * @link   http://www.php.net/manual/en/function.array-merge-recursive.php#96201
      * @author Mark Roduner <mark.roduner@gmail.com>
      */
-    private function array_merge_recursive_distinct() {
+    private function array_merge_recursive_distinct(): mixed {
 
         $arrays = func_get_args();
         $base = array_shift($arrays);

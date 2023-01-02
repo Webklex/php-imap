@@ -54,24 +54,24 @@ class Attachment {
     /**
      * @var Message $oMessage
      */
-    protected $oMessage;
+    protected Message $oMessage;
 
     /**
      * Used config
      *
      * @var array $config
      */
-    protected $config = [];
+    protected array $config = [];
 
     /** @var Part $part */
-    protected $part;
+    protected Part $part;
 
     /**
      * Attribute holder
      *
      * @var array $attributes
      */
-    protected $attributes = [
+    protected array $attributes = [
         'content' => null,
         'type' => null,
         'part_number' => 0,
@@ -88,7 +88,7 @@ class Attachment {
      *
      * @var string $mask
      */
-    protected $mask = AttachmentMask::class;
+    protected string $mask = AttachmentMask::class;
 
     /**
      * Attachment constructor.
@@ -204,8 +204,7 @@ class Attachment {
     /**
      * Fetch the given attachment
      */
-    protected function fetch() {
-
+    protected function fetch(): void {
         $content = $this->part->content;
 
         $this->content_type = $this->part->content_type;
@@ -244,7 +243,7 @@ class Attachment {
      *
      * @return boolean
      */
-    public function save(string $path, $filename = null): bool {
+    public function save(string $path, string $filename = null): bool {
         $filename = $filename ?: $this->getName();
 
         return file_put_contents($path.$filename, $this->getContent()) !== false;
@@ -254,7 +253,7 @@ class Attachment {
      * Set the attachment name and try to decode it
      * @param $name
      */
-    public function setName($name) {
+    public function setName($name): void {
         $decoder = $this->config['decoder']['attachment'];
         if ($name !== null) {
             if($decoder === 'utf-8' && extension_loaded('imap')) {
@@ -270,7 +269,7 @@ class Attachment {
      *
      * @return string|null
      */
-    public function getMimeType(){
+    public function getMimeType(): ?string {
         return (new \finfo())->buffer($this->getContent(), FILEINFO_MIME_TYPE);
     }
 
@@ -279,7 +278,7 @@ class Attachment {
      *
      * @return string|null
      */
-    public function getExtension(){
+    public function getExtension(): ?string {
         $guesser = "\Symfony\Component\Mime\MimeTypes";
         if (class_exists($guesser) !== false) {
             /** @var Symfony\Component\Mime\MimeTypes $guesser */
@@ -342,7 +341,7 @@ class Attachment {
      * @return mixed
      * @throws MaskNotFoundException
      */
-    public function mask($mask = null){
+    public function mask(string $mask = null): mixed {
         $mask = $mask !== null ? $mask : $this->mask;
         if(class_exists($mask)){
             return new $mask($this);

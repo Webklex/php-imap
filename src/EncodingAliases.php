@@ -25,7 +25,7 @@ class EncodingAliases {
      *
      * @var array
      */
-    private static $aliases = [
+    private static array $aliases = [
         /*
         |--------------------------------------------------------------------------
         | Email encoding aliases
@@ -472,11 +472,11 @@ class EncodingAliases {
      *
      * @return string
      */
-    public static function get($encoding, string $fallback = null): string {
+    public static function get(?string $encoding, string $fallback = null): string {
         if (isset(self::$aliases[strtolower($encoding ?? '')])) {
             return self::$aliases[strtolower($encoding ?? '')];
         }
-        return $fallback !== null ? $fallback : $encoding;
+        return $fallback ?: $encoding;
     }
     
 }

@@ -27,117 +27,117 @@ class Part {
      *
      * @var string $raw
      */
-    public $raw = "";
+    public string $raw = "";
 
     /**
      * Part type
      *
      * @var int $type
      */
-    public $type = IMAP::MESSAGE_TYPE_TEXT;
+    public int $type = IMAP::MESSAGE_TYPE_TEXT;
 
     /**
      * Part content
      *
      * @var string $content
      */
-    public $content = "";
+    public string $content = "";
 
     /**
      * Part subtype
      *
-     * @var string $subtype
+     * @var ?string $subtype
      */
-    public $subtype = null;
+    public ?string $subtype = null;
 
     /**
      * Part charset - if available
      *
      * @var string $charset
      */
-    public $charset = "utf-8";
+    public string $charset = "utf-8";
 
     /**
      * Part encoding method
      *
      * @var int $encoding
      */
-    public $encoding = IMAP::MESSAGE_ENC_OTHER;
+    public int $encoding = IMAP::MESSAGE_ENC_OTHER;
 
     /**
      * Alias to check if the part is an attachment
      *
      * @var boolean $ifdisposition
      */
-    public $ifdisposition = false;
+    public bool $ifdisposition = false;
 
     /**
      * Indicates if the part is an attachment
      *
-     * @var string $disposition
+     * @var ?string $disposition
      */
-    public $disposition = null;
+    public ?string $disposition = null;
 
     /**
      * Alias to check if the part has a description
      *
      * @var boolean $ifdescription
      */
-    public $ifdescription = false;
+    public bool $ifdescription = false;
 
     /**
      * Part description if available
      *
-     * @var string $description
+     * @var ?string $description
      */
-    public $description = null;
+    public ?string $description = null;
 
     /**
      * Part filename if available
      *
-     * @var string $filename
+     * @var ?string $filename
      */
-    public $filename = null;
+    public ?string $filename = null;
 
     /**
      * Part name if available
      *
-     * @var string $name
+     * @var ?string $name
      */
-    public $name = null;
+    public ?string $name = null;
 
     /**
      * Part id if available
      *
-     * @var string $id
+     * @var ?string $id
      */
-    public $id = null;
+    public ?string $id = null;
 
     /**
      * The part number of the current part
      *
      * @var integer $part_number
      */
-    public $part_number = 0;
+    public int $part_number = 0;
 
     /**
      * Part length in bytes
      *
      * @var integer $bytes
      */
-    public $bytes = null;
+    public int $bytes;
 
     /**
      * Part content type
      *
      * @var string|null $content_type
      */
-    public $content_type = null;
+    public ?string $content_type = null;
 
     /**
-     * @var Header $header
+     * @var ?Header $header
      */
-    private $header = null;
+    private ?Header $header;
 
     /**
      * Part constructor.
@@ -159,7 +159,7 @@ class Part {
      *
      * @throws InvalidMessageDateException
      */
-    protected function parse(){
+    protected function parse(): void {
         if ($this->header === null) {
             $body = $this->findHeaders();
         }else{
@@ -224,9 +224,9 @@ class Part {
      * Try to parse the subtype if any is present
      * @param $content_type
      *
-     * @return string
+     * @return ?string
      */
-    private function parseSubtype($content_type){
+    private function parseSubtype($content_type): ?string {
         if (is_array($content_type)) {
             foreach ($content_type as $part){
                 if ((strpos($part, "/")) !== false){
@@ -244,9 +244,9 @@ class Part {
     /**
      * Try to parse the disposition if any is present
      */
-    private function parseDisposition(){
-        $content_disposition = $this->header->get("content_disposition");
-        if($content_disposition !== null) {
+    private function parseDisposition(): void {
+        $content_disposition = $this->header->get("content_disposition")->first();
+        if($content_disposition) {
             $this->ifdisposition = true;
             $this->disposition = (is_array($content_disposition)) ? implode(' ', $content_disposition) : $content_disposition;
         }
@@ -255,9 +255,9 @@ class Part {
     /**
      * Try to parse the description if any is present
      */
-    private function parseDescription(){
-        $content_description = $this->header->get("content_description");
-        if($content_description !== null) {
+    private function parseDescription(): void {
+        $content_description = $this->header->get("content_description")->first();
+        if($content_description) {
             $this->ifdescription = true;
             $this->description = $content_description;
         }

@@ -24,21 +24,21 @@ use ReturnTypeWillChange;
 class Attribute implements ArrayAccess {
 
     /** @var string $name */
-    protected $name;
+    protected string $name;
 
     /**
      * Value holder
      *
      * @var array $values
      */
-    protected $values = [];
+    protected array $values = [];
 
     /**
      * Attribute constructor.
      * @param string $name
-     * @param array|mixed      $value
+     * @param mixed|null $value
      */
-    public function __construct(string $name, $value = null) {
+    public function __construct(string $name, mixed $value = null) {
         $this->setName($name);
         $this->add($value);
     }

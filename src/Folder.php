@@ -33,57 +33,57 @@ class Folder {
      *
      * @var Client
      */
-    protected $client;
+    protected Client $client;
 
     /**
      * Folder full path
      *
      * @var string
      */
-    public $path;
+    public string $path;
 
     /**
      * Folder name
      *
      * @var string
      */
-    public $name;
+    public string $name;
 
     /**
-     * Folder fullname
+     * Folder full name
      *
      * @var string
      */
-    public $full_name;
+    public string $full_name;
 
     /**
      * Children folders
      *
-     * @var FolderCollection|array
+     * @var FolderCollection
      */
-    public $children = [];
+    public FolderCollection $children;
 
     /**
      * Delimiter for folder
      *
      * @var string
      */
-    public $delimiter;
+    public string $delimiter;
 
     /**
-     * Indicates if folder can't containg any "children".
+     * Indicates if folder can't contain any "children".
      * CreateFolder won't work on this folder.
      *
      * @var boolean
      */
-    public $no_inferiors;
+    public bool $no_inferiors;
 
     /**
      * Indicates if folder is only container, not a mailbox - you can't open it.
      *
      * @var boolean
      */
-    public $no_select;
+    public bool $no_select;
 
     /**
      * Indicates if folder is marked. This means that it may contain new messages since the last time it was checked.
@@ -91,26 +91,26 @@ class Folder {
      *
      * @var boolean
      */
-    public $marked;
+    public bool $marked;
 
     /**
-     * Indicates if folder containg any "children".
+     * Indicates if folder contains any "children".
      * Not provided by all IMAP servers.
      *
      * @var boolean
      */
-    public $has_children;
+    public bool $has_children;
 
     /**
-     * Indicates if folder refers to other.
+     * Indicates if folder refers to others.
      * Not provided by all IMAP servers.
      *
      * @var boolean
      */
-    public $referral;
+    public bool $referral;
 
     /** @var array */
-    public $status;
+    public array $status;
 
     /**
      * Folder constructor.
@@ -184,11 +184,11 @@ class Folder {
 
     /**
      * Set children.
-     * @param FolderCollection|array $children
+     * @param FolderCollection $children
      *
-     * @return self
+     * @return Folder
      */
-    public function setChildren($children = []): Folder {
+    public function setChildren(FolderCollection $children): Folder {
         $this->children = $children;
 
         return $this;
@@ -199,9 +199,9 @@ class Folder {
      * It converts UTF7-IMAP encoding to UTF-8.
      * @param $name
      *
-     * @return array|false|string|string[]|null
+     * @return string|array|bool|string[]|null
      */
-    protected function decodeName($name) {
+    protected function decodeName($name): string|array|bool|null {
         return mb_convert_encoding($name, "UTF-8", "UTF7-IMAP");
     }
 
@@ -210,9 +210,9 @@ class Folder {
      * @param $delimiter
      * @param $full_name
      *
-     * @return mixed
+     * @return string|bool
      */
-    protected function getSimpleName($delimiter, $full_name) {
+    protected function getSimpleName($delimiter, $full_name): string|bool {
         $arr = explode($delimiter, $full_name);
 
         return end($arr);
@@ -222,7 +222,7 @@ class Folder {
      * Parse attributes and set it to object properties.
      * @param $attributes
      */
-    protected function parseAttributes($attributes) {
+    protected function parseAttributes($attributes): void {
         $this->no_inferiors = in_array('\NoInferiors', $attributes);
         $this->no_select    = in_array('\NoSelect', $attributes);
         $this->marked       = in_array('\Marked', $attributes);
@@ -235,13 +235,13 @@ class Folder {
      * @param string $new_name
      * @param boolean $expunge
      *
-     * @return bool
+     * @return array
      * @throws ConnectionFailedException
      * @throws Exceptions\EventNotFoundException
      * @throws Exceptions\FolderFetchingException
      * @throws Exceptions\RuntimeException
      */
-    public function move(string $new_name, bool $expunge = true): bool {
+    public function move(string $new_name, bool $expunge = true): array {
         $this->client->checkConnection();
         $status = $this->client->getConnection()->renameFolder($this->full_name, $new_name);
         if($expunge) $this->client->expunge();
@@ -274,13 +274,13 @@ class Folder {
      * Append a string message to the current mailbox
      * @param string $message
      * @param array|null $options
-     * @param string|null|Carbon $internal_date
+     * @param string|Carbon|null $internal_date
      *
      * @return bool
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\RuntimeException
      */
-    public function appendMessage(string $message, array $options = null, $internal_date = null): bool {
+    public function appendMessage(string $message, array $options = null, Carbon|string $internal_date = null): array {
         /**
          * Check if $internal_date is parsed. If it is null it should not be set. Otherwise, the message can't be stored.
          * If this parameter is set, it will set the INTERNALDATE on the appended message. The parameter should be a
@@ -299,13 +299,13 @@ class Folder {
      * @param string $new_name
      * @param boolean $expunge
      *
-     * @return bool
+     * @return array
      * @throws ConnectionFailedException
      * @throws Exceptions\EventNotFoundException
      * @throws Exceptions\FolderFetchingException
      * @throws Exceptions\RuntimeException
      */
-    public function rename(string $new_name, bool $expunge = true): bool {
+    public function rename(string $new_name, bool $expunge = true): array {
         return $this->move($new_name, $expunge);
     }
 
@@ -318,9 +318,9 @@ class Folder {
      * @throws Exceptions\RuntimeException
      * @throws Exceptions\EventNotFoundException
      */
-    public function delete(bool $expunge = true): bool {
-        $status = $this->client->getConnection()->deleteFolder($this->path);
-        if($expunge) $this->client->expunge();
+    public function delete(bool $expunge = true): array {
+        $status = $this->client->getConnection()->deleteFolder($this->path)->validatedData();
+        if ($expunge) $this->client->expunge();
 
         $event = $this->getEvent("folder", "deleted");
         $event::dispatch($this);
@@ -335,7 +335,7 @@ class Folder {
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\RuntimeException
      */
-    public function subscribe(): bool {
+    public function subscribe(): array {
         $this->client->openFolder($this->path);
         return $this->client->getConnection()->subscribeFolder($this->path);
     }
@@ -347,7 +347,7 @@ class Folder {
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\RuntimeException
      */
-    public function unsubscribe(): bool {
+    public function unsubscribe(): array {
         $this->client->openFolder($this->path);
         return $this->client->getConnection()->unsubscribeFolder($this->path);
     }
@@ -368,7 +368,7 @@ class Folder {
      * @throws Exceptions\MessageNotFoundException
      * @throws Exceptions\NotSupportedCapabilityException
      */
-    public function idle(callable $callback, int $timeout = 300, bool $auto_reconnect = false) {
+    public function idle(callable $callback, int $timeout = 300): void {
         $this->client->setTimeout($timeout);
         if (!in_array("IDLE", $this->client->getConnection()->getCapabilities())) {
             throw new NotSupportedCapabilityException("IMAP server does not support IDLE");
@@ -434,8 +434,7 @@ class Folder {
      * @throws RuntimeException
      * @throws ConnectionFailedException
      */
-    public function loadStatus(): Folder
-    {
+    public function loadStatus(): Folder {
         $this->status = $this->getStatus();
         return $this;
     }
@@ -465,8 +464,8 @@ class Folder {
      * Set the delimiter
      * @param $delimiter
      */
-    public function setDelimiter($delimiter){
-        if(in_array($delimiter, [null, '', ' ', false]) === true) {
+    public function setDelimiter($delimiter): void {
+        if (in_array($delimiter, [null, '', ' ', false]) === true) {
             $delimiter = ClientManager::get('options.delimiter', '/');
         }
 

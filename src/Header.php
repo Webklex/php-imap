@@ -29,44 +29,36 @@ class Header {
      *
      * @var string $raw
      */
-    public $raw = "";
+    public string $raw = "";
 
     /**
      * Attribute holder
      *
      * @var Attribute[]|array $attributes
      */
-    protected $attributes = [];
+    protected array $attributes = [];
 
     /**
      * Config holder
      *
      * @var array $config
      */
-    protected $config = [];
+    protected array $config = [];
 
     /**
      * Fallback Encoding
      *
      * @var string
      */
-    public $fallback_encoding = 'UTF-8';
-
-    /**
-     * Convert parsed values to attributes
-     *
-     * @var bool
-     */
-    protected $attributize = false;
+    public string $fallback_encoding = 'UTF-8';
 
     /**
      * Header constructor.
      * @param string $raw_header
-     * @param boolean $attributize
      *
      * @throws InvalidMessageDateException
      */
-    public function __construct(string $raw_header, bool $attributize = true) {
+    public function __construct(string $raw_header) {
         $this->raw = $raw_header;
         $this->config = ClientManager::get('options');
         $this->attributize = $attributize;
@@ -108,9 +100,10 @@ class Header {
      * Get a specific header attribute
      * @param $name
      *
-     * @return Attribute|mixed
+     * @return Attribute
      */
-    public function get($name) {
+    public function get($name): Attribute {
+        $name = str_replace(["-", " "], "_", strtolower($name));
         if (isset($this->attributes[$name])) {
             return $this->attributes[$name];
         }
@@ -124,9 +117,9 @@ class Header {
      * @param array|mixed $value
      * @param boolean $strict
      *
-     * @return Attribute
+     * @return Attribute|array
      */
-    public function set(string $name, $value, bool $strict = false) {
+    public function set(string $name, mixed $value, bool $strict = false): Attribute|array {
         if (isset($this->attributes[$name]) && $strict === false) {
             if ($this->attributize) {
                 $this->attributes[$name]->add($value, true);
@@ -156,7 +149,7 @@ class Header {
      *
      * @return mixed|null
      */
-    public function find($pattern) {
+    public function find($pattern): mixed {
         if (preg_match_all($pattern, $this->raw, $matches)) {
             if (isset($matches[1])) {
                 if (count($matches[1]) > 0) {
@@ -172,7 +165,7 @@ class Header {
      *
      * @return string|null
      */
-    public function getBoundary() {
+    public function getBoundary(): ?string {
         $regex = $this->config["boundary"] ?? "/boundary=(.*?(?=;)|(.*))/i";
         $boundary = $this->find($regex);
 
@@ -198,7 +191,7 @@ class Header {
      *
      * @throws InvalidMessageDateException
      */
-    protected function parse() {
+    protected function parse(): void {
         $header = $this->rfc822_parse_headers($this->raw);
 
         $this->extractAddresses($header);
@@ -232,7 +225,7 @@ class Header {
      *
      * @return object
      */
-    public function rfc822_parse_headers($raw_headers) {
+    public function rfc822_parse_headers($raw_headers): object {
         $headers = [];
         $imap_headers = [];
         if (extension_loaded('imap') && $this->config["rfc822"]) {
@@ -367,7 +360,7 @@ class Header {
      *
      * @return mixed|string
      */
-    public function convertEncoding($str, $from = "ISO-8859-2", $to = "UTF-8") {
+    public function convertEncoding($str, string $from = "ISO-8859-2", string $to = "UTF-8"): mixed {
 
         $from = EncodingAliases::get($from, $this->fallback_encoding);
         $to = EncodingAliases::get($to, $this->fallback_encoding);
@@ -416,7 +409,7 @@ class Header {
      *
      * @return string
      */
-    public function getEncoding($structure): string {
+    public function getEncoding(object|string $structure): string {
         if (property_exists($structure, 'parameters')) {
             foreach ($structure->parameters as $parameter) {
                 if (strtolower($parameter->attribute) == "charset") {
@@ -449,7 +442,7 @@ class Header {
      *
      * @return mixed
      */
-    private function decode($value) {
+    private function decode(mixed $value): mixed {
         if (is_array($value)) {
             return $this->decodeArray($value);
         }
@@ -592,7 +585,7 @@ class Header {
      * Extract a given part as address array from a given header
      * @param object $header
      */
-    private function extractAddresses($header) {
+    private function extractAddresses(object $header): void {
         foreach (['from', 'to', 'cc', 'bcc', 'reply_to', 'sender'] as $key) {
             if (property_exists($header, $key)) {
                 $this->set($key, $this->parseAddresses($header->$key));
@@ -651,7 +644,7 @@ class Header {
     /**
      * Search and extract potential header extensions
      */
-    private function extractHeaderExtensions() {
+    private function extractHeaderExtensions(): void {
         foreach ($this->attributes as $key => $value) {
             if (is_array($value)) {
                 $value = implode(", ", $value);
@@ -704,7 +697,7 @@ class Header {
      *
      * @throws InvalidMessageDateException
      */
-    private function parseDate($header) {
+    private function parseDate(object $header): void {
 
         if (property_exists($header, 'date')) {
             $date = $header->date;

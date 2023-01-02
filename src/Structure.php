@@ -28,33 +28,33 @@ class Structure {
      *
      * @var string $raw
      */
-    public $raw = "";
+    public string $raw = "";
 
     /**
      * @var Header $header
      */
-    private $header = null;
+    private Header $header;
 
     /**
      * Message type (if multipart or not)
      *
      * @var int $type
      */
-    public $type = IMAP::MESSAGE_TYPE_TEXT;
+    public int $type = IMAP::MESSAGE_TYPE_TEXT;
 
     /**
      * All available parts
      *
      * @var Part[] $parts
      */
-    public $parts = [];
+    public array $parts = [];
 
     /**
      * Config holder
      *
      * @var array $config
      */
-    protected $config = [];
+    protected array $config = [];
 
     /**
      * Structure constructor.
@@ -77,7 +77,7 @@ class Structure {
      * @throws MessageContentFetchingException
      * @throws InvalidMessageDateException
      */
-    protected function parse(){
+    protected function parse(): void {
         $this->findContentType();
         $this->parts = $this->find_parts();
     }
