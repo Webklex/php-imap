@@ -32,11 +32,11 @@
         "illuminate/pagination": ">=5.0.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.5.10",
-        "symfony/var-dumper": "^6.2"
+        "phpunit/phpunit": "^9.5.10"
     },
     "suggest": {
-        "symfony/mime": "Recomended for better extension support"
+        "symfony/mime": "Recomended for better extension support",
+        "symfony/var-dumper": "Usefull tool for debugging"
     },
     "autoload": {
         "psr-4": {
