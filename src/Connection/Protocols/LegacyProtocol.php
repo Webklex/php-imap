@@ -90,11 +90,11 @@ class LegacyProtocol extends Protocol {
                 throw new AuthFailedException($message);
             }
 
-        if(!$this->stream) {
-            $errors = \imap_errors();
-            $message = implode("; ", (is_array($errors) ? $errors : array()));
-            throw new AuthFailedException($message);
-        }
+            if (!$this->stream) {
+                $errors = \imap_errors();
+                $message = implode("; ", (is_array($errors) ? $errors : array()));
+                throw new AuthFailedException($message);
+            }
 
             $errors = \imap_errors();
             $response->addCommand("imap_errors");
@@ -135,12 +135,12 @@ class LegacyProtocol extends Protocol {
      * @return string
      */
     protected function getAddress(): string {
-        $address = "{".$this->host.":".$this->port."/".$this->protocol;
+        $address = "{" . $this->host . ":" . $this->port . "/" . $this->protocol;
         if (!$this->cert_validation) {
             $address .= '/novalidate-cert';
         }
-        if (in_array($this->encryption,['tls', 'notls', 'ssl'])) {
-            $address .= '/'.$this->encryption;
+        if (in_array($this->encryption, ['tls', 'notls', 'ssl'])) {
+            $address .= '/' . $this->encryption;
         } elseif ($this->encryption === "starttls") {
             $address .= '/tls';
         }
@@ -704,14 +704,14 @@ class LegacyProtocol extends Protocol {
     /**
      * Enable the debug mode
      */
-    public function enableDebug(){
+    public function enableDebug() {
         $this->debug = true;
     }
 
     /**
      * Disable the debug mode
      */
-    public function disableDebug(){
+    public function disableDebug() {
         $this->debug = false;
     }
 

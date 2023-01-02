@@ -191,7 +191,7 @@ class ImapProtocol extends Protocol {
                 $token = substr($token, 1);
             }
             if ($token[0] == '"') {
-                if (preg_match('%^\(*"((.|\\\\|\\")*?)" *%', $line, $matches)) {
+                if (preg_match('%^\(*"((.|\\\\|\")*?)" *%', $line, $matches)) {
                     $tokens[] = $matches[1];
                     $line = substr($line, strlen($matches[0]));
                     continue;
@@ -203,14 +203,14 @@ class ImapProtocol extends Protocol {
                 if (is_numeric($chars)) {
                     $token = '';
                     while (strlen($token) < $chars) {
-                        $token .= $this->nextLine();
+                        $token .= $this->nextLine($response);
                     }
                     $line = '';
                     if (strlen($token) > $chars) {
                         $line = substr($token, $chars);
                         $token = substr($token, 0, $chars);
                     } else {
-                        $line .= $this->nextLine();
+                        $line .= $this->nextLine($response);
                     }
                     $tokens[] = $token;
                     $line = trim($line) . ' ';
@@ -229,7 +229,7 @@ class ImapProtocol extends Protocol {
                 }
                 $token = $tokens;
                 $tokens = array_pop($stack);
-                // special handline if more than one closing brace
+                // special handling if more than one closing brace
                 while ($braces-- > 0) {
                     $tokens[] = $token;
                     $token = $tokens;
@@ -633,11 +633,11 @@ class ImapProtocol extends Protocol {
         if (is_array($from)) {
             $set = implode(',', $from);
         } elseif ($to === null) {
-            $set = (int)$from;
-        } elseif ($to === INF) {
-            $set = (int)$from . ':*';
+            $set = $from;
+        } elseif ($to == INF) {
+            $set = $from . ':*';
         } else {
-            $set = (int)$from . ':' . (int)$to;
+            $set = $from . ':' . (int)$to;
         }
 
         $items = (array)$items;
@@ -651,6 +651,9 @@ class ImapProtocol extends Protocol {
             if ($tokens[1] != 'FETCH') {
                 continue;
             }
+
+            $uidKey = 0;
+            $data = [];
 
             // find array key of UID value; try the last elements, or search for it
             if ($uid) {
@@ -682,7 +685,7 @@ class ImapProtocol extends Protocol {
                     $data = $tokens[2][3];
                 } else {
                     $expectedResponse = 0;
-                    // maybe the server send an other field we didn't wanted
+                    // maybe the server send another field we didn't wanted
                     $count = count($tokens[2]);
                     // we start with 2, because 0 was already checked
                     for ($i = 2; $i < $count; $i += 2) {
@@ -698,7 +701,6 @@ class ImapProtocol extends Protocol {
                     }
                 }
             } else {
-                $data = [];
                 while (key($tokens[2]) !== null) {
                     $data[current($tokens[2])] = next($tokens[2]);
                     next($tokens[2]);
@@ -713,7 +715,7 @@ class ImapProtocol extends Protocol {
             }
             if ($uid) {
                 $result[$tokens[2][$uidKey]] = $data;
-            }else{
+            } else {
                 $result[$tokens[0]] = $data;
             }
         }
@@ -873,7 +875,7 @@ class ImapProtocol extends Protocol {
         $set = $this->buildSet($from, $to);
 
         $command = $this->buildUIDCommand("STORE", $uid);
-        $item = ($mode == '-' ? "-" : "+").($item === null ? "FLAGS" : $item).($silent ? '.SILENT' : "");
+        $item = ($mode == '-' ? "-" : "+") . ($item === null ? "FLAGS" : $item) . ($silent ? '.SILENT' : "");
 
         $response = $this->requestAndResponse($command, [$set, $item, $flags], $silent);
 
@@ -1029,9 +1031,9 @@ class ImapProtocol extends Protocol {
         if (is_array($ids) && !empty($ids)) {
             $token = "(";
             foreach ($ids as $id) {
-                $token .= '"'.$id.'" ';
+                $token .= '"' . $id . '" ';
             }
-            $token = rtrim($token).")";
+            $token = rtrim($token) . ")";
         }
 
         return $this->requestAndResponse("ID", [$token], true);
@@ -1238,7 +1240,7 @@ class ImapProtocol extends Protocol {
         $ids = [];
         foreach ($response->data() as $msgn => $v) {
             $id = $uid ? $v : $msgn;
-            if ( ($to >= $id && $from <= $id) || ($to === "*" && $from <= $id) ){
+            if (($to >= $id && $from <= $id) || ($to === "*" && $from <= $id)) {
                 $ids[] = $id;
             }
         }

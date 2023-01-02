@@ -305,39 +305,42 @@ class Client {
                     throw new MaskNotFoundException("Unknown mask provided: ".$config['masks']['message']);
                 }
             }else{
-                if(class_exists($default_config['message'])) {
-                    $this->default_message_mask = $default_config['message'];
+                $default_mask  = ClientManager::getMask("message");
+                if($default_mask != ""){
+                    $this->default_message_mask = $default_mask;
                 }else{
-                    throw new MaskNotFoundException("Unknown mask provided: ".$default_config['message']);
+                    throw new MaskNotFoundException("Unknown message mask provided");
                 }
             }
             if(isset($config['masks']['attachment'])) {
                 if(class_exists($config['masks']['attachment'])) {
                     $this->default_attachment_mask = $config['masks']['attachment'];
                 }else{
-                    throw new MaskNotFoundException("Unknown mask provided: ".$config['masks']['attachment']);
+                    throw new MaskNotFoundException("Unknown mask provided: ". $config['masks']['attachment']);
                 }
             }else{
-                if(class_exists($default_config['attachment'])) {
-                    $this->default_attachment_mask = $default_config['attachment'];
+                $default_mask  = ClientManager::getMask("attachment");
+                if($default_mask != ""){
+                    $this->default_attachment_mask = $default_mask;
                 }else{
-                    throw new MaskNotFoundException("Unknown mask provided: ".$default_config['attachment']);
+                    throw new MaskNotFoundException("Unknown attachment mask provided");
                 }
             }
         }else{
-            if(class_exists($default_config['message'])) {
-                $this->default_message_mask = $default_config['message'];
+            $default_mask  = ClientManager::getMask("message");
+            if($default_mask != ""){
+                $this->default_message_mask = $default_mask;
             }else{
-                throw new MaskNotFoundException("Unknown mask provided: ".$default_config['message']);
+                throw new MaskNotFoundException("Unknown message mask provided");
             }
 
-            if(class_exists($default_config['attachment'])) {
-                $this->default_attachment_mask = $default_config['attachment'];
+            $default_mask  = ClientManager::getMask("attachment");
+            if($default_mask != ""){
+                $this->default_attachment_mask = $default_mask;
             }else{
-                throw new MaskNotFoundException("Unknown mask provided: ".$default_config['attachment']);
+                throw new MaskNotFoundException("Unknown attachment mask provided");
             }
         }
-
     }
 
     /**
@@ -375,10 +378,16 @@ class Client {
      * @throws RuntimeException
      * @throws ResponseException
      */
-    public function checkConnection() {
-        if (!$this->isConnected()) {
+    public function checkConnection(): bool {
+        try {
+            if (!$this->isConnected()) {
+                $this->connect();
+                return true;
+            }
+        } catch (\Throwable) {
             $this->connect();
         }
+        return false;
     }
 
     /**

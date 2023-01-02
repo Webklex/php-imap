@@ -143,7 +143,7 @@ class Query {
 
         try {
             $date = Carbon::parse($date);
-        } catch (Exception $e) {
+        } catch (Exception) {
             throw new MessageSearchValidationException();
         }
 
@@ -428,14 +428,10 @@ class Query {
      * @throws ResponseException
      */
     public function paginate(int $per_page = 5, $page = null, string $page_name = 'imap_page'): LengthAwarePaginator {
-        if (
-            $page === null
-            && isset($_GET[$page_name])
-            && $_GET[$page_name] > 0
-        ) {
+        if ($page === null && isset($_GET[$page_name]) && $_GET[$page_name] > 0) {
             $this->page = intval($_GET[$page_name]);
         } elseif ($page > 0) {
-            $this->page = $page;
+            $this->page = (int)$page;
         }
 
         $this->limit = $per_page;

@@ -170,32 +170,28 @@ class Part {
         $this->parseDescription();
         $this->parseEncoding();
 
-        $this->charset = $this->header->get("charset");
+        $this->charset = $this->header->get("charset")->first();
         $this->name = $this->header->get("name");
         $this->filename = $this->header->get("filename");
 
-        if(!empty($this->header->get("id"))) {
+        if($this->header->get("id")->exist()) {
             $this->id = $this->header->get("id");
-        } else if(!empty($this->header->get("x_attachment_id"))){
+        } else if($this->header->get("x_attachment_id")->exist()){
             $this->id = $this->header->get("x_attachment_id");
-        } else if(!empty($this->header->get("content_id"))){
+        } else if($this->header->get("content_id")->exist()){
             $this->id = strtr($this->header->get("content_id"), [
                 '<' => '',
                 '>' => ''
             ]);
         }
 
-        $content_types = $this->header->get("content_type");
+        $content_types = $this->header->get("content_type")->all();
         if(!empty($content_types)){
             $this->subtype = $this->parseSubtype($content_types);
-            $content_type = $content_types;
-            if (is_array($content_types)) {
-                $content_type = $content_types[0];
-            }
+            $content_type = $content_types[0];
             $parts = explode(';', $content_type);
             $this->content_type = trim($parts[0]);
         }
-
 
         $this->content = trim(rtrim($body));
         $this->bytes = strlen($this->content);
@@ -236,7 +232,7 @@ class Part {
             return null;
         }
         if (($pos = strpos($content_type, "/")) !== false){
-            return substr($content_type, $pos + 1);
+            return substr(explode(";", $content_type)[0], $pos + 1);
         }
         return null;
     }
@@ -248,7 +244,7 @@ class Part {
         $content_disposition = $this->header->get("content_disposition")->first();
         if($content_disposition) {
             $this->ifdisposition = true;
-            $this->disposition = (is_array($content_disposition)) ? implode(' ', $content_disposition) : $content_disposition;
+            $this->disposition = (is_array($content_disposition)) ? implode(' ', $content_disposition) : explode(";", $content_disposition)[0];
         }
     }
 

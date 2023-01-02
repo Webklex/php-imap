@@ -205,7 +205,7 @@ class Message {
         $this->boot();
 
         $default_mask = $client->getDefaultMessageMask();
-        if($default_mask != null) {
+        if ($default_mask != null) {
             $this->mask = $default_mask;
         }
         $this->events["message"] = $client->getDefaultEvents("message");
@@ -269,13 +269,13 @@ class Message {
         $instance->boot();
 
         $default_mask = $client->getDefaultMessageMask();
-        if($default_mask != null) {
+        if ($default_mask != null) {
             $instance->setMask($default_mask);
         }
         $instance->setEvents([
-            "message" => $client->getDefaultEvents("message"),
-            "flag" => $client->getDefaultEvents("flag"),
-        ]);
+                                 "message" => $client->getDefaultEvents("message"),
+                                 "flag"    => $client->getDefaultEvents("flag"),
+                             ]);
         $instance->setFolderPath($client->getFolderPath());
         $instance->setSequence($sequence);
         $instance->setFetchOption($fetch_options);
@@ -320,19 +320,19 @@ class Message {
      * @throws ResponseException
      */
     public function __call(string $method, array $arguments) {
-        if(strtolower(substr($method, 0, 3)) === 'get') {
+        if (strtolower(substr($method, 0, 3)) === 'get') {
             $name = Str::snake(substr($method, 3));
             return $this->get($name);
-        }elseif (strtolower(substr($method, 0, 3)) === 'set') {
+        } elseif (strtolower(substr($method, 0, 3)) === 'set') {
             $name = Str::snake(substr($method, 3));
 
-            if(in_array($name, array_keys($this->attributes))) {
+            if (in_array($name, array_keys($this->attributes))) {
                 return $this->__set($name, array_pop($arguments));
             }
 
         }
 
-        throw new MethodNotFoundException("Method ".self::class.'::'.$method.'() is not supported');
+        throw new MethodNotFoundException("Method " . self::class . '::' . $method . '() is not supported');
     }
 
     /**
@@ -604,7 +604,7 @@ class Message {
     private function fetchPart(Part $part): void {
         if ($part->isAttachment()) {
             $this->fetchAttachment($part);
-        }else{
+        } else {
             $encoding = $this->getEncoding($part);
 
             $content = $this->decodeString($part->content, $part->encoding);
@@ -628,8 +628,8 @@ class Message {
             $subtype = $subtype == "plain" || $subtype == "" ? "text" : $subtype;
 
             if (isset($this->bodies[$subtype])) {
-                $this->bodies[$subtype] .= "\n".$content;
-            }else{
+                $this->bodies[$subtype] .= "\n" . $content;
+            } else {
                 $this->bodies[$subtype] = $content;
             }
         }
@@ -778,7 +778,7 @@ class Message {
         }
 
         if (function_exists('iconv') && $from != 'UTF-7' && $to != 'UTF-7') {
-            return @iconv($from, $to.'//IGNORE', $str);
+            return @iconv($from, $to . '//IGNORE', $str);
         } else {
             if (!$from) {
                 return mb_convert_encoding($str, $to);
@@ -800,9 +800,9 @@ class Message {
                     return EncodingAliases::get($parameter->value, "ISO-8859-2");
                 }
             }
-        }elseif (property_exists($structure, 'charset')){
+        } elseif (property_exists($structure, 'charset')) {
             return EncodingAliases::get($structure->charset, "ISO-8859-2");
-        }elseif (is_string($structure) === true){
+        } elseif (is_string($structure) === true) {
             return mb_detect_encoding($structure);
         }
 
@@ -847,7 +847,7 @@ class Message {
         $sent_folder = $sent_folder ?: $this->client->getFolderByPath(ClientManager::get("options.common_folders.sent", "INBOX/Sent"));
 
         /** @var Message $message */
-        foreach($thread as $message) {
+        foreach ($thread as $message) {
             if ($message->message_id->first() == $this->message_id->first()) {
                 return $thread;
             }
@@ -858,7 +858,7 @@ class Message {
         $this->fetchThreadByInReplyTo($thread, $this->message_id, $sent_folder, $folder, $sent_folder);
 
         if (is_array($this->in_reply_to)) {
-            foreach($this->in_reply_to as $in_reply_to) {
+            foreach ($this->in_reply_to as $in_reply_to) {
                 $this->fetchThreadByMessageId($thread, $in_reply_to, $folder, $folder, $sent_folder);
                 $this->fetchThreadByMessageId($thread, $in_reply_to, $sent_folder, $folder, $sent_folder);
             }
@@ -886,11 +886,11 @@ class Message {
      */
     protected function fetchThreadByInReplyTo(MessageCollection &$thread, string $in_reply_to, Folder $primary_folder, Folder $secondary_folder, Folder $sent_folder): void {
         $primary_folder->query()->inReplyTo($in_reply_to)
-        ->setFetchBody($this->getFetchBodyOption())
-        ->leaveUnread()->get()->each(function($message) use(&$thread, $secondary_folder, $sent_folder){
-            /** @var Message $message */
-            $message->thread($sent_folder, $thread, $secondary_folder);
-        });
+            ->setFetchBody($this->getFetchBodyOption())
+            ->leaveUnread()->get()->each(function($message) use (&$thread, $secondary_folder, $sent_folder) {
+                /** @var Message $message */
+                $message->thread($sent_folder, $thread, $secondary_folder);
+            });
     }
 
     /**
@@ -912,11 +912,11 @@ class Message {
      */
     protected function fetchThreadByMessageId(MessageCollection &$thread, string $message_id, Folder $primary_folder, Folder $secondary_folder, Folder $sent_folder): void {
         $primary_folder->query()->messageId($message_id)
-        ->setFetchBody($this->getFetchBodyOption())
-        ->leaveUnread()->get()->each(function($message) use(&$thread, $secondary_folder, $sent_folder){
-            /** @var Message $message */
-            $message->thread($sent_folder, $thread, $secondary_folder);
-        });
+            ->setFetchBody($this->getFetchBodyOption())
+            ->leaveUnread()->get()->each(function($message) use (&$thread, $secondary_folder, $sent_folder) {
+                /** @var Message $message */
+                $message->thread($sent_folder, $thread, $secondary_folder);
+            });
     }
 
     /**
@@ -1059,11 +1059,11 @@ class Message {
      */
     public function delete(bool $expunge = true, string $trash_path = null, bool $force_move = false): bool {
         $status = $this->setFlag("Deleted");
-        if($force_move) {
-            $trash_path = $trash_path === null ? $this->config["common_folders"]["trash"]: $trash_path;
-            $status = $this->move($trash_path);
+        if ($force_move) {
+            $trash_path = $trash_path === null ? $this->config["common_folders"]["trash"] : $trash_path;
+            $this->move($trash_path);
         }
-        if($expunge) $this->client->expunge();
+        if ($expunge) $this->client->expunge();
 
         $event = $this->getEvent("message", "deleted");
         $event::dispatch($this);
@@ -1087,7 +1087,7 @@ class Message {
      */
     public function restore(bool $expunge = true): bool {
         $status = $this->unsetFlag("Deleted");
-        if($expunge) $this->client->expunge();
+        if ($expunge) $this->client->expunge();
 
         $event = $this->getEvent("message", "restored");
         $event::dispatch($this);
@@ -1111,7 +1111,7 @@ class Message {
      */
     public function setFlag(array|string $flag): bool {
         $this->client->openFolder($this->folder_path);
-        $flag = "\\".trim(is_array($flag) ? implode(" \\", $flag) : $flag);
+        $flag = "\\" . trim(is_array($flag) ? implode(" \\", $flag) : $flag);
         $sequence_id = $this->getSequenceId();
         try {
             $status = $this->client->getConnection()->store([$flag], $sequence_id, $sequence_id, "+", true, $this->sequence === IMAP::ST_UID)->validatedData();
@@ -1143,7 +1143,7 @@ class Message {
     public function unsetFlag(array|string $flag): bool {
         $this->client->openFolder($this->folder_path);
 
-        $flag = "\\".trim(is_array($flag) ? implode(" \\", $flag) : $flag);
+        $flag = "\\" . trim(is_array($flag) ? implode(" \\", $flag) : $flag);
         $sequence_id = $this->getSequenceId();
         try {
             $status = $this->client->getConnection()->store([$flag], $sequence_id, $sequence_id, "-", true, $this->sequence === IMAP::ST_UID)->validatedData();
@@ -1348,7 +1348,7 @@ class Message {
      * @return Message
      */
     public function setMask($mask): Message {
-        if(class_exists($mask)){
+        if (class_exists($mask)) {
             $this->mask = $mask;
         }
 
@@ -1373,11 +1373,11 @@ class Message {
      */
     public function mask(mixed $mask = null): mixed {
         $mask = $mask !== null ? $mask : $this->mask;
-        if(class_exists($mask)){
+        if (class_exists($mask)) {
             return new $mask($this);
         }
 
-        throw new MaskNotFoundException("Unknown mask provided: ".$mask);
+        throw new MaskNotFoundException("Unknown mask provided: " . $mask);
     }
 
     /**
@@ -1524,7 +1524,7 @@ class Message {
         if ($this->getSequence() === IMAP::ST_UID) {
             $this->setUid($uid);
             $this->setMsglist($msglist);
-        }else{
+        } else {
             $this->setMsgn($uid, $msglist);
         }
     }

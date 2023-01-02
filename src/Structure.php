@@ -85,9 +85,8 @@ class Structure {
     /**
      * Determine the message content type
      */
-    public function findContentType(){
-        $content_type = $this->header->get("content_type");
-        $content_type = (is_array($content_type)) ? implode(' ', $content_type) : $content_type;
+    public function findContentType(): void {
+        $content_type = $this->header->get("content_type")->first();
         if($content_type && stripos($content_type, 'multipart') === 0) {
             $this->type = IMAP::MESSAGE_TYPE_MULTIPART;
         }else{
@@ -115,6 +114,7 @@ class Structure {
         if (($boundary = $headers->getBoundary()) !== null) {
             return $this->detectParts($boundary, $body, $part_number);
         }
+
         return [new Part($body, $headers, $part_number)];
     }
 

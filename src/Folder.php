@@ -135,9 +135,9 @@ class Folder {
         $this->events["folder"] = $client->getDefaultEvents("folder");
 
         $this->setDelimiter($delimiter);
-        $this->path      = $folder_name;
-        $this->full_name  = $this->decodeName($folder_name);
-        $this->name      = $this->getSimpleName($this->delimiter, $this->full_name);
+        $this->path = $folder_name;
+        $this->full_name = $this->decodeName($folder_name);
+        $this->name = $this->getSimpleName($this->delimiter, $this->full_name);
 
         $this->parseAttributes($attributes);
     }
@@ -245,9 +245,9 @@ class Folder {
      */
     protected function parseAttributes($attributes): void {
         $this->no_inferiors = in_array('\NoInferiors', $attributes);
-        $this->no_select    = in_array('\NoSelect', $attributes);
-        $this->marked       = in_array('\Marked', $attributes);
-        $this->referral     = in_array('\Referral', $attributes);
+        $this->no_select = in_array('\NoSelect', $attributes);
+        $this->marked = in_array('\Marked', $attributes);
+        $this->referral = in_array('\Referral', $attributes);
         $this->has_children = in_array('\HasChildren', $attributes);
     }
 
@@ -321,7 +321,7 @@ class Folder {
          * date string that conforms to the rfc2060 specifications for a date_time value or be a Carbon object.
          */
 
-        if ($internal_date instanceof Carbon){
+        if ($internal_date instanceof Carbon) {
             $internal_date = $internal_date->format('d-M-Y H:i:s O');
         }
 

@@ -76,17 +76,17 @@ class ClientManager {
     public static function get(string $key, $default = null): mixed {
         $parts = explode('.', $key);
         $value = null;
-        foreach($parts as $part) {
-            if($value === null) {
-                if(isset(self::$config[$part])) {
+        foreach ($parts as $part) {
+            if ($value === null) {
+                if (isset(self::$config[$part])) {
                     $value = self::$config[$part];
-                }else{
+                } else {
                     break;
                 }
-            }else{
-                if(isset($value[$part])) {
+            } else {
+                if (isset($value[$part])) {
                     $value = $value[$part];
-                }else{
+                } else {
                     break;
                 }
             }
@@ -154,8 +154,9 @@ class ClientManager {
         if ($name === null || $name === 'null' || $name === "") {
             return ['driver' => 'null'];
         }
+        $account = self::$config["accounts"][$name] ?? [];
 
-        return is_array(self::$config["accounts"][$name]) ? self::$config["accounts"][$name] : [];
+        return is_array($account) ? $account : [];
     }
 
     /**
@@ -191,27 +192,27 @@ class ClientManager {
      */
     public function setConfig(array|string $config): ClientManager {
 
-        if(is_array($config) === false) {
+        if (is_array($config) === false) {
             $config = require $config;
         }
 
         $config_key = 'imap';
-        $path = __DIR__.'/config/'.$config_key.'.php';
+        $path = __DIR__ . '/config/' . $config_key . '.php';
 
         $vendor_config = require $path;
         $config = $this->array_merge_recursive_distinct($vendor_config, $config);
 
-        if(is_array($config)){
-            if(isset($config['default'])){
-                if(isset($config['accounts']) && $config['default']){
+        if (is_array($config)) {
+            if (isset($config['default'])) {
+                if (isset($config['accounts']) && $config['default']) {
 
                     $default_config = $vendor_config['accounts']['default'];
-                    if(isset($config['accounts'][$config['default']])){
+                    if (isset($config['accounts'][$config['default']])) {
                         $default_config = array_merge($default_config, $config['accounts'][$config['default']]);
                     }
 
-                    if(is_array($config['accounts'])){
-                        foreach($config['accounts'] as $account_key => $account){
+                    if (is_array($config['accounts'])) {
+                        foreach ($config['accounts'] as $account_key => $account) {
                             $config['accounts'][$account_key] = array_merge($default_config, $account);
                         }
                     }
@@ -250,20 +251,20 @@ class ClientManager {
             return array_keys($arr) !== range(0, count($arr) - 1);
         };
 
-        if(!is_array($base)) $base = empty($base) ? array() : array($base);
+        if (!is_array($base)) $base = empty($base) ? array() : array($base);
 
-        foreach($arrays as $append) {
+        foreach ($arrays as $append) {
 
-            if(!is_array($append)) $append = array($append);
+            if (!is_array($append)) $append = array($append);
 
-            foreach($append as $key => $value) {
+            foreach ($append as $key => $value) {
 
-                if(!array_key_exists($key, $base) and !is_numeric($key)) {
+                if (!array_key_exists($key, $base) and !is_numeric($key)) {
                     $base[$key] = $value;
                     continue;
                 }
 
-                if(
+                if (
                     (
                         is_array($value)
                         && $isAssoc($value)
@@ -277,8 +278,8 @@ class ClientManager {
                     // else merging $baseConfig['dispositions'] = ['attachment', 'inline'] with $customConfig['dispositions'] = ['attachment']
                     // results in $resultConfig['dispositions'] = ['attachment', 'inline']
                     $base[$key] = $this->array_merge_recursive_distinct($base[$key], $value);
-                } else if(is_numeric($key)) {
-                    if(!in_array($value, $base)) $base[] = $value;
+                } else if (is_numeric($key)) {
+                    if (!in_array($value, $base)) $base[] = $value;
                 } else {
                     $base[$key] = $value;
                 }
