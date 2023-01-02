@@ -26,6 +26,7 @@ Discord: [discord.gg/rd4cN9h6][link-discord]
 
 ## Table of Contents
 - [Documentations](#documentations)
+- [Compatibility](#compatibility)
 - [Basic usage example](#basic-usage-example)
 - [Known issues](#known-issues)
 - [Support](#support)
@@ -40,13 +41,24 @@ Discord: [discord.gg/rd4cN9h6][link-discord]
 - Core documentation: [php-imap.com](https://www.php-imap.com/)
 
 
+## Compatibility
+| Version | PHP 5.6 | PHP 7 | PHP 8 |
+|:--------|:-------:|:-----:|:-----:|
+| v5.x    |    /    |   /   |   X   |
+| v4.x    |    /    |   X   |   X   |
+| v3.x    |    /    |   X   |   /   |
+| v2.x    |    X    |   X   |   /   |
+| v1.x    |    X    |   /   |   /   |
+
 ## Basic usage example
 This is a basic example, which will echo out all Mails within all imap folders
 and will move every message into INBOX.read. Please be aware that this should not be
-tested in real life and is only meant to gives an impression on how things work.
+tested in real life and is only meant to give an impression on how things work.
 
 ```php
 use Webklex\PHPIMAP\ClientManager;
+
+require_once "vendor/autoload.php";
 
 $cm = new ClientManager('path/to/config/imap.php');
 
@@ -86,15 +98,15 @@ foreach($folders as $folder){
 
 
 ### Known issues
-| Error                                                                     | Solution                                                   | 
-| ------------------------------------------------------------------------- | ---------------------------------------------------------- | 
-| Kerberos error: No credentials cache file found (try running kinit) (...) | Uncomment "DISABLE_AUTHENTICATOR" inside your config and use the `legacy-imap` protocol | 
+| Error                                                                      | Solution                                                                                |
+|:---------------------------------------------------------------------------|:----------------------------------------------------------------------------------------|
+| Kerberos error: No credentials cache file found (try running kinit) (...)  | Uncomment "DISABLE_AUTHENTICATOR" inside your config and use the `legacy-imap` protocol |
 
 
 ## Support
 If you encounter any problems or if you find a bug, please don't hesitate to create a new [issue](https://github.com/Webklex/php-imap/issues).
-However please be aware that it might take some time to get an answer.
-Off topic, rude or abusive issues will be deleted without any notice.
+However, please be aware that it might take some time to get an answer.
+Off-topic, rude or abusive issues will be deleted without any notice.
 
 If you need **commercial** support, feel free to send me a mail at github@webklex.com.
 
@@ -116,7 +128,7 @@ echo 'your php code...';
 
 
 ## Features & pull requests
-Everyone can contribute to this project. Every pull request will be considered but it can also happen to be declined.  
+Everyone can contribute to this project. Every pull request will be considered, but it can also happen to be declined.  
 To prevent unnecessary work, please consider to create a [feature issue](https://github.com/Webklex/php-imap/issues/new?template=feature_request.md)  
 first, if you're planning to do bigger changes. Of course, you can also create a new [feature issue](https://github.com/Webklex/php-imap/issues/new?template=feature_request.md)
 if you're just wishing a feature ;)
