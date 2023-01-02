@@ -14,12 +14,22 @@ namespace Webklex\PHPIMAP;
 
 use ReflectionClass;
 use ReflectionException;
+use Webklex\PHPIMAP\Exceptions\AuthFailedException;
+use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
+use Webklex\PHPIMAP\Exceptions\EventNotFoundException;
+use Webklex\PHPIMAP\Exceptions\FolderFetchingException;
+use Webklex\PHPIMAP\Exceptions\GetMessagesFailedException;
+use Webklex\PHPIMAP\Exceptions\ImapBadRequestException;
+use Webklex\PHPIMAP\Exceptions\ImapServerErrorException;
 use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
 use Webklex\PHPIMAP\Exceptions\MaskNotFoundException;
 use Webklex\PHPIMAP\Exceptions\MessageContentFetchingException;
 use Webklex\PHPIMAP\Exceptions\MessageFlagException;
 use Webklex\PHPIMAP\Exceptions\MessageHeaderFetchingException;
+use Webklex\PHPIMAP\Exceptions\MessageNotFoundException;
 use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
+use Webklex\PHPIMAP\Exceptions\ResponseException;
+use Webklex\PHPIMAP\Exceptions\RuntimeException;
 use Webklex\PHPIMAP\Support\AttachmentCollection;
 use Webklex\PHPIMAP\Support\FlagCollection;
 use Webklex\PHPIMAP\Support\Masks\MessageMask;
@@ -179,14 +189,17 @@ class Message {
      * @param boolean $fetch_flags
      * @param integer|null $sequence
      *
-     * @throws Exceptions\ConnectionFailedException
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws EventNotFoundException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
      * @throws InvalidMessageDateException
-     * @throws Exceptions\RuntimeException
-     * @throws MessageHeaderFetchingException
      * @throws MessageContentFetchingException
-     * @throws Exceptions\EventNotFoundException
      * @throws MessageFlagException
-     * @throws Exceptions\MessageNotFoundException
+     * @throws MessageHeaderFetchingException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function __construct(int $uid, ?int $msglist, Client $client, int $fetch_options = null, bool $fetch_body = false, bool $fetch_flags = false, int $sequence = null) {
         $this->boot();
@@ -237,18 +250,21 @@ class Message {
      * @param null $sequence
      *
      * @return Message
-     * @throws Exceptions\ConnectionFailedException
-     * @throws Exceptions\EventNotFoundException
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws EventNotFoundException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
      * @throws InvalidMessageDateException
      * @throws MessageContentFetchingException
-     * @throws ReflectionException
      * @throws MessageFlagException
-     * @throws Exceptions\RuntimeException
-     * @throws Exceptions\MessageNotFoundException
+     * @throws ReflectionException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public static function make(int $uid, ?int $msglist, Client $client, string $raw_header, string $raw_body, array $raw_flags, $fetch_options = null, $sequence = null): Message {
         $reflection = new ReflectionClass(self::class);
-        /** @var self $instance */
+        /** @var Message $instance */
         $instance = $reflection->newInstanceWithoutConstructor();
         $instance->boot();
 
@@ -294,7 +310,14 @@ class Message {
      * @param array $arguments
      *
      * @return mixed
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws MessageNotFoundException
      * @throws MethodNotFoundException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function __call(string $method, array $arguments) {
         if(strtolower(substr($method, 0, 3)) === 'get') {
@@ -330,6 +353,13 @@ class Message {
      * @param $name
      *
      * @return Attribute|mixed|null
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws MessageNotFoundException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function __get($name) {
         return $this->get($name);
@@ -396,14 +426,18 @@ class Message {
     /**
      * Parse all defined headers
      *
-     * @throws Exceptions\ConnectionFailedException
-     * @throws Exceptions\RuntimeException
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
      * @throws InvalidMessageDateException
      * @throws MessageHeaderFetchingException
+     * @throws ResponseException
      */
     private function parseHeader(): void {
         $sequence_id = $this->getSequenceId();
-        $headers = $this->client->getConnection()->headers([$sequence_id], "RFC822", $this->sequence === IMAP::ST_UID);
+        $headers = $this->client->getConnection()->headers([$sequence_id], "RFC822", $this->sequence === IMAP::ST_UID)->validatedData();
         if (!isset($headers[$sequence_id])) {
             throw new MessageHeaderFetchingException("no headers found", 0);
         }
@@ -442,9 +476,13 @@ class Message {
      * Parse additional flags
      *
      * @return void
-     * @throws Exceptions\ConnectionFailedException
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
      * @throws MessageFlagException
-     * @throws Exceptions\RuntimeException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     private function parseFlags(): void {
         $this->client->openFolder($this->folder_path);
@@ -452,7 +490,7 @@ class Message {
 
         $sequence_id = $this->getSequenceId();
         try {
-            $flags = $this->client->getConnection()->flags([$sequence_id], $this->sequence === IMAP::ST_UID);
+            $flags = $this->client->getConnection()->flags([$sequence_id], $this->sequence === IMAP::ST_UID)->validatedData();
         } catch (Exceptions\RuntimeException $e) {
             throw new MessageFlagException("flag could not be fetched", 0, $e);
         }
@@ -472,16 +510,17 @@ class Message {
      * @throws ImapBadRequestException
      * @throws ImapServerErrorException
      * @throws InvalidMessageDateException
-     * @throws Exceptions\EventNotFoundException
+     * @throws MessageContentFetchingException
      * @throws MessageFlagException
-     * @throws Exceptions\RuntimeException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function parseBody(): Message {
         $this->client->openFolder($this->folder_path);
 
         $sequence_id = $this->getSequenceId();
         try {
-            $contents = $this->client->getConnection()->content([$sequence_id], "RFC822", $this->sequence === IMAP::ST_UID);
+            $contents = $this->client->getConnection()->content([$sequence_id], "RFC822", $this->sequence === IMAP::ST_UID)->validatedData();
         } catch (Exceptions\RuntimeException $e) {
             throw new MessageContentFetchingException("failed to fetch content", 0);
         }
@@ -499,17 +538,21 @@ class Message {
     /**
      * Handle auto "Seen" flag handling
      *
-     * @throws Exceptions\ConnectionFailedException
-     * @throws Exceptions\EventNotFoundException
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws EventNotFoundException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
      * @throws MessageFlagException
-     * @throws Exceptions\RuntimeException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function peek(): void {
         if ($this->fetch_options == IMAP::FT_PEEK) {
             if ($this->getFlags()->get("seen") == null) {
                 $this->unsetFlag("Seen");
             }
-        }elseif ($this->getFlags()->get("seen") != null) {
+        } elseif ($this->getFlags()->get("seen") != null) {
             $this->setFlag("Seen");
         }
     }
@@ -525,7 +568,8 @@ class Message {
      * @throws ImapServerErrorException
      * @throws InvalidMessageDateException
      * @throws MessageContentFetchingException
-     * @throws Exceptions\RuntimeException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function parseRawBody(string $raw_body): Message {
         $this->structure = new Structure($raw_body, $this->header);
@@ -538,8 +582,12 @@ class Message {
      * Fetch the Message structure
      * @param Structure $structure
      *
-     * @throws Exceptions\ConnectionFailedException
-     * @throws Exceptions\RuntimeException
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     private function fetchStructure(Structure $structure): void {
         $this->client?->openFolder($this->folder_path);
@@ -764,10 +812,14 @@ class Message {
     /**
      * Get the messages folder
      *
-     * @return mixed
-     * @throws Exceptions\ConnectionFailedException
-     * @throws Exceptions\FolderFetchingException
-     * @throws Exceptions\RuntimeException
+     * @return ?Folder
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws FolderFetchingException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function getFolder(): ?Folder {
         return $this->client->getFolderByPath($this->folder_path);
@@ -779,15 +831,19 @@ class Message {
      * @param MessageCollection|null $thread
      * @param Folder|null $folder
      *
-     * @return MessageCollection|null
-     * @throws Exceptions\ConnectionFailedException
-     * @throws Exceptions\FolderFetchingException
-     * @throws Exceptions\GetMessagesFailedException
-     * @throws Exceptions\RuntimeException
+     * @return MessageCollection
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws FolderFetchingException
+     * @throws GetMessagesFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function thread(Folder $sent_folder = null, MessageCollection &$thread = null, Folder $folder = null): MessageCollection {
         $thread = $thread ?: MessageCollection::make([]);
-        $folder = $folder ?:  $this->getFolder();
+        $folder = $folder ?: $this->getFolder();
         $sent_folder = $sent_folder ?: $this->client->getFolderByPath(ClientManager::get("options.common_folders.sent", "INBOX/Sent"));
 
         /** @var Message $message */
@@ -819,10 +875,14 @@ class Message {
      * @param Folder $secondary_folder
      * @param Folder $sent_folder
      *
-     * @throws Exceptions\ConnectionFailedException
-     * @throws Exceptions\GetMessagesFailedException
-     * @throws Exceptions\RuntimeException
-     * @throws Exceptions\FolderFetchingException
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws FolderFetchingException
+     * @throws GetMessagesFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     protected function fetchThreadByInReplyTo(MessageCollection &$thread, string $in_reply_to, Folder $primary_folder, Folder $secondary_folder, Folder $sent_folder): void {
         $primary_folder->query()->inReplyTo($in_reply_to)
@@ -841,10 +901,14 @@ class Message {
      * @param Folder $secondary_folder
      * @param Folder $sent_folder
      *
-     * @throws Exceptions\ConnectionFailedException
-     * @throws Exceptions\GetMessagesFailedException
-     * @throws Exceptions\RuntimeException
-     * @throws Exceptions\FolderFetchingException
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws GetMessagesFailedException
+     * @throws FolderFetchingException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     protected function fetchThreadByMessageId(MessageCollection &$thread, string $message_id, Folder $primary_folder, Folder $secondary_folder, Folder $sent_folder): void {
         $primary_folder->query()->messageId($message_id)
@@ -861,19 +925,23 @@ class Message {
      * @param boolean $expunge
      *
      * @return null|Message
-     * @throws Exceptions\ConnectionFailedException
-     * @throws Exceptions\FolderFetchingException
-     * @throws Exceptions\RuntimeException
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws EventNotFoundException
+     * @throws FolderFetchingException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
      * @throws InvalidMessageDateException
      * @throws MessageContentFetchingException
-     * @throws MessageHeaderFetchingException
-     * @throws Exceptions\EventNotFoundException
      * @throws MessageFlagException
-     * @throws Exceptions\MessageNotFoundException
+     * @throws MessageHeaderFetchingException
+     * @throws MessageNotFoundException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function copy(string $folder_path, bool $expunge = false): ?Message {
         $this->client->openFolder($folder_path);
-        $status = $this->client->getConnection()->examineFolder($folder_path);
+        $status = $this->client->getConnection()->examineFolder($folder_path)->validatedData();
 
         if (isset($status["uidnext"])) {
             $next_uid = $status["uidnext"];
@@ -882,7 +950,7 @@ class Message {
             $folder = $this->client->getFolderByPath($folder_path);
 
             $this->client->openFolder($this->folder_path);
-            if ($this->client->getConnection()->copyMessage($folder->path, $this->getSequenceId(), null, $this->sequence === IMAP::ST_UID) == true) {
+            if ($this->client->getConnection()->copyMessage($folder->path, $this->getSequenceId(), null, $this->sequence === IMAP::ST_UID)->validatedData()) {
                 return $this->fetchNewMail($folder, $next_uid, "copied", $expunge);
             }
         }
@@ -896,19 +964,23 @@ class Message {
      * @param boolean $expunge
      *
      * @return Message|null
-     * @throws Exceptions\ConnectionFailedException
-     * @throws Exceptions\FolderFetchingException
-     * @throws Exceptions\RuntimeException
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws EventNotFoundException
+     * @throws FolderFetchingException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
      * @throws InvalidMessageDateException
      * @throws MessageContentFetchingException
-     * @throws MessageHeaderFetchingException
-     * @throws Exceptions\EventNotFoundException
      * @throws MessageFlagException
-     * @throws Exceptions\MessageNotFoundException
+     * @throws MessageHeaderFetchingException
+     * @throws MessageNotFoundException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function move(string $folder_path, bool $expunge = false): ?Message {
         $this->client->openFolder($folder_path);
-        $status = $this->client->getConnection()->examineFolder($folder_path);
+        $status = $this->client->getConnection()->examineFolder($folder_path)->validatedData();
 
         if (isset($status["uidnext"])) {
             $next_uid = $status["uidnext"];
@@ -917,7 +989,7 @@ class Message {
             $folder = $this->client->getFolderByPath($folder_path);
 
             $this->client->openFolder($this->folder_path);
-            if ($this->client->getConnection()->moveMessage($folder->path, $this->getSequenceId(), null, $this->sequence === IMAP::ST_UID) == true) {
+            if ($this->client->getConnection()->moveMessage($folder->path, $this->getSequenceId(), null, $this->sequence === IMAP::ST_UID)->validatedData()) {
                 return $this->fetchNewMail($folder, $next_uid, "moved", $expunge);
             }
         }
@@ -933,24 +1005,28 @@ class Message {
      * @param boolean $expunge
      *
      * @return Message
-     * @throws Exceptions\ConnectionFailedException
-     * @throws Exceptions\EventNotFoundException
-     * @throws Exceptions\MessageNotFoundException
-     * @throws Exceptions\RuntimeException
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws EventNotFoundException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
      * @throws InvalidMessageDateException
      * @throws MessageContentFetchingException
      * @throws MessageFlagException
      * @throws MessageHeaderFetchingException
+     * @throws MessageNotFoundException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     protected function fetchNewMail(Folder $folder, int $next_uid, string $event, bool $expunge): Message {
-        if($expunge) $this->client->expunge();
+        if ($expunge) $this->client->expunge();
 
         $this->client->openFolder($folder->path);
 
         if ($this->sequence === IMAP::ST_UID) {
             $sequence_id = $next_uid;
-        }else{
-            $sequence_id = $this->client->getConnection()->getMessageNumber($next_uid);
+        } else {
+            $sequence_id = $this->client->getConnection()->getMessageNumber($next_uid)->validatedData();
         }
 
         $message = $folder->query()->getMessage($sequence_id, null, $this->sequence);
@@ -967,15 +1043,19 @@ class Message {
      * @param boolean $force_move
      *
      * @return bool
-     * @throws Exceptions\ConnectionFailedException
-     * @throws Exceptions\EventNotFoundException
-     * @throws Exceptions\FolderFetchingException
-     * @throws Exceptions\MessageNotFoundException
-     * @throws Exceptions\RuntimeException
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws EventNotFoundException
+     * @throws FolderFetchingException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
      * @throws InvalidMessageDateException
      * @throws MessageContentFetchingException
      * @throws MessageFlagException
      * @throws MessageHeaderFetchingException
+     * @throws MessageNotFoundException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function delete(bool $expunge = true, string $trash_path = null, bool $force_move = false): bool {
         $status = $this->setFlag("Deleted");
@@ -996,10 +1076,14 @@ class Message {
      * @param boolean $expunge
      *
      * @return bool
-     * @throws Exceptions\ConnectionFailedException
-     * @throws Exceptions\EventNotFoundException
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws EventNotFoundException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
      * @throws MessageFlagException
-     * @throws Exceptions\RuntimeException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function restore(bool $expunge = true): bool {
         $status = $this->unsetFlag("Deleted");
@@ -1016,17 +1100,21 @@ class Message {
      * @param array|string $flag
      *
      * @return bool
-     * @throws Exceptions\ConnectionFailedException
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws EventNotFoundException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
      * @throws MessageFlagException
-     * @throws Exceptions\EventNotFoundException
-     * @throws Exceptions\RuntimeException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function setFlag(array|string $flag): bool {
         $this->client->openFolder($this->folder_path);
         $flag = "\\".trim(is_array($flag) ? implode(" \\", $flag) : $flag);
         $sequence_id = $this->getSequenceId();
         try {
-            $status = $this->client->getConnection()->store([$flag], $sequence_id, $sequence_id, "+", true, $this->sequence === IMAP::ST_UID);
+            $status = $this->client->getConnection()->store([$flag], $sequence_id, $sequence_id, "+", true, $this->sequence === IMAP::ST_UID)->validatedData();
         } catch (Exceptions\RuntimeException $e) {
             throw new MessageFlagException("flag could not be set", 0, $e);
         }
@@ -1043,10 +1131,14 @@ class Message {
      * @param array|string $flag
      *
      * @return bool
-     * @throws Exceptions\ConnectionFailedException
-     * @throws Exceptions\EventNotFoundException
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws EventNotFoundException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
      * @throws MessageFlagException
-     * @throws Exceptions\RuntimeException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function unsetFlag(array|string $flag): bool {
         $this->client->openFolder($this->folder_path);
@@ -1054,7 +1146,7 @@ class Message {
         $flag = "\\".trim(is_array($flag) ? implode(" \\", $flag) : $flag);
         $sequence_id = $this->getSequenceId();
         try {
-            $status = $this->client->getConnection()->store([$flag], $sequence_id, $sequence_id, "-", true, $this->sequence === IMAP::ST_UID);
+            $status = $this->client->getConnection()->store([$flag], $sequence_id, $sequence_id, "-", true, $this->sequence === IMAP::ST_UID)->validatedData();
         } catch (Exceptions\RuntimeException $e) {
             throw new MessageFlagException("flag could not be removed", 0, $e);
         }
@@ -1071,10 +1163,14 @@ class Message {
      * @param array|string $flag
      *
      * @return bool
-     * @throws Exceptions\ConnectionFailedException
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws EventNotFoundException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
      * @throws MessageFlagException
-     * @throws Exceptions\EventNotFoundException
-     * @throws Exceptions\RuntimeException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function addFlag(array|string $flag): bool {
         return $this->setFlag($flag);
@@ -1085,10 +1181,14 @@ class Message {
      * @param array|string $flag
      *
      * @return bool
-     * @throws Exceptions\ConnectionFailedException
-     * @throws Exceptions\EventNotFoundException
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws EventNotFoundException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
      * @throws MessageFlagException
-     * @throws Exceptions\RuntimeException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function removeFlag(array|string $flag): bool {
         return $this->unsetFlag($flag);
@@ -1353,9 +1453,13 @@ class Message {
      * Set the client
      * @param $client
      *
-     * @return $this
-     * @throws Exceptions\RuntimeException
-     * @throws Exceptions\ConnectionFailedException
+     * @return Message
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function setClient($client): Message {
         $this->client = $client;

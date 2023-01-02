@@ -15,13 +15,17 @@ namespace Webklex\PHPIMAP;
 use ErrorException;
 use Webklex\PHPIMAP\Connection\Protocols\ImapProtocol;
 use Webklex\PHPIMAP\Connection\Protocols\LegacyProtocol;
-use Webklex\PHPIMAP\Connection\Protocols\Protocol;
 use Webklex\PHPIMAP\Connection\Protocols\ProtocolInterface;
 use Webklex\PHPIMAP\Exceptions\AuthFailedException;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
+use Webklex\PHPIMAP\Exceptions\EventNotFoundException;
 use Webklex\PHPIMAP\Exceptions\FolderFetchingException;
+use Webklex\PHPIMAP\Exceptions\ImapBadRequestException;
+use Webklex\PHPIMAP\Exceptions\ImapServerErrorException;
 use Webklex\PHPIMAP\Exceptions\MaskNotFoundException;
 use Webklex\PHPIMAP\Exceptions\ProtocolNotSupportedException;
+use Webklex\PHPIMAP\Exceptions\ResponseException;
+use Webklex\PHPIMAP\Exceptions\RuntimeException;
 use Webklex\PHPIMAP\Support\FolderCollection;
 use Webklex\PHPIMAP\Support\Masks\AttachmentMask;
 use Webklex\PHPIMAP\Support\Masks\MessageMask;
@@ -182,6 +186,10 @@ class Client {
 
     /**
      * Client destructor
+     *
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
      */
     public function __destruct() {
         $this->disconnect();
@@ -335,8 +343,13 @@ class Client {
     /**
      * Get the current imap resource
      *
-     * @return bool|Protocol|ProtocolInterface
+     * @return ProtocolInterface
      * @throws ConnectionFailedException
+     * @throws AuthFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function getConnection(): ProtocolInterface {
         $this->checkConnection();
@@ -356,6 +369,11 @@ class Client {
      * Determine if connection was established and connect if not.
      *
      * @throws ConnectionFailedException
+     * @throws AuthFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function checkConnection() {
         if (!$this->isConnected()) {
@@ -367,6 +385,11 @@ class Client {
      * Force the connection to reconnect
      *
      * @throws ConnectionFailedException
+     * @throws AuthFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function reconnect(): void {
         if ($this->isConnected()) {
@@ -380,6 +403,11 @@ class Client {
      *
      * @return $this
      * @throws ConnectionFailedException
+     * @throws AuthFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function connect(): Client {
         $this->disconnect();
@@ -421,19 +449,18 @@ class Client {
     /**
      * Authenticate the current session
      *
-     * @throws ConnectionFailedException
+     * @throws AuthFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws ResponseException
      */
-    protected function authenticate() {
-        try {
-            if ($this->authentication == "oauth") {
-                if (!$this->connection->authenticate($this->username, $this->password)) {
-                    throw new AuthFailedException();
-                }
-            } elseif (!$this->connection->login($this->username, $this->password)) {
+    protected function authenticate(): void {
+        if ($this->authentication == "oauth") {
+            if (!$this->connection->authenticate($this->username, $this->password)->validatedData()) {
                 throw new AuthFailedException();
             }
-        } catch (AuthFailedException $e) {
-            throw new ConnectionFailedException("connection setup failed", 0, $e);
+        } elseif (!$this->connection->login($this->username, $this->password)->validatedData()) {
+            throw new AuthFailedException();
         }
     }
 
@@ -441,9 +468,12 @@ class Client {
      * Disconnect from server.
      *
      * @return $this
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
      */
     public function disconnect(): Client {
-        if ($this->isConnected() && $this->connection !== false) {
+        if ($this->isConnected()) {
             $this->connection->logout();
         }
         $this->active_folder = null;
@@ -457,9 +487,13 @@ class Client {
      * @param string|null $delimiter
      *
      * @return Folder|null
-     * @throws ConnectionFailedException
      * @throws FolderFetchingException
-     * @throws Exceptions\RuntimeException
+     * @throws ConnectionFailedException
+     * @throws AuthFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function getFolder(string $folder_name, ?string $delimiter = null): ?Folder {
         // Set delimiter to false to force selection via getFolderByName (maybe useful for uncommon folder names)
@@ -476,9 +510,13 @@ class Client {
      * @param $folder_name
      *
      * @return Folder|null
-     * @throws ConnectionFailedException
      * @throws FolderFetchingException
-     * @throws Exceptions\RuntimeException
+     * @throws ConnectionFailedException
+     * @throws AuthFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function getFolderByName($folder_name): ?Folder {
         return $this->getFolders(false)->where("name", $folder_name)->first();
@@ -489,9 +527,13 @@ class Client {
      * @param $folder_path
      *
      * @return Folder|null
-     * @throws ConnectionFailedException
      * @throws FolderFetchingException
-     * @throws Exceptions\RuntimeException
+     * @throws ConnectionFailedException
+     * @throws AuthFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function getFolderByPath($folder_path): ?Folder {
         return $this->getFolders(false)->where("path", $folder_path)->first();
@@ -507,16 +549,20 @@ class Client {
      * @return FolderCollection
      * @throws ConnectionFailedException
      * @throws FolderFetchingException
-     * @throws Exceptions\RuntimeException
+     * @throws AuthFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function getFolders(bool $hierarchical = true, string $parent_folder = null): FolderCollection {
         $this->checkConnection();
         $folders = FolderCollection::make([]);
 
         $pattern = $parent_folder.($hierarchical ? '%' : '*');
-        $items = $this->connection->folders('', $pattern);
+        $items = $this->connection->folders('', $pattern)->validatedData();
 
-        if(is_array($items)){
+        if(!empty($items)){
             foreach ($items as $folder_name => $item) {
                 $folder = new Folder($this, $folder_name, $item["delimiter"], $item["flags"]);
 
@@ -544,18 +590,22 @@ class Client {
      * @param string|null $parent_folder
      *
      * @return FolderCollection
-     * @throws ConnectionFailedException
      * @throws FolderFetchingException
-     * @throws Exceptions\RuntimeException
+     * @throws ConnectionFailedException
+     * @throws AuthFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function getFoldersWithStatus(bool $hierarchical = true, string $parent_folder = null): FolderCollection {
         $this->checkConnection();
         $folders = FolderCollection::make([]);
 
         $pattern = $parent_folder.($hierarchical ? '%' : '*');
-        $items = $this->connection->folders('', $pattern);
+        $items = $this->connection->folders('', $pattern)->validatedData();
 
-        if(is_array($items)){
+        if(!empty($items)){
             foreach ($items as $folder_name => $item) {
                 $folder = new Folder($this, $folder_name, $item["delimiter"], $item["flags"]);
 
@@ -581,9 +631,13 @@ class Client {
      * @param string $folder_path
      * @param boolean $force_select
      *
-     * @return array|bool
+     * @return array
      * @throws ConnectionFailedException
-     * @throws Exceptions\RuntimeException
+     * @throws AuthFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function openFolder(string $folder_path, bool $force_select = false): array {
         if ($this->active_folder == $folder_path && $this->isConnected() && $force_select === false) {
@@ -591,7 +645,7 @@ class Client {
         }
         $this->checkConnection();
         $this->active_folder = $folder_path;
-        return $this->connection->selectFolder($folder_path);
+        return $this->connection->selectFolder($folder_path)->validatedData();
     }
 
     /**
@@ -601,17 +655,21 @@ class Client {
      *
      * @return Folder
      * @throws ConnectionFailedException
+     * @throws AuthFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
+     * @throws EventNotFoundException
      * @throws FolderFetchingException
-     * @throws Exceptions\EventNotFoundException
-     * @throws Exceptions\RuntimeException
+     * @throws ResponseException
      */
     public function createFolder(string $folder_path, bool $expunge = true): Folder {
         $this->checkConnection();
-        $status = $this->connection->createFolder($folder);
+        $status = $this->connection->createFolder($folder_path)->validatedData();
 
         if($expunge) $this->expunge();
 
-        $folder = $this->getFolderByPath($folder);
+        $folder = $this->getFolderByPath($folder_path);
         if($status && $folder) {
             $event = $this->getEvent("folder", "new");
             $event::dispatch($folder);
@@ -626,11 +684,15 @@ class Client {
      *
      * @return array
      * @throws ConnectionFailedException
-     * @throws Exceptions\RuntimeException
+     * @throws AuthFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function checkFolder(string $folder_path): array {
         $this->checkConnection();
-        return $this->connection->examineFolder($folder);
+        return $this->connection->examineFolder($folder_path)->validatedData();
     }
 
     /**
@@ -650,11 +712,15 @@ class Client {
      * @return array
      *
      * @throws ConnectionFailedException
-     * @throws Exceptions\RuntimeException
+     * @throws AuthFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function Id(array $ids = null): array {
         $this->checkConnection();
-        return $this->connection->ID($ids);
+        return $this->connection->ID($ids)->validatedData();
     }
 
     /**
@@ -662,11 +728,15 @@ class Client {
      *
      * @return array
      * @throws ConnectionFailedException
-     * @throws Exceptions\RuntimeException
+     * @throws AuthFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function getQuota(): array {
         $this->checkConnection();
-        return $this->connection->getQuota($this->username);
+        return $this->connection->getQuota($this->username)->validatedData();
     }
 
     /**
@@ -675,10 +745,15 @@ class Client {
      *
      * @return array
      * @throws ConnectionFailedException
+     * @throws AuthFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function getQuotaRoot(string $quota_root = 'INBOX'): array {
         $this->checkConnection();
-        return $this->connection->getQuotaRoot($quota_root);
+        return $this->connection->getQuotaRoot($quota_root)->validatedData();
     }
 
     /**
@@ -686,21 +761,30 @@ class Client {
      *
      * @return array
      * @throws ConnectionFailedException
-     * @throws Exceptions\RuntimeException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
+     * @throws AuthFailedException
+     * @throws ResponseException
      */
     public function expunge(): array {
         $this->checkConnection();
-        return $this->connection->expunge();
+        return $this->connection->expunge()->validatedData();
     }
 
     /**
      * Set the connection timeout
      * @param integer $timeout
      *
-     * @return Protocol
+     * @return ProtocolInterface
      * @throws ConnectionFailedException
+     * @throws AuthFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
-    public function setTimeout(int $timeout): Protocol {
+    public function setTimeout(int $timeout): ProtocolInterface {
         $this->timeout = $timeout;
         if ($this->isConnected()) {
             $this->connection->setConnectionTimeout($timeout);
@@ -714,6 +798,11 @@ class Client {
      *
      * @return int
      * @throws ConnectionFailedException
+     * @throws AuthFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
+     * @throws ResponseException
      */
     public function getTimeout(): int {
         $this->checkConnection();
