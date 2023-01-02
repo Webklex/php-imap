@@ -297,4 +297,66 @@ abstract class Protocol implements ProtocolInterface {
     public function disableUidCache(): void {
         $this->enable_uid_cache = false;
     }
+
+    /**
+     * Set the encryption method
+     * @param string $encryption
+     *
+     * @return void
+     */
+    public function setEncryption(string $encryption): void {
+        $this->encryption = $encryption;
+    }
+
+    /**
+     * Get the encryption method
+     * @return string
+     */
+    public function getEncryption(): string {
+        return $this->encryption;
+    }
+
+    /**
+     * Check if the current session is connected
+     *
+     * @return bool
+     */
+    public function connected(): bool {
+        return (bool)$this->stream;
+    }
+
+    /**
+     * Retrieves header/meta data from the resource stream
+     *
+     * @return array
+     */
+    public function meta(): array {
+        if (!$this->stream) {
+            return [
+                "crypto"       => [
+                    "protocol"       => "",
+                    "cipher_name"    => "",
+                    "cipher_bits"    => 0,
+                    "cipher_version" => "",
+                ],
+                "timed_out"    => true,
+                "blocked"      => true,
+                "eof"          => true,
+                "stream_type"  => "tcp_socket/unknown",
+                "mode"         => "c",
+                "unread_bytes" => 0,
+                "seekable"     => false,
+            ];
+        }
+        return stream_get_meta_data($this->stream);
+    }
+
+    /**
+     * Get the resource stream
+     *
+     * @return mixed
+     */
+    public function getStream(): mixed {
+        return $this->stream;
+    }
 }
