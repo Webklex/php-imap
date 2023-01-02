@@ -107,7 +107,7 @@ class Header {
             return $this->attributes[$name];
         }
 
-        return null;
+        return new Attribute($name);
     }
 
     /**
@@ -120,21 +120,7 @@ class Header {
      */
     public function set(string $name, mixed $value, bool $strict = false): Attribute|array {
         if (isset($this->attributes[$name]) && $strict === false) {
-            if ($this->attributize) {
-                $this->attributes[$name]->add($value, true);
-            } else {
-                if (isset($this->attributes[$name])) {
-                    if (!is_array($this->attributes[$name])) {
-                        $this->attributes[$name] = [$this->attributes[$name], $value];
-                    } else {
-                        $this->attributes[$name][] = $value;
-                    }
-                } else {
-                    $this->attributes[$name] = $value;
-                }
-            }
-        } elseif (!$this->attributize) {
-            $this->attributes[$name] = $value;
+            $this->attributes[$name]->add($value, true);
         } else {
             $this->attributes[$name] = new Attribute($name, $value);
         }
