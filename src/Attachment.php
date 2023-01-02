@@ -102,9 +102,16 @@ class Attachment {
         $this->part = $part;
         $this->part_number = $part->part_number;
 
-        $default_mask = $this->oMessage->getClient()->getDefaultAttachmentMask();
-        if($default_mask != null) {
-            $this->mask = $default_mask;
+        if ($this->oMessage->getClient()) {
+            $default_mask = $this->oMessage->getClient()?->getDefaultAttachmentMask();
+            if($default_mask != null) {
+                $this->mask = $default_mask;
+            }
+        }else{
+            $default_mask  = ClientManager::getMask("attachment");
+            if($default_mask != ""){
+                $this->mask =$default_mask;
+            }
         }
 
         $this->findType();
