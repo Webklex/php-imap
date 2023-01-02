@@ -421,48 +421,53 @@ class Folder {
         if (!in_array("IDLE", $this->client->getConnection()->getCapabilities()->validatedData())) {
             throw new Exceptions\NotSupportedCapabilityException("IMAP server does not support IDLE");
         }
-        $this->client->openFolder($this->path, true);
-        $connection = $this->client->getConnection();
-        $connection->idle();
+
+        $idle_client = $this->client->clone();
+        $idle_client->connect();
+        $idle_client->openFolder($this->path, true);
+        $idle_client->getConnection()->idle();
+
+        $last_action = Carbon::now()->addSeconds($timeout);
 
         $sequence = ClientManager::get('options.sequence', IMAP::ST_MSGN);
 
         while (true) {
-            try {
-                // This polymorphic call is fine - Protocol::idle() will throw an exception beforehand
-                $line = $connection->nextLine();
+            // This polymorphic call is fine - Protocol::idle() will throw an exception beforehand
+            $line = $idle_client->getConnection()->nextLine(Response::empty());
 
-                if (($pos = strpos($line, "EXISTS")) !== false) {
-                    $connection->done();
-                    $msgn = (int) substr($line, 2, $pos -2);
+            if (($pos = strpos($line, "EXISTS")) !== false) {
+                $msgn = (int)substr($line, 2, $pos - 2);
 
-                    $this->client->openFolder($this->path, true);
-                    $message = $this->query()->getMessageByMsgn($msgn);
-                    $message->setSequence($sequence);
-                    $callback($message);
+                // Check if the stream is still alive or should be considered stale
+                if (!$this->client->isConnected() || $last_action->isBefore(Carbon::now())) {
+                    // Reset the connection before interacting with it. Otherwise, the resource might be stale which
+                    // would result in a stuck interaction. If you know of a way of detecting a stale resource, please
+                    // feel free to improve this logic. I tried a lot but nothing seem to work reliably...
+                    // Things that didn't work:
+                    //      - Closing the resource with fclose()
+                    //      - Verifying the resource with stream_get_meta_data()
+                    //      - Bool validating the resource stream (e.g.: (bool)$stream)
+                    //      - Sending a NOOP command
+                    //      - Sending a null package
+                    //      - Reading a null package
+                    //      - Catching the fs warning
 
-                    $event = $this->getEvent("message", "new");
-                    $event::dispatch($message);
-                    $connection->idle();
-                } elseif (strpos($line, "OK") === false) {
-                    $connection->done();
-                    $connection->idle();
+                    // This polymorphic call is fine - Protocol::idle() will throw an exception beforehand
+                    $this->client->getConnection()->reset();
+                    // Establish a new connection
+                    $this->client->connect();
                 }
-            }catch (Exceptions\RuntimeException $e) {
-                if(strpos($e->getMessage(), "empty response") >= 0 && $connection->connected()) {
-                    $connection->done();
-                    $connection->idle();
-                    continue;
-                }
-                if(strpos($e->getMessage(), "connection closed") === false) {
-                    throw $e;
-                }
+                $last_action = Carbon::now()->addSeconds($timeout);
 
-                $this->client->reconnect();
+                // Always reopen the folder - otherwise the new message number isn't known to the current remote session
                 $this->client->openFolder($this->path, true);
 
-                $connection = $this->client->getConnection();
-                $connection->idle();
+                $message = $this->query()->getMessageByMsgn($msgn);
+                $message->setSequence($sequence);
+                $callback($message);
+
+                $event = $this->getEvent("message", "new");
+                $event::dispatch($message);
             }
         }
     }
