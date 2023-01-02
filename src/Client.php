@@ -689,6 +689,34 @@ class Client {
     }
 
     /**
+     * Delete a given folder
+     * @param string $folder_path
+     * @param boolean $expunge
+     *
+     * @return array
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws EventNotFoundException
+     * @throws FolderFetchingException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
+     * @throws ResponseException
+     */
+    public function deleteFolder(string $folder_path, bool $expunge = true): array {
+        $this->checkConnection();
+
+        $folder = $this->getFolderByPath($folder_path);
+        $status = $this->getConnection()->deleteFolder($folder_path)->validatedData();
+        if ($expunge) $this->expunge();
+
+        $event = $this->getEvent("folder", "deleted");
+        $event::dispatch($folder);
+
+        return $status;
+    }
+
+    /**
      * Check a given folder
      * @param string $folder_path
      *
