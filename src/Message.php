@@ -292,6 +292,48 @@ class Message {
     }
 
     /**
+     * Create a new message instance by reading and loading a file or remote location
+     *
+     * @throws RuntimeException
+     * @throws MessageContentFetchingException
+     * @throws ResponseException
+     * @throws ImapBadRequestException
+     * @throws InvalidMessageDateException
+     * @throws ConnectionFailedException
+     * @throws ImapServerErrorException
+     * @throws ReflectionException
+     * @throws AuthFailedException
+     * @throws MaskNotFoundException
+     */
+    public static function fromFile($filename): Message {
+        $reflection = new ReflectionClass(self::class);
+        /** @var Message $instance */
+        $instance = $reflection->newInstanceWithoutConstructor();
+        $instance->boot();
+
+        $default_mask  = ClientManager::getMask("message");
+        if($default_mask != ""){
+            $instance->setMask($default_mask);
+        }else{
+            throw new MaskNotFoundException("Unknown message mask provided");
+        }
+
+        $email = file_get_contents($filename);
+        if(!str_contains($email, "\r\n")){
+            $email = str_replace("\n", "\r\n", $email);
+        }
+        $raw_header = substr($email, 0, strpos($email, "\r\n\r\n"));
+        $raw_body = substr($email, strlen($raw_header)+8);
+
+        $instance->parseRawHeader($raw_header);
+        $instance->parseRawBody($raw_body);
+
+        $instance->setUid(0);
+
+        return $instance;
+    }
+
+    /**
      * Boot a new instance
      */
     public function boot(): void {
