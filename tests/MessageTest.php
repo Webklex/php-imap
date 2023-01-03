@@ -187,7 +187,27 @@ class MessageTest extends TestCase {
         self::assertSame("txt", $attachment->getExtension());
         self::assertInstanceOf(Message::class, $attachment->getMessage());
         self::assertSame("text/plain", $attachment->getMimeType());
+    }
 
+    public function testIssue348() {
+        $filename = implode(DIRECTORY_SEPARATOR, [__DIR__, "messages", "issue-348.eml"]);
+        $message = Message::fromFile($filename);
+
+        self::assertSame(1, $message->getAttachments()->count());
+
+        /** @var Attachment $attachment */
+        $attachment = $message->getAttachments()->first();
+
+        self::assertSame("attachment", $attachment->disposition);
+        self::assertSame("application/pdf", $attachment->content_type);
+        self::assertSame("Kelvinsong—Font_test_page_bold.pdf", $attachment->name);
+        self::assertSame(1, $attachment->part_number);
+        self::assertSame("text", $attachment->type);
+        self::assertNotEmpty($attachment->id);
+        self::assertSame(92384, $attachment->size);
+        self::assertSame("pdf", $attachment->getExtension());
+        self::assertInstanceOf(Message::class, $attachment->getMessage());
+        self::assertSame("application/pdf", $attachment->getMimeType());
     }
 
     protected function createNewProtocolMockup() {
