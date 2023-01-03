@@ -761,4 +761,26 @@ class Header {
         return $this->attributes;
     }
 
+    /**
+     * Set all header attributes
+     * @param array $attributes
+     *
+     * @return Header
+     */
+    public function setAttributes(array $attributes): Header {
+        $this->attributes = $attributes;
+        return $this;
+    }
+
+    /**
+     * Set the configuration used for parsing a raw header
+     * @param array $config
+     *
+     * @return Header
+     */
+    public function setConfig(array $config): Header {
+        $this->config = $config;
+        return $this;
+    }
+
 }
