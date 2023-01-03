@@ -81,6 +81,7 @@ class HeaderTest extends TestCase {
             ->getMock();
 
         $config = new \ReflectionProperty($mock, 'config');
+        $config->setAccessible(true);
         $config->setValue($mock, ['rfc822' => true]);
 
         $mockHeader = "Content-Type: text/csv; charset=WINDOWS-1252;  name*0=\"TH_Is_a_F ile name example 20221013.c\"; name*1=sv\r\nContent-Transfer-Encoding: quoted-printable\r\nContent-Disposition: attachment; filename*0=\"TH_Is_a_F ile name example 20221013.c\"; filename*1=\"sv\"\r\n";
@@ -109,6 +110,7 @@ class HeaderTest extends TestCase {
         ];
 
         $attributes = new \ReflectionProperty($mock, 'attributes');
+        $attributes->setAccessible(true);
         $attributes->setValue($mock, $mockAttributes);
 
         $method->invoke($mock);
