@@ -16,6 +16,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Syntax updated to support php 8 features
 - Get the attachment file extension from the filename if no mimetype detection library is available
 - Prevent the structure parsing from parsing an empty part
+- Convert all header keys to their lower case representation
 
 ### Added
 - Unit tests added #347 #242 (thanks @sergiy-petrov, @boekkooi-lengoo)

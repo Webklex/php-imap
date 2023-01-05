@@ -216,7 +216,7 @@ class Header {
         if (extension_loaded('imap') && $this->config["rfc822"]) {
             $raw_imap_headers = (array)\imap_rfc822_parse_headers($raw_headers);
             foreach ($raw_imap_headers as $key => $values) {
-                $key = str_replace("-", "_", $key);
+                $key = strtolower(str_replace("-", "_", $key));
                 $imap_headers[$key] = $values;
             }
         }
@@ -249,7 +249,7 @@ class Header {
             } else {
                 if (($pos = strpos($line, ":")) > 0) {
                     $key = trim(rtrim(strtolower(substr($line, 0, $pos))));
-                    $key = str_replace("-", "_", $key);
+                    $key = strtolower(str_replace("-", "_", $key));
 
                     $value = trim(rtrim(substr($line, $pos + 1)));
                     if (isset($headers[$key])) {
