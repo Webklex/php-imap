@@ -463,7 +463,7 @@ class Header {
                 foreach ($decoded_values as $decoded_value) {
                     $tempValue .= $this->convertEncoding($decoded_value->text, $decoded_value->charset);
                 }
-                if (empty($tempValue) === false) {
+                if ($tempValue) {
                     $value = $tempValue;
                 } else {
                     $value = \imap_utf8($value);
