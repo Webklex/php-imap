@@ -13,6 +13,7 @@
   <testsuites>
     <testsuite name="PHP-IMAP Test Suite">
       <directory>tests</directory>
+      <directory>tests/issues</directory>
     </testsuite>
   </testsuites>
   <logging>
