@@ -2,3 +2,5 @@ vendor
 composer.lock
 .idea
 /build/
+test.php
+.phpunit.result.cache
