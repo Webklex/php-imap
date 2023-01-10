@@ -435,26 +435,19 @@ class Header {
         $decoder = $this->config['decoder']['message'];
 
         if ($value !== null) {
-            $is_utf8_base = $this->is_uft8($value);
-
             if ($decoder === 'utf-8' && extension_loaded('imap')) {
-                $value = \imap_utf8($value);
-                $is_utf8_base = $this->is_uft8($value);
-                if ($is_utf8_base) {
-                    $value = mb_decode_mimeheader($value);
+                $decoded_values = $this->mime_header_decode($value);
+                $tempValue = "";
+                foreach ($decoded_values as $decoded_value) {
+                    $tempValue .= $this->convertEncoding($decoded_value->text, $decoded_value->charset);
                 }
-                if ($this->notDecoded($original_value, $value)) {
-                    $decoded_value = $this->mime_header_decode($value);
-                    if (count($decoded_value) > 0) {
-                        if (property_exists($decoded_value[0], "text")) {
-                            $value = $decoded_value[0]->text;
-                        }
-                    }
+                if ($tempValue) {
+                    $value = $tempValue;
+                } else {
+                    $value = \imap_utf8($value);
                 }
-            } elseif ($decoder === 'iconv' && $is_utf8_base) {
+            } elseif ($decoder === 'iconv' && $this->is_uft8($value)) {
                 $value = iconv_mime_decode($value);
-            } elseif ($is_utf8_base) {
-                $value = mb_decode_mimeheader($value);
             }
 
             if ($this->is_uft8($value)) {
