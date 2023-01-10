@@ -17,6 +17,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Get the attachment file extension from the filename if no mimetype detection library is available
 - Prevent the structure parsing from parsing an empty part
 - Convert all header keys to their lower case representation
+- Restructure the decode function #355 (thanks @istid)
 
 ### Added
 - Unit tests added #347 #242 (thanks @sergiy-petrov, @boekkooi-lengoo)
