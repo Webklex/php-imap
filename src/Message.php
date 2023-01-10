@@ -495,7 +495,7 @@ class Message {
      */
     private function parseHeader(): void {
         $sequence_id = $this->getSequenceId();
-        $headers = $this->client->getConnection()->headers([$sequence_id], "RFC822", $this->sequence === IMAP::ST_UID)->validatedData();
+        $headers = $this->client->getConnection()->headers([$sequence_id], "RFC822", $this->sequence)->validatedData();
         if (!isset($headers[$sequence_id])) {
             throw new MessageHeaderFetchingException("no headers found", 0);
         }
@@ -548,7 +548,7 @@ class Message {
 
         $sequence_id = $this->getSequenceId();
         try {
-            $flags = $this->client->getConnection()->flags([$sequence_id], $this->sequence === IMAP::ST_UID)->validatedData();
+            $flags = $this->client->getConnection()->flags([$sequence_id], $this->sequence)->validatedData();
         } catch (Exceptions\RuntimeException $e) {
             throw new MessageFlagException("flag could not be fetched", 0, $e);
         }
@@ -578,7 +578,7 @@ class Message {
 
         $sequence_id = $this->getSequenceId();
         try {
-            $contents = $this->client->getConnection()->content([$sequence_id], "RFC822", $this->sequence === IMAP::ST_UID)->validatedData();
+            $contents = $this->client->getConnection()->content([$sequence_id], "RFC822", $this->sequence)->validatedData();
         } catch (Exceptions\RuntimeException $e) {
             throw new MessageContentFetchingException("failed to fetch content", 0);
         }
@@ -1008,7 +1008,7 @@ class Message {
             $folder = $this->client->getFolderByPath($folder_path);
 
             $this->client->openFolder($this->folder_path);
-            if ($this->client->getConnection()->copyMessage($folder->path, $this->getSequenceId(), null, $this->sequence === IMAP::ST_UID)->validatedData()) {
+            if ($this->client->getConnection()->copyMessage($folder->path, $this->getSequenceId(), null, $this->sequence)->validatedData()) {
                 return $this->fetchNewMail($folder, $next_uid, "copied", $expunge);
             }
         }
@@ -1047,7 +1047,7 @@ class Message {
             $folder = $this->client->getFolderByPath($folder_path);
 
             $this->client->openFolder($this->folder_path);
-            if ($this->client->getConnection()->moveMessage($folder->path, $this->getSequenceId(), null, $this->sequence === IMAP::ST_UID)->validatedData()) {
+            if ($this->client->getConnection()->moveMessage($folder->path, $this->getSequenceId(), null, $this->sequence)->validatedData()) {
                 return $this->fetchNewMail($folder, $next_uid, "moved", $expunge);
             }
         }
@@ -1172,7 +1172,7 @@ class Message {
         $flag = "\\" . trim(is_array($flag) ? implode(" \\", $flag) : $flag);
         $sequence_id = $this->getSequenceId();
         try {
-            $status = $this->client->getConnection()->store([$flag], $sequence_id, $sequence_id, "+", true, $this->sequence === IMAP::ST_UID)->validatedData();
+            $status = $this->client->getConnection()->store([$flag], $sequence_id, $sequence_id, "+", true, $this->sequence)->validatedData();
         } catch (Exceptions\RuntimeException $e) {
             throw new MessageFlagException("flag could not be set", 0, $e);
         }
@@ -1204,7 +1204,7 @@ class Message {
         $flag = "\\" . trim(is_array($flag) ? implode(" \\", $flag) : $flag);
         $sequence_id = $this->getSequenceId();
         try {
-            $status = $this->client->getConnection()->store([$flag], $sequence_id, $sequence_id, "-", true, $this->sequence === IMAP::ST_UID)->validatedData();
+            $status = $this->client->getConnection()->store([$flag], $sequence_id, $sequence_id, "-", true, $this->sequence)->validatedData();
         } catch (Exceptions\RuntimeException $e) {
             throw new MessageFlagException("flag could not be removed", 0, $e);
         }
