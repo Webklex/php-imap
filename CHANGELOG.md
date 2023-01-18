@@ -6,6 +6,17 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
+- NaN
+
+### Added
+- NaN
+
+### Breaking changes
+- NaN
+
+
+## [5.0.0] - 2023-01-18
+### Fixed
 - The message uid and message number will only be fetched if accessed and wasn't previously set #326 #285 (thanks @szymekjanaczek)
 - Fix undefined attachment name when headers use "filename*=" format #301 (thanks @JulienChavee)
 - Fixed `ImapProtocol::logout` always throws 'not connected' Exception after upgraded to 4.1.2 #351
