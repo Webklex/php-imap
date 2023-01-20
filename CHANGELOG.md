@@ -6,7 +6,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
+- More unique ID generation to prevent multiple attachments with same ID #363 (thanks @Guite)
 
 ### Added
 - NaN
