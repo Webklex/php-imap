@@ -265,7 +265,7 @@ class Header {
         foreach ($headers as $key => $values) {
             if (isset($imap_headers[$key])) continue;
             $value = null;
-            switch ($key) {
+            switch ((string)$key) {
                 case 'from':
                 case 'to':
                 case 'cc':
