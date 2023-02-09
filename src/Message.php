@@ -701,7 +701,7 @@ class Message {
         $oAttachment = new Attachment($this, $part);
 
         if ($oAttachment->getName() !== null && $oAttachment->getSize() > 0) {
-            if ($oAttachment->getId() !== null) {
+            if ($oAttachment->getId() !== null && $this->attachments->offsetExists($oAttachment->getId())) {
                 $this->attachments->put($oAttachment->getId(), $oAttachment);
             } else {
                 $this->attachments->push($oAttachment);
