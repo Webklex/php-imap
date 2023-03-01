@@ -144,13 +144,6 @@ class Message {
      * @var ?Header $header
      */
     public ?Header $header = null;
-    
-    /**
-     * Size of the message in bytes
-     * 
-     * @var int $size
-     */
-    private int $size = -1;
 
     /**
      * Raw message body
@@ -235,7 +228,6 @@ class Message {
         }
 
         $this->parseHeader();
-        $this->fetchSize();
 
         if ($this->getFetchBodyOption() === true) {
             $this->parseBody();
@@ -440,6 +432,11 @@ class Message {
             case "msgn":
                 $this->attributes[$name] = $this->client->getConnection()->getMessageNumber($this->uid)->validate()->integer();
                 return $this->attributes[$name];
+            case "size":
+                if (!isset($this->attributes[$name])) {
+                    $this->fetchSize();
+                }
+                return $this->attributes[$name];
         }
 
         return $this->header->get($name);
@@ -612,7 +609,7 @@ class Message {
          if (!isset($sizes[$sequence_id])) {
             throw new MessageSizeFetchingException("sizes did not set an array entry for the supplied sequence_id", 0);
         }
-        $this->size = $sizes[$sequence_id];
+        $this->attributes["size"] = $sizes[$sequence_id];
     }
 
     /**
@@ -1326,10 +1323,10 @@ class Message {
     /**
      * Get the message size in bytes
      *
-     * @return int Size of the message in bytes or -1 if it was not fetched
+     * @return int Size of the message in bytes
      */
     public function getSize(): int {
-        return $this->size;
+        return $this->get("size");
     }
 
     /**
