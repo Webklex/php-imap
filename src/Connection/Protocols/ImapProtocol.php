@@ -112,7 +112,7 @@ class ImapProtocol extends Protocol {
      */
     public function nextLine(Response $response): string {
         $line = "";
-        while (($next_char = fread($this->stream, 1)) !== false && $next_char !== "\n") {
+        while (($next_char = fread($this->stream, 1)) !== false && !in_array($next_char, ["","\n"])) {
             $line .= $next_char;
         }
         if ($line === "" && $next_char === false) {
@@ -147,7 +147,7 @@ class ImapProtocol extends Protocol {
         $line = $this->nextLine($response);
         list($tag, $line) = explode(' ', $line, 2);
 
-        return $line;
+        return $line ?? '';
     }
 
     /**
