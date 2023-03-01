@@ -7,6 +7,8 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ## [UNRELEASED]
 ### Fixed
 - More unique ID generation to prevent multiple attachments with same ID #363 (thanks @Guite)
+- Not all attachments are pushed to the collection #372 (thanks @AdrianKuriata)
+- Partial fix for #362 (allow search response to be empty)
 
 ### Added
 - NaN

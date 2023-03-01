@@ -64,6 +64,8 @@ class Response {
      */
     protected bool $debug = false;
 
+    protected bool $can_be_empty = false;
+
     /**
      * Create a new Response instance
      */
@@ -328,7 +330,7 @@ class Response {
                 return false;
             }
         }
-        return $this->boolean() && !$this->getErrors();
+        return ($this->boolean() || $this->canBeEmpty()) && !$this->getErrors();
     }
 
 
@@ -368,5 +370,14 @@ class Response {
 
     public function Noun(): int {
         return $this->noun;
+    }
+
+    public function setCanBeEmpty(bool $can_be_empty): Response {
+        $this->can_be_empty = $can_be_empty;
+        return $this;
+    }
+
+    public function canBeEmpty(): bool {
+        return $this->can_be_empty;
     }
 }

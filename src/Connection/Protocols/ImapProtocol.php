@@ -1196,12 +1196,11 @@ class ImapProtocol extends Protocol {
      */
     public function search(array $params, int|string $uid = IMAP::ST_UID): Response {
         $command = $this->buildUIDCommand("SEARCH", $uid);
-        $response = $this->requestAndResponse($command, $params);
+        $response = $this->requestAndResponse($command, $params)->setCanBeEmpty(true);
 
         foreach ($response->data() as $ids) {
             if ($ids[0] === 'SEARCH') {
                 array_shift($ids);
-
                 return $response->setResult($ids);
             }
         }

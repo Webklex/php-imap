@@ -697,6 +697,7 @@ class LegacyProtocol extends Protocol {
      */
     public function search(array $params, int|string $uid = IMAP::ST_UID): Response {
         return $this->response("imap_search")->wrap(function($response)use($params, $uid){
+            $response->setCanBeEmpty(true);
             $result = \imap_search($this->stream, $params[0], $uid ? IMAP::ST_UID : IMAP::NIL);
             return $result ?: [];
         });
