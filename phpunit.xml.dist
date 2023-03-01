@@ -20,6 +20,12 @@
     <junit outputFile="build/report.junit.xml"/>
   </logging>
   <php>
-    <env name="APP_ENV" value="testing"/>
+    <env name="LIVE_MAILBOX" value="false"/>
+    <env name="LIVE_MAILBOX_HOST" value="localhost"/>
+    <env name="LIVE_MAILBOX_PORT" value="143"/>
+    <env name="LIVE_MAILBOX_VALIDATE_CERT" value="false"/>
+    <env name="LIVE_MAILBOX_ENCRYPTION" value=""/>
+    <env name="LIVE_MAILBOX_USERNAME" value="root@example.com"/>
+    <env name="LIVE_MAILBOX_PASSWORD" value="foobar"/>
   </php>
 </phpunit>
