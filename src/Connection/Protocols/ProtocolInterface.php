@@ -151,6 +151,17 @@ interface ProtocolInterface {
      * @throws RuntimeException
      */
     public function flags(int|array $uids, int|string $uid = IMAP::ST_UID): Response;
+    
+    /**
+     * Fetch message sizes
+     * @param int|array $uids
+     * @param int|string $uid set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
+     * message numbers instead.
+     *
+     * @return Response
+     * @throws RuntimeException
+     */
+    public function sizes(int|array $uids, int|string $uid = IMAP::ST_UID): Response;
 
     /**
      * Get uid for a given id

@@ -698,7 +698,7 @@ class ImapProtocol extends Protocol {
             // if we want only one message we can ignore everything else and just return
             if ($to === null && !is_array($from) && ($uid === IMAP::ST_UID ? $tokens[2][$uidKey] == $from : $tokens[0] == $from)) {
                 // we still need to read all lines
-                while (!$this->readLine($response, $tokens, $tag))
+                if (!$this->readLine($response, $tokens, $tag))
                     return $response->setResult($data);
             }
             if ($uid === IMAP::ST_UID) {
@@ -754,6 +754,19 @@ class ImapProtocol extends Protocol {
      */
     public function flags(int|array $uids, int|string $uid = IMAP::ST_UID): Response {
         return $this->fetch(["FLAGS"], $uids, null, $uid);
+    }
+
+    /**
+     * Fetch message sizes
+     * @param int|array $uids
+     * @param int|string $uid set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
+     * message numbers instead.
+     *
+     * @return Response
+     * @throws RuntimeException
+     */
+    public function sizes(int|array $uids, int|string $uid = IMAP::ST_UID): Response {
+        return $this->fetch(["RFC822.SIZE"], $uids, null, $uid);
     }
 
     /**
