@@ -314,6 +314,34 @@ class LegacyProtocol extends Protocol {
             return $result;
         });
     }
+    
+    /**
+     * Fetch message sizes
+     * @param int|array $uids
+     * @param int|string $uid set to IMAP::ST_UID if you pass message unique identifiers instead of numbers.
+     *
+     * @return Response
+     */
+    public function sizes(int|array $uids, int|string $uid = IMAP::ST_UID): Response {
+        return $this->response()->wrap(function($response)use($uids, $uid){
+            /** @var Response $response */
+            $result = [];
+            $uids = is_array($uids) ? $uids : [$uids];
+            $uid_text = implode("','",$uids);
+            $response->addCommand("imap_fetch_overview");
+            $raw_overview = false;
+            if ($uid == IMAP::ST_UID)
+              $raw_overview = imap_fetch_overview($this->stream, $uid_text, FT_UID);
+            else
+              $raw_overview = imap_fetch_overview($this->stream, $uid_text);
+            if ($raw_overview !== false) {
+              foreach ($raw_overview as $overview_element) {
+                $result[$overview_element[$uid == IMAP::ST_UID ? 'uid': 'msgno']] = $overview_element['size'];
+              }
+            }
+            return $result;
+        });
+    }
 
     /**
      * Get uid for a given id

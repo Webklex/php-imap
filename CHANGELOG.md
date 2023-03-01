@@ -9,7 +9,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - NaN
 
 ### Added
-- NaN
+- sizes() methods to protocol interface and implmentations (to have FETCH NNN RFC822.SIZE attribute available)
 
 ### Breaking changes
 - NaN

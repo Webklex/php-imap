@@ -144,6 +144,13 @@ class Message {
      * @var ?Header $header
      */
     public ?Header $header = null;
+    
+    /**
+     * Size of the message in bytes
+     * 
+     * @var int $size
+     */
+    private int $size = -1;
 
     /**
      * Raw message body
@@ -228,6 +235,7 @@ class Message {
         }
 
         $this->parseHeader();
+        $this->fetchSize();
 
         if ($this->getFetchBodyOption() === true) {
             $this->parseBody();
@@ -591,6 +599,20 @@ class Message {
         $this->peek();
 
         return $body;
+    }
+    
+    /**
+     * Fetches the size for this message.
+     * 
+     * @throws MessageSizeFetchingException
+     */
+    private function fetchSize(): void {
+        $sequence_id = $this->getSequenceId();
+        $sizes = $this->client->getConnection()->sizes([$sequence_id], $this->sequence)->validatedData();
+         if (!isset($sizes[$sequence_id])) {
+            throw new MessageSizeFetchingException("sizes did not set an array entry for the supplied sequence_id", 0);
+        }
+        $this->size = $sizes[$sequence_id];
     }
 
     /**
@@ -1302,6 +1324,15 @@ class Message {
     }
 
     /**
+     * Get the message size in bytes
+     *
+     * @return int Size of the message in bytes or -1 if it was not fetched
+     */
+    public function getSize(): int {
+        return $this->size;
+    }
+
+    /**
      * Get the current client
      *
      * @return ?Client
@@ -1565,7 +1596,7 @@ class Message {
     }
 
     /**
-     * Set the sequence type
+     * Get the current sequence id (either a UID or a message number!)
      *
      * @return int
      */

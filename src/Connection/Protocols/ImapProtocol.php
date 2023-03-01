@@ -757,6 +757,19 @@ class ImapProtocol extends Protocol {
     }
 
     /**
+     * Fetch message sizes
+     * @param int|array $uids
+     * @param int|string $uid set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
+     * message numbers instead.
+     *
+     * @return Response
+     * @throws RuntimeException
+     */
+    public function sizes(int|array $uids, int|string $uid = IMAP::ST_UID): Response {
+        return $this->fetch(["RFC822.SIZE"], $uids, null, $uid);
+    }
+
+    /**
      * Get uid for a given id
      * @param int|null $id message number
      *
