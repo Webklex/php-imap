@@ -6,18 +6,23 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- More unique ID generation to prevent multiple attachments with same ID #363 (thanks @Guite)
-- Not all attachments are pushed to the collection #372 (thanks @AdrianKuriata)
-- Partial fix for #362 (allow search response to be empty)
-- Unsafe usage of switch case. #354 #366 (thanks @shuergab)
-- Fix use of ST_MSGN as sequence method #356 (thanks @gioid)
-- Prevent infinite loop in ImapProtocol #316 (thanks @thin-k-design)
+- NaN
 
 ### Added
 - NaN
 
 ### Breaking changes
 - NaN
+
+
+## [5.0.1] - 2023-03-01
+### Fixed
+- More unique ID generation to prevent multiple attachments with same ID #363 (thanks @Guite)
+- Not all attachments are pushed to the collection #372 (thanks @AdrianKuriata)
+- Partial fix for #362 (allow search response to be empty)
+- Unsafe usage of switch case. #354 #366 (thanks @shuergab)
+- Fix use of ST_MSGN as sequence method #356 (thanks @gioid)
+- Prevent infinite loop in ImapProtocol #316 (thanks @thin-k-design)
 
 
 ## [5.0.0] - 2023-01-18
