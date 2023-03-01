@@ -9,7 +9,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - NaN
 
 ### Added
-- sizes() methods to protocol interface and implmentations (to have FETCH NNN RFC822.SIZE attribute available)
+- `Protocol::sizes()` support added (fetch the message byte size via RFC822.SIZE). Accessible through `Message::getSize()` #379 (thanks @didi1357)
 
 ### Breaking changes
 - NaN
