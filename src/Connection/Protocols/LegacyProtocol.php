@@ -331,9 +331,9 @@ class LegacyProtocol extends Protocol {
             $response->addCommand("imap_fetch_overview");
             $raw_overview = false;
             if ($uid == IMAP::ST_UID)
-              $raw_overview = imap_fetch_overview($this->stream, $uid_text, FT_UID);
+              $raw_overview = \imap_fetch_overview($this->stream, $uid_text, IMAP::FT_UID);
             else
-              $raw_overview = imap_fetch_overview($this->stream, $uid_text);
+              $raw_overview = \imap_fetch_overview($this->stream, $uid_text);
             if ($raw_overview !== false) {
               foreach ($raw_overview as $overview_element) {
                 $result[$overview_element[$uid == IMAP::ST_UID ? 'uid': 'msgno']] = $overview_element['size'];

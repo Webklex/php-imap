@@ -27,6 +27,7 @@ use Webklex\PHPIMAP\Exceptions\MessageContentFetchingException;
 use Webklex\PHPIMAP\Exceptions\MessageFlagException;
 use Webklex\PHPIMAP\Exceptions\MessageHeaderFetchingException;
 use Webklex\PHPIMAP\Exceptions\MessageNotFoundException;
+use Webklex\PHPIMAP\Exceptions\MessageSizeFetchingException;
 use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
 use Webklex\PHPIMAP\Exceptions\ResponseException;
 use Webklex\PHPIMAP\Exceptions\RuntimeException;
@@ -45,6 +46,7 @@ use Webklex\PHPIMAP\Traits\HasEvents;
  * @property integer msglist
  * @property integer uid
  * @property integer msgn
+ * @property integer size
  * @property Attribute subject
  * @property Attribute message_id
  * @property Attribute message_no
@@ -62,6 +64,7 @@ use Webklex\PHPIMAP\Traits\HasEvents;
  * @method integer setMsglist($msglist)
  * @method integer getUid()
  * @method integer getMsgn()
+ * @method integer getSize()
  * @method Attribute getPriority()
  * @method Attribute getSubject()
  * @method Attribute getMessageId()
@@ -358,6 +361,7 @@ class Message {
      * @throws ImapServerErrorException
      * @throws MessageNotFoundException
      * @throws MethodNotFoundException
+     * @throws MessageSizeFetchingException
      * @throws RuntimeException
      * @throws ResponseException
      */
@@ -400,6 +404,7 @@ class Message {
      * @throws ImapBadRequestException
      * @throws ImapServerErrorException
      * @throws MessageNotFoundException
+     * @throws MessageSizeFetchingException
      * @throws RuntimeException
      * @throws ResponseException
      */
@@ -419,6 +424,7 @@ class Message {
      * @throws MessageNotFoundException
      * @throws RuntimeException
      * @throws ResponseException
+     * @throws MessageSizeFetchingException
      */
     public function get($name): mixed {
         if (isset($this->attributes[$name]) && $this->attributes[$name] !== null) {
@@ -597,11 +603,17 @@ class Message {
 
         return $body;
     }
-    
+
     /**
      * Fetches the size for this message.
-     * 
+     *
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
      * @throws MessageSizeFetchingException
+     * @throws ResponseException
+     * @throws RuntimeException
      */
     private function fetchSize(): void {
         $sequence_id = $this->getSequenceId();
@@ -1318,15 +1330,6 @@ class Message {
      */
     public function getHeader(): ?Header {
         return $this->header;
-    }
-
-    /**
-     * Get the message size in bytes
-     *
-     * @return int Size of the message in bytes
-     */
-    public function getSize(): int {
-        return $this->get("size");
     }
 
     /**
