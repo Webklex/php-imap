@@ -644,7 +644,7 @@ class ImapProtocol extends Protocol {
             $data = [];
 
             // find array key of UID value; try the last elements, or search for it
-            if ($uid) {
+            if ($uid === IMAP::ST_UID) {
                 $count = count($tokens[2]);
                 if ($tokens[2][$count - 2] == 'UID') {
                     $uidKey = $count - 1;
@@ -661,7 +661,7 @@ class ImapProtocol extends Protocol {
             }
 
             // ignore other messages
-            if ($to === null && !is_array($from) && ($uid ? $tokens[2][$uidKey] != $from : $tokens[0] != $from)) {
+            if ($to === null && !is_array($from) && ($uid === IMAP::ST_UID ? $tokens[2][$uidKey] != $from : $tokens[0] != $from)) {
                 continue;
             }
 
@@ -669,7 +669,7 @@ class ImapProtocol extends Protocol {
             if (count($items) == 1) {
                 if ($tokens[2][0] == $items[0]) {
                     $data = $tokens[2][1];
-                } elseif ($uid && $tokens[2][2] == $items[0]) {
+                } elseif ($uid === IMAP::ST_UID && $tokens[2][2] == $items[0]) {
                     $data = $tokens[2][3];
                 } else {
                     $expectedResponse = 0;
@@ -696,12 +696,12 @@ class ImapProtocol extends Protocol {
             }
 
             // if we want only one message we can ignore everything else and just return
-            if ($to === null && !is_array($from) && ($uid ? $tokens[2][$uidKey] == $from : $tokens[0] == $from)) {
+            if ($to === null && !is_array($from) && ($uid === IMAP::ST_UID ? $tokens[2][$uidKey] == $from : $tokens[0] == $from)) {
                 // we still need to read all lines
                 while (!$this->readLine($response, $tokens, $tag))
                     return $response->setResult($data);
             }
-            if ($uid) {
+            if ($uid === IMAP::ST_UID) {
                 $result[$tokens[2][$uidKey]] = $data;
             } else {
                 $result[$tokens[0]] = $data;
@@ -1226,7 +1226,7 @@ class ImapProtocol extends Protocol {
         $response = $this->getUid();
         $ids = [];
         foreach ($response->data() as $msgn => $v) {
-            $id = $uid ? $v : $msgn;
+            $id = $uid === IMAP::ST_UID ? $v : $msgn;
             if (($to >= $id && $from <= $id) || ($to === "*" && $from <= $id)) {
                 $ids[] = $id;
             }

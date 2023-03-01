@@ -295,7 +295,7 @@ class Folder {
     public function overview(string $sequence = null): array {
         $this->client->openFolder($this->path);
         $sequence = $sequence === null ? "1:*" : $sequence;
-        $uid = ClientManager::get('options.sequence', IMAP::ST_MSGN) == IMAP::ST_UID;
+        $uid = ClientManager::get('options.sequence', IMAP::ST_MSGN);
         $response = $this->client->getConnection()->overview($sequence, $uid);
         return $response->validatedData();
     }

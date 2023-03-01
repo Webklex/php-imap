@@ -253,7 +253,7 @@ class LegacyProtocol extends Protocol {
             $uids = is_array($uids) ? $uids : [$uids];
             foreach ($uids as $id) {
                 $response->addCommand("imap_fetchbody");
-                $result[$id] = \imap_fetchbody($this->stream, $id, "", $uid ? IMAP::ST_UID : IMAP::NIL);
+                $result[$id] = \imap_fetchbody($this->stream, $id, "", $uid === IMAP::ST_UID ? IMAP::ST_UID : IMAP::NIL);
             }
 
             return $result;
