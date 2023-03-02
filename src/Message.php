@@ -28,6 +28,7 @@ use Webklex\PHPIMAP\Exceptions\MessageContentFetchingException;
 use Webklex\PHPIMAP\Exceptions\MessageFlagException;
 use Webklex\PHPIMAP\Exceptions\MessageHeaderFetchingException;
 use Webklex\PHPIMAP\Exceptions\MessageNotFoundException;
+use Webklex\PHPIMAP\Exceptions\MessageSizeFetchingException;
 use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
 use Webklex\PHPIMAP\Exceptions\ResponseException;
 use Webklex\PHPIMAP\Exceptions\RuntimeException;
@@ -41,9 +42,11 @@ use Webklex\PHPIMAP\Traits\HasEvents;
  * Class Message
  *
  *
- * @property int msglist
- * @property int uid
- * @property int msgn
+
+ * @property integer msglist
+ * @property integer uid
+ * @property integer msgn
+ * @property integer size
  * @property Attribute subject
  * @property Attribute message_id
  * @property Attribute message_no
@@ -57,10 +60,12 @@ use Webklex\PHPIMAP\Traits\HasEvents;
  * @property Attribute in_reply_to
  * @property Attribute sender
  *
- * @method int getMsglist()
- * @method int setMsglist($msglist)
- * @method int getUid()
- * @method int getMsgn()
+
+ * @method integer getMsglist()
+ * @method integer setMsglist($msglist)
+ * @method integer getUid()
+ * @method integer getMsgn()
+ * @method integer getSize()
  * @method Attribute getPriority()
  * @method Attribute getSubject()
  * @method Attribute getMessageId()
@@ -329,6 +334,7 @@ class Message
      * @throws ImapServerErrorException
      * @throws MessageNotFoundException
      * @throws MethodNotFoundException
+     * @throws MessageSizeFetchingException
      * @throws RuntimeException
      * @throws ResponseException
      */
@@ -371,6 +377,7 @@ class Message
      * @throws ImapBadRequestException
      * @throws ImapServerErrorException
      * @throws MessageNotFoundException
+     * @throws MessageSizeFetchingException
      * @throws RuntimeException
      * @throws ResponseException
      */
@@ -391,6 +398,7 @@ class Message
      * @throws MessageNotFoundException
      * @throws RuntimeException
      * @throws ResponseException
+     * @throws MessageSizeFetchingException
      */
     public function get($name): mixed
     {
@@ -406,6 +414,11 @@ class Message
             case 'msgn':
                 $this->attributes[$name] = $this->client->getConnection()->getMessageNumber($this->uid)->validate()->integer();
 
+                return $this->attributes[$name];
+            case "size":
+                if (!isset($this->attributes[$name])) {
+                    $this->fetchSize();
+                }
                 return $this->attributes[$name];
         }
 
@@ -562,6 +575,26 @@ class Message
         $this->peek();
 
         return $body;
+    }
+
+    /**
+     * Fetches the size for this message.
+     *
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws MessageSizeFetchingException
+     * @throws ResponseException
+     * @throws RuntimeException
+     */
+    private function fetchSize(): void {
+        $sequence_id = $this->getSequenceId();
+        $sizes = $this->client->getConnection()->sizes([$sequence_id], $this->sequence)->validatedData();
+         if (!isset($sizes[$sequence_id])) {
+            throw new MessageSizeFetchingException("sizes did not set an array entry for the supplied sequence_id", 0);
+        }
+        $this->attributes["size"] = $sizes[$sequence_id];
     }
 
     /**
@@ -1472,7 +1505,9 @@ class Message
     }
 
     /**
-     * Set the sequence type
+     * Get the current sequence id (either a UID or a message number!)
+     *
+     * @return int
      */
     public function getSequenceId(): int
     {

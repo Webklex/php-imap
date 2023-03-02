@@ -9,7 +9,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - NaN
 
 ### Added
-- NaN
+- `Protocol::sizes()` support added (fetch the message byte size via RFC822.SIZE). Accessible through `Message::getSize()` #379 (thanks @didi1357)
 
 ### Breaking changes
 - NaN
