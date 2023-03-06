@@ -12,32 +12,16 @@
 
 namespace Tests\issues;
 
-use PHPUnit\Framework\TestCase;
-use Webklex\PHPIMAP\Client;
-use Webklex\PHPIMAP\ClientManager;
+use Tests\LiveMailboxTestCase;
 
-class Issue379Test extends TestCase {
+class Issue379Test extends LiveMailboxTestCase {
 
     public function testIssue() {
         if (!$_ENV["LIVE_MAILBOX"] ?? false) {
             $this->markTestSkipped("This test requires a live mailbox. Please set the LIVE_MAILBOX environment variable to run this test.");
         }
-        $cm = new ClientManager([
-            'accounts' => [
-                'default' => [
-                    'host'           => $_ENV["LIVE_MAILBOX_HOST"] ?? "localhost",
-                    'port'           => $_ENV["LIVE_MAILBOX_PORT"] ?? 143,
-                    'protocol'       => 'imap', //might also use imap, [pop3 or nntp (untested)]
-                    'encryption'     => $_ENV["LIVE_MAILBOX_ENCRYPTION"] ?? false, // Supported: false, 'ssl', 'tls'
-                    'validate_cert'  => $_ENV["LIVE_MAILBOX_VALIDATE_CERT"] ?? false,
-                    'username'       => $_ENV["LIVE_MAILBOX_USERNAME"] ?? "root@example.com",
-                    'password'       => $_ENV["LIVE_MAILBOX_PASSWORD"] ?? "foobar",
-                ],
-            ],
-        ]);
 
-        /** @var Client $client */
-        $client = $cm->account('default');
+        $client = $this->getClient();
         $this->assertNotNull($client);
 
         //Connect to the IMAP Server
@@ -46,10 +30,13 @@ class Issue379Test extends TestCase {
         $folder = $client->getFolderByPath('INBOX');
         $this->assertNotNull($folder);
 
-        $message = $folder->messages()->getMessageByUid(2);
+        $content = file_get_contents(implode(DIRECTORY_SEPARATOR, [__DIR__, "..", "messages", "plain.eml"]));
+        $message = $this->appendMessage($folder, $content);
         $this->assertNotNull($message);
 
-        $this->assertEquals(127, $message->getSize());
+        $this->assertEquals(214, $message->getSize());
+
+        $this->assertEquals(true, $message->delete(true));
     }
 
 }
