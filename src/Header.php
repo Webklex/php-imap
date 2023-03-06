@@ -346,7 +346,6 @@ class Header {
      * @return mixed|string
      */
     public function convertEncoding($str, string $from = "ISO-8859-2", string $to = "UTF-8"): mixed {
-
         $from = EncodingAliases::get($from, $this->fallback_encoding);
         $to = EncodingAliases::get($to, $this->fallback_encoding);
 
@@ -354,38 +353,7 @@ class Header {
             return $str;
         }
 
-        // We don't need to do convertEncoding() if charset is ASCII (us-ascii):
-        //     ASCII is a subset of UTF-8, so all ASCII files are already UTF-8 encoded
-        //     https://stackoverflow.com/a/11303410
-        //
-        // us-ascii is the same as ASCII:
-        //     ASCII is the traditional name for the encoding system; the Internet Assigned Numbers Authority (IANA)
-        //     prefers the updated name US-ASCII, which clarifies that this system was developed in the US and
-        //     based on the typographical symbols predominantly in use there.
-        //     https://en.wikipedia.org/wiki/ASCII
-        //
-        // convertEncoding() function basically means convertToUtf8(), so when we convert ASCII string into UTF-8 it gets broken.
-        if (strtolower($from) == 'us-ascii' && $to == 'UTF-8') {
-            return $str;
-        }
-
-        try {
-            if (function_exists('iconv') && $from != 'UTF-7' && $to != 'UTF-7') {
-                return iconv($from, $to, $str);
-            } else {
-                if (!$from) {
-                    return mb_convert_encoding($str, $to);
-                }
-                return mb_convert_encoding($str, $to, $from);
-            }
-        } catch (\Exception $e) {
-            if (str_contains($from, '-')) {
-                $from = str_replace('-', '', $from);
-                return $this->convertEncoding($str, $from, $to);
-            } else {
-                return $str;
-            }
-        }
+        return EncodingAliases::convert($str, $from, $to);
     }
 
     /**

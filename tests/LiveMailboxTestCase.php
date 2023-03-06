@@ -18,6 +18,7 @@ use Webklex\PHPIMAP\ClientManager;
 use Webklex\PHPIMAP\Exceptions\AuthFailedException;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
 use Webklex\PHPIMAP\Exceptions\EventNotFoundException;
+use Webklex\PHPIMAP\Exceptions\FolderFetchingException;
 use Webklex\PHPIMAP\Exceptions\ImapBadRequestException;
 use Webklex\PHPIMAP\Exceptions\ImapServerErrorException;
 use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
@@ -36,6 +37,10 @@ use Webklex\PHPIMAP\Message;
  * @package Tests
  */
 abstract class LiveMailboxTestCase extends TestCase {
+
+    /**
+     * Special chars
+     */
     const SPECIAL_CHARS = 'A_\\|!"£$%&()=?àèìòùÀÈÌÒÙ<>-@#[]_ß_б_π_€_✔_你_يد_Z_';
 
     /**
@@ -81,8 +86,40 @@ abstract class LiveMailboxTestCase extends TestCase {
         return $this->getManager()->account('default');
     }
 
+    /**
+     * Get special chars
+     *
+     * @return string
+     */
     final protected function getSpecialChars(): string {
         return self::SPECIAL_CHARS;
+    }
+
+    /**
+     * Get a folder
+     * @param string $folder_path
+     *
+     * @return Folder
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws MaskNotFoundException
+     * @throws ResponseException
+     * @throws RuntimeException
+     * @throws FolderFetchingException
+     */
+    final protected function getFolder(string $folder_path = "INDEX"): Folder {
+        $client = $this->getClient();
+        $this->assertNotNull($client);
+
+        //Connect to the IMAP Server
+        $client->connect();
+
+        $folder = $client->getFolderByPath($folder_path);
+        $this->assertNotNull($folder);
+
+        return $folder;
     }
 
     /**
@@ -104,17 +141,80 @@ abstract class LiveMailboxTestCase extends TestCase {
      * @throws RuntimeException
      */
     final protected function appendMessage(Folder $folder, string $message): Message {
+        $status = $folder->examine();
+        if (!isset($status['uidnext'])) {
+            $this->fail("No UIDNEXT returned");
+        }
+
         $response = $folder->appendMessage($message);
-
-        if (!isset($response[0])) {
-            $this->fail("No message ID returned");
+        $valid_response = false;
+        foreach ($response as $line) {
+            if (str_starts_with($line, 'OK')) {
+                $valid_response = true;
+                break;
+            }
         }
-        $test = explode(' ', $response[0]);
-        if (!isset($test[3])) {
-            $this->fail("No message ID returned");
+        if (!$valid_response) {
+            $this->fail("Failed to append message: ".implode("\n", $response));
         }
 
-        $id = substr($test[3], 0, -1);
-        return $folder->messages()->getMessageByUid(intval($id));
+        $message = $folder->messages()->getMessageByUid($status['uidnext']);
+        $this->assertNotNull($message);
+
+        return $message;
+    }
+
+    /**
+     * Append a message template to a folder
+     * @param Folder $folder
+     * @param string $template
+     *
+     * @return Message
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws EventNotFoundException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws InvalidMessageDateException
+     * @throws MessageContentFetchingException
+     * @throws MessageFlagException
+     * @throws MessageHeaderFetchingException
+     * @throws ResponseException
+     * @throws RuntimeException
+     */
+    final protected function appendMessageTemplate(Folder $folder, string $template): Message {
+        $content = file_get_contents(implode(DIRECTORY_SEPARATOR, [__DIR__, "messages", $template]));
+        return $this->appendMessage($folder, $content);
+    }
+
+    /**
+     * Delete a folder if it is given
+     * @param Folder|null $folder
+     *
+     * @return bool
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws EventNotFoundException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws ResponseException
+     * @throws RuntimeException
+     */
+    final protected function deleteFolder(Folder $folder = null): bool {
+        $response = $folder?->delete(false);
+        if (is_array($response)) {
+            $valid_response = false;
+            foreach ($response as $line) {
+                if (str_starts_with($line, 'OK')) {
+                    $valid_response = true;
+                    break;
+                }
+            }
+            if (!$valid_response) {
+                $this->fail("Failed to delete mailbox: ".implode("\n", $response));
+            }
+            return $valid_response;
+        }
+        return false;
     }
 }

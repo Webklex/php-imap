@@ -546,6 +546,7 @@ class Client {
      * @throws ResponseException
      */
     public function getFolderByPath($folder_path): ?Folder {
+        $folder_path = EncodingAliases::convert($folder_path, "", "UTF7-IMAP");
         return $this->getFolders(false)->where("path", $folder_path)->first();
     }
 

@@ -13,6 +13,7 @@
 namespace Webklex\PHPIMAP\Connection\Protocols;
 
 use Exception;
+use Webklex\PHPIMAP\EncodingAliases;
 use Webklex\PHPIMAP\Exceptions\AuthFailedException;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
 use Webklex\PHPIMAP\Exceptions\ImapBadRequestException;
@@ -588,6 +589,7 @@ class ImapProtocol extends Protocol {
     public function selectFolder(string $folder = 'INBOX'): Response {
         $this->uid_cache = [];
 
+        $folder = EncodingAliases::convert($folder, "", "UTF7-IMAP");
         return $this->examineOrSelect('SELECT', $folder);
     }
 
@@ -599,6 +601,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function examineFolder(string $folder = 'INBOX'): Response {
+        $folder = EncodingAliases::convert($folder, "", "UTF7-IMAP");
         return $this->examineOrSelect('EXAMINE', $folder);
     }
 
@@ -911,6 +914,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function appendMessage(string $folder, string $message, array $flags = null, string $date = null): Response {
+        $folder = EncodingAliases::convert($folder, "", "UTF7-IMAP");
         $tokens = [];
         $tokens[] = $this->escapeString($folder);
         if ($flags !== null) {
@@ -990,6 +994,7 @@ class ImapProtocol extends Protocol {
         $set = $this->buildSet($from, $to);
         $command = $this->buildUIDCommand("MOVE", $uid);
 
+        $folder = EncodingAliases::convert($folder, "", "UTF7-IMAP");
         return $this->requestAndResponse($command, [$set, $this->escapeString($folder)], true);
     }
 
@@ -1009,6 +1014,7 @@ class ImapProtocol extends Protocol {
      */
     public function moveManyMessages(array $messages, string $folder, int|string $uid = IMAP::ST_UID): Response {
         $command = $this->buildUIDCommand("MOVE", $uid);
+        $folder = EncodingAliases::convert($folder, "", "UTF7-IMAP");
 
         $set = implode(',', $messages);
         $tokens = [$set, $this->escapeString($folder)];
@@ -1051,6 +1057,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function createFolder(string $folder): Response {
+        $folder = EncodingAliases::convert($folder, "", "UTF7-IMAP");
         return $this->requestAndResponse('CREATE', [$this->escapeString($folder)], true);
     }
 
@@ -1067,6 +1074,8 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function renameFolder(string $old, string $new): Response {
+        $old = EncodingAliases::convert($old, "", "UTF7-IMAP");
+        $new = EncodingAliases::convert($new, "", "UTF7-IMAP");
         return $this->requestAndResponse('RENAME', $this->escapeString($old, $new), true);
     }
 
@@ -1081,6 +1090,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function deleteFolder(string $folder): Response {
+        $folder = EncodingAliases::convert($folder, "", "UTF7-IMAP");
         return $this->requestAndResponse('DELETE', [$this->escapeString($folder)], true);
     }
 
@@ -1095,6 +1105,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function subscribeFolder(string $folder): Response {
+        $folder = EncodingAliases::convert($folder, "", "UTF7-IMAP");
         return $this->requestAndResponse('SUBSCRIBE', [$this->escapeString($folder)], true);
     }
 
@@ -1109,6 +1120,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function unsubscribeFolder(string $folder): Response {
+        $folder = EncodingAliases::convert($folder, "", "UTF7-IMAP");
         return $this->requestAndResponse('UNSUBSCRIBE', [$this->escapeString($folder)], true);
     }
 
