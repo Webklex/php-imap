@@ -144,7 +144,7 @@ docker build -t php-imap-server .
 ```
 Run the docker image:
 ```bash
-docker run --name imap-server -p 993:993 -it --rm -d php-imap-server
+docker run --name imap-server -p 993:993 --rm -d php-imap-server
 ```
 Stop the docker image:
 ```bash
