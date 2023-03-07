@@ -1244,12 +1244,14 @@ class ImapProtocol extends Protocol {
                 $ids[] = $id;
             }
         }
-        $headers = $this->headers($ids, "RFC822", $uid);
-        $response->stack($headers);
-        foreach ($headers->data() as $id => $raw_header) {
-            $result[$id] = (new Header($raw_header, false))->getAttributes();
+        if (!empty($ids)) {
+            $headers = $this->headers($ids, "RFC822", $uid);
+            $response->stack($headers);
+            foreach ($headers->data() as $id => $raw_header) {
+                $result[$id] = (new Header($raw_header, false))->getAttributes();
+            }
         }
-        return $response->setResult($result);
+        return $response->setResult($result)->setCanBeEmpty(true);
     }
 
     /**
