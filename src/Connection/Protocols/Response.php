@@ -64,6 +64,10 @@ class Response {
      */
     protected bool $debug = false;
 
+    /**
+     * Can the response be empty?
+     * @var bool $can_be_empty
+     */
     protected bool $can_be_empty = false;
 
     /**
@@ -334,6 +338,12 @@ class Response {
     }
 
 
+    /**
+     * Check if the Response can be considered failed
+     * @param mixed $data
+     *
+     * @return bool
+     */
     public function verify_data(mixed $data): bool {
         if (is_array($data)) {
             foreach ($data as $line) {
@@ -355,6 +365,12 @@ class Response {
         return true;
     }
 
+    /**
+     * Verify a single line
+     * @param string $line
+     *
+     * @return bool
+     */
     public function verify_line(string $line): bool {
         return !str_starts_with($line, "TAG".$this->noun." BAD ") && !str_starts_with($line, "TAG".$this->noun." NO ");
     }
@@ -368,15 +384,31 @@ class Response {
         return !$this->successful();
     }
 
+    /**
+     * Get the Response noun
+     *
+     * @return int
+     */
     public function Noun(): int {
         return $this->noun;
     }
 
+    /**
+     * Set the Response to be allowed to be empty
+     * @param bool $can_be_empty
+     *
+     * @return $this
+     */
     public function setCanBeEmpty(bool $can_be_empty): Response {
         $this->can_be_empty = $can_be_empty;
         return $this;
     }
 
+    /**
+     * Check if the Response can be empty
+     *
+     * @return bool
+     */
     public function canBeEmpty(): bool {
         return $this->can_be_empty;
     }
