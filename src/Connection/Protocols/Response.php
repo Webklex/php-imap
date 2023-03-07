@@ -301,6 +301,7 @@ class Response {
 
     /**
      * Validate and retrieve the response data
+     *
      * @throws ResponseException
      */
     public function validatedData(): mixed {
@@ -309,6 +310,7 @@ class Response {
 
     /**
      * Validate the response date
+     *
      * @throws ResponseException
      */
     public function validate(): Response {

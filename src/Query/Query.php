@@ -707,6 +707,8 @@ class Query {
     }
 
     /**
+     * Get the current query collection
+     *
      * @return Collection
      */
     public function getQuery(): Collection {
@@ -714,7 +716,9 @@ class Query {
     }
 
     /**
+     * Set all query parameters
      * @param array $query
+     *
      * @return Query
      */
     public function setQuery(array $query): Query {
@@ -723,6 +727,8 @@ class Query {
     }
 
     /**
+     * Get the raw query
+     *
      * @return string
      */
     public function getRawQuery(): string {
@@ -730,7 +736,9 @@ class Query {
     }
 
     /**
+     * Set the raw query
      * @param string $raw_query
+     *
      * @return Query
      */
     public function setRawQuery(string $raw_query): Query {
@@ -739,6 +747,8 @@ class Query {
     }
 
     /**
+     * Get all applied extensions
+     *
      * @return string[]
      */
     public function getExtensions(): array {
@@ -746,7 +756,9 @@ class Query {
     }
 
     /**
+     * Set all extensions that should be used
      * @param string[] $extensions
+     *
      * @return Query
      */
     public function setExtensions(array $extensions): Query {
@@ -760,7 +772,9 @@ class Query {
     }
 
     /**
+     * Set the client instance
      * @param Client $client
+     *
      * @return Query
      */
     public function setClient(Client $client): Query {
@@ -770,6 +784,7 @@ class Query {
 
     /**
      * Get the set fetch limit
+     *
      * @return ?int
      */
     public function getLimit(): ?int {
@@ -777,7 +792,9 @@ class Query {
     }
 
     /**
+     * Set the fetch limit
      * @param int $limit
+     *
      * @return Query
      */
     public function setLimit(int $limit): Query {
@@ -786,6 +803,8 @@ class Query {
     }
 
     /**
+     * Get the set page
+     *
      * @return int
      */
     public function getPage(): int {
@@ -793,7 +812,9 @@ class Query {
     }
 
     /**
+     * Set the page
      * @param int $page
+     *
      * @return Query
      */
     public function setPage(int $page): Query {
@@ -802,7 +823,9 @@ class Query {
     }
 
     /**
+     * Set the fetch option flag
      * @param int $fetch_options
+     *
      * @return Query
      */
     public function setFetchOptions(int $fetch_options): Query {
@@ -811,7 +834,9 @@ class Query {
     }
 
     /**
+     * Set the fetch option flag
      * @param int $fetch_options
+     *
      * @return Query
      */
     public function fetchOptions(int $fetch_options): Query {
@@ -819,6 +844,8 @@ class Query {
     }
 
     /**
+     * Get the fetch option flag
+     *
      * @return ?int
      */
     public function getFetchOptions(): ?int {
@@ -826,6 +853,8 @@ class Query {
     }
 
     /**
+     * Get the fetch body flag
+     *
      * @return boolean
      */
     public function getFetchBody(): bool {
@@ -833,7 +862,9 @@ class Query {
     }
 
     /**
+     * Set the fetch body flag
      * @param boolean $fetch_body
+     *
      * @return Query
      */
     public function setFetchBody(bool $fetch_body): Query {
@@ -842,7 +873,9 @@ class Query {
     }
 
     /**
+     * Set the fetch body flag
      * @param boolean $fetch_body
+     *
      * @return Query
      */
     public function fetchBody(bool $fetch_body): Query {
@@ -850,6 +883,8 @@ class Query {
     }
 
     /**
+     * Get the fetch body flag
+     *
      * @return bool
      */
     public function getFetchFlags(): bool {
@@ -857,7 +892,9 @@ class Query {
     }
 
     /**
+     * Set the fetch flag
      * @param bool $fetch_flags
+     *
      * @return Query
      */
     public function setFetchFlags(bool $fetch_flags): Query {
@@ -866,7 +903,9 @@ class Query {
     }
 
     /**
+     * Set the fetch order
      * @param string $fetch_order
+     *
      * @return Query
      */
     public function setFetchOrder(string $fetch_order): Query {
@@ -880,7 +919,9 @@ class Query {
     }
 
     /**
+     * Set the fetch order
      * @param string $fetch_order
+     *
      * @return Query
      */
     public function fetchOrder(string $fetch_order): Query {
@@ -888,6 +929,8 @@ class Query {
     }
 
     /**
+     * Get the fetch order
+     *
      * @return string
      */
     public function getFetchOrder(): string {
@@ -895,6 +938,8 @@ class Query {
     }
 
     /**
+     * Set the fetch order to ascending
+     *
      * @return Query
      */
     public function setFetchOrderAsc(): Query {
@@ -902,6 +947,8 @@ class Query {
     }
 
     /**
+     * Set the fetch order to ascending
+     *
      * @return Query
      */
     public function fetchOrderAsc(): Query {
@@ -909,6 +956,8 @@ class Query {
     }
 
     /**
+     * Set the fetch order to descending
+     *
      * @return Query
      */
     public function setFetchOrderDesc(): Query {
@@ -916,6 +965,8 @@ class Query {
     }
 
     /**
+     * Set the fetch order to descending
+     *
      * @return Query
      */
     public function fetchOrderDesc(): Query {
@@ -923,18 +974,20 @@ class Query {
     }
 
     /**
-     * @return Query
+     * Set soft fail mode
      * @var boolean $state
      *
+     * @return Query
      */
     public function softFail(bool $state = true): Query {
         return $this->setSoftFail($state);
     }
 
     /**
-     * @return Query
-     * @var boolean $state
+     * Set soft fail mode
      *
+     * @var boolean $state
+     * @return Query
      */
     public function setSoftFail(bool $state = true): Query {
         $this->soft_fail = $state;
@@ -943,6 +996,8 @@ class Query {
     }
 
     /**
+     * Get soft fail mode
+     *
      * @return boolean
      */
     public function getSoftFail(): bool {
@@ -973,9 +1028,9 @@ class Query {
 
     /**
      * Check if there are any errors / exceptions present
-     * @return boolean
      * @var ?integer $uid
      *
+     * @return boolean
      */
     public function hasErrors(?int $uid = null): bool {
         if ($uid !== null) {
@@ -986,9 +1041,9 @@ class Query {
 
     /**
      * Check if there is an error / exception present
-     * @return boolean
      * @var integer $uid
      *
+     * @return boolean
      */
     public function hasError(int $uid): bool {
         return isset($this->errors[$uid]);
@@ -1014,9 +1069,9 @@ class Query {
 
     /**
      * Get a specific error / exception
-     * @return Exception|null
      * @var integer $uid
      *
+     * @return Exception|null
      */
     public function error(int $uid): ?Exception {
         return $this->getError($uid);
@@ -1024,9 +1079,9 @@ class Query {
 
     /**
      * Get a specific error / exception
-     * @return ?Exception
      * @var integer $uid
      *
+     * @return ?Exception
      */
     public function getError(int $uid): ?Exception {
         if ($this->hasError($uid)) {
