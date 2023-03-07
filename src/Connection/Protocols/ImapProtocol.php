@@ -1163,7 +1163,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function getQuotaRoot(string $quota_root = 'INBOX'): Response {
-        $command = "QUOTA";
+        $command = "GETQUOTAROOT";
         $params = [$quota_root];
 
         return $this->requestAndResponse($command, $params);
