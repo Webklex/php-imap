@@ -575,7 +575,7 @@ class EncodingAliases {
      *
      * @return bool
      */
-    protected static function isUtf7(string $encoding): bool {
+    public static function isUtf7(string $encoding): bool {
         return str_contains(str_replace("-", "", strtolower($encoding)), "utf7");
     }
 }

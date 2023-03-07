@@ -866,7 +866,7 @@ class Message {
             return $str;
         }
 
-        if (function_exists('iconv') && $from != 'UTF-7' && $to != 'UTF-7') {
+        if (function_exists('iconv') && !EncodingAliases::isUtf7($from) && !EncodingAliases::isUtf7($to)) {
             return @iconv($from, $to . '//IGNORE', $str);
         } else {
             if (!$from) {
