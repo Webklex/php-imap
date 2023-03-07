@@ -42,6 +42,7 @@ class Issue383Test extends LiveMailboxTestCase {
         if (!getenv("LIVE_MAILBOX") ?? false) {
             $this->markTestSkipped("This test requires a live mailbox. Please set the LIVE_MAILBOX environment variable to run this test.");
         }
+
         $client = $this->getClient();
         $client->connect();
 
@@ -53,11 +54,15 @@ class Issue383Test extends LiveMailboxTestCase {
 
         $folder = $client->createFolder($folder_path, false);
         $this->assertNotNull($folder);
+
         $folder = $this->getFolder($folder_path);
         $this->assertNotNull($folder);
 
         $this->assertEquals('Entwürfe+', $folder->name);
         $this->assertEquals($folder_path, $folder->full_name);
+
+        $folder_path = implode($delimiter, ['INBOX', 'Entw&APw-rfe+']);
+        $this->assertEquals($folder_path, $folder->path);
 
         // Clean up
         if ($this->deleteFolder($folder) === false) {

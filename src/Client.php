@@ -505,11 +505,11 @@ class Client {
      * @throws RuntimeException
      * @throws ResponseException
      */
-    public function getFolder(string $folder_name, ?string $delimiter = null): ?Folder {
+    public function getFolder(string $folder_name, ?string $delimiter = null, bool $utf7 = false): ?Folder {
         // Set delimiter to false to force selection via getFolderByName (maybe useful for uncommon folder names)
         $delimiter = is_null($delimiter) ? ClientManager::get('options.delimiter', "/") : $delimiter;
         if (str_contains($folder_name, (string)$delimiter)) {
-            return $this->getFolderByPath($folder_name);
+            return $this->getFolderByPath($folder_name, $utf7);
         }
 
         return $this->getFolderByName($folder_name);
@@ -535,18 +535,18 @@ class Client {
     /**
      * Get a folder instance by a folder path
      * @param $folder_path
-     *
+     * @param bool $utf7
      * @return Folder|null
-     * @throws FolderFetchingException
-     * @throws ConnectionFailedException
      * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws FolderFetchingException
      * @throws ImapBadRequestException
      * @throws ImapServerErrorException
-     * @throws RuntimeException
      * @throws ResponseException
+     * @throws RuntimeException
      */
-    public function getFolderByPath($folder_path): ?Folder {
-        $folder_path = EncodingAliases::convert($folder_path, "", "UTF7-IMAP");
+    public function getFolderByPath($folder_path, bool $utf7 = false): ?Folder {
+        if (!$utf7) $folder_path = EncodingAliases::convert($folder_path, "utf-8", "utf7-imap");
         return $this->getFolders(false)->where("path", $folder_path)->first();
     }
 
@@ -663,24 +663,27 @@ class Client {
      * Create a new Folder
      * @param string $folder_path
      * @param boolean $expunge
-     *
+     * @param bool $utf7
      * @return Folder
-     * @throws ConnectionFailedException
      * @throws AuthFailedException
-     * @throws ImapBadRequestException
-     * @throws ImapServerErrorException
-     * @throws RuntimeException
+     * @throws ConnectionFailedException
      * @throws EventNotFoundException
      * @throws FolderFetchingException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
      * @throws ResponseException
+     * @throws RuntimeException
      */
-    public function createFolder(string $folder_path, bool $expunge = true): Folder {
+    public function createFolder(string $folder_path, bool $expunge = true, bool $utf7 = false): Folder {
         $this->checkConnection();
+
+        if (!$utf7) $folder_path = EncodingAliases::convert($folder_path, "utf-8", "UTF7-IMAP");
+
         $status = $this->connection->createFolder($folder_path)->validatedData();
 
         if($expunge) $this->expunge();
 
-        $folder = $this->getFolderByPath($folder_path);
+        $folder = $this->getFolderByPath($folder_path, true);
         if($status && $folder) {
             $event = $this->getEvent("folder", "new");
             $event::dispatch($folder);
@@ -708,7 +711,7 @@ class Client {
         $this->checkConnection();
 
         $folder = $this->getFolderByPath($folder_path);
-        $status = $this->getConnection()->deleteFolder($folder_path)->validatedData();
+        $status = $this->getConnection()->deleteFolder($folder->path)->validatedData();
         if ($expunge) $this->expunge();
 
         $event = $this->getEvent("folder", "deleted");

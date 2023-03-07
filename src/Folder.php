@@ -225,7 +225,7 @@ class Folder {
     protected function decodeName($name): string|array|bool|null {
         $parts = [];
         foreach (explode($this->delimiter, $name) as $item) {
-            $parts[] = EncodingAliases::convert($item, "", "UTF-8");
+            $parts[] = EncodingAliases::convert($item, "UTF7-IMAP", "UTF-8");
         }
 
         return implode($this->delimiter, $parts);
@@ -240,8 +240,7 @@ class Folder {
      */
     protected function getSimpleName($delimiter, $full_name): string|bool {
         $arr = explode($delimiter, $full_name);
-
-        return EncodingAliases::convert(end($arr), "", "UTF-8");
+        return end($arr);
     }
 
     /**
