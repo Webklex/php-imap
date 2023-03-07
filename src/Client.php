@@ -495,19 +495,20 @@ class Client {
      * Get a folder instance by a folder name
      * @param string $folder_name
      * @param string|null $delimiter
-     *
+     * @param bool $utf7
      * @return Folder|null
-     * @throws FolderFetchingException
-     * @throws ConnectionFailedException
      * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws FolderFetchingException
      * @throws ImapBadRequestException
      * @throws ImapServerErrorException
-     * @throws RuntimeException
      * @throws ResponseException
+     * @throws RuntimeException
      */
     public function getFolder(string $folder_name, ?string $delimiter = null, bool $utf7 = false): ?Folder {
         // Set delimiter to false to force selection via getFolderByName (maybe useful for uncommon folder names)
         $delimiter = is_null($delimiter) ? ClientManager::get('options.delimiter', "/") : $delimiter;
+
         if (str_contains($folder_name, (string)$delimiter)) {
             return $this->getFolderByPath($folder_name, $utf7);
         }
