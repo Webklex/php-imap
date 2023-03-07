@@ -189,7 +189,7 @@ class ImapProtocol extends Protocol {
                 $token = substr($token, 1);
             }
             if ($token[0] == '"') {
-                if (preg_match('%^\(*"((.|\\\\|\")*?)" *%', $line, $matches)) {
+                if (preg_match('%^\(*\"((.|\\\|\")*?)\"( |$)%', $line, $matches)) {
                     $tokens[] = $matches[1];
                     $line = substr($line, strlen($matches[0]));
                     continue;
@@ -844,6 +844,7 @@ class ImapProtocol extends Protocol {
                 if (count($item) != 4 || $item[0] != 'LIST') {
                     continue;
                 }
+                $item[3] = str_replace("\\\\", "\\", str_replace("\\\"", "\"", $item[3]));
                 $result[$item[3]] = ['delimiter' => $item[2], 'flags' => $item[1]];
             }
         }
