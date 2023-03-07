@@ -216,6 +216,15 @@ class Folder {
     }
 
     /**
+     * Get children.
+     *
+     * @return FolderCollection
+     */
+    public function getChildren(): FolderCollection {
+        return $this->children;
+    }
+
+    /**
      * Decode name.
      * It converts UTF7-IMAP encoding to UTF-8.
      * @param $name
