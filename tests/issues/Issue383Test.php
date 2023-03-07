@@ -12,7 +12,7 @@
 
 namespace Tests\issues;
 
-use Tests\LiveMailboxTestCase;
+use Tests\live\LiveMailboxTestCase;
 use Webklex\PHPIMAP\Exceptions\AuthFailedException;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
 use Webklex\PHPIMAP\Exceptions\EventNotFoundException;
@@ -22,6 +22,7 @@ use Webklex\PHPIMAP\Exceptions\ImapServerErrorException;
 use Webklex\PHPIMAP\Exceptions\MaskNotFoundException;
 use Webklex\PHPIMAP\Exceptions\ResponseException;
 use Webklex\PHPIMAP\Exceptions\RuntimeException;
+use Webklex\PHPIMAP\Folder;
 
 class Issue383Test extends LiveMailboxTestCase {
 
@@ -39,10 +40,6 @@ class Issue383Test extends LiveMailboxTestCase {
      * @throws MaskNotFoundException
      */
     public function testIssue(): void {
-        if (!getenv("LIVE_MAILBOX") ?? false) {
-            $this->markTestSkipped("This test requires a live mailbox. Please set the LIVE_MAILBOX environment variable to run this test.");
-        }
-
         $client = $this->getClient();
         $client->connect();
 
@@ -53,10 +50,10 @@ class Issue383Test extends LiveMailboxTestCase {
         $this->deleteFolder($folder);
 
         $folder = $client->createFolder($folder_path, false);
-        $this->assertNotNull($folder);
+        self::assertInstanceOf(Folder::class, $folder);
 
         $folder = $this->getFolder($folder_path);
-        $this->assertNotNull($folder);
+        self::assertInstanceOf(Folder::class, $folder);
 
         $this->assertEquals('Entwürfe+', $folder->name);
         $this->assertEquals($folder_path, $folder->full_name);

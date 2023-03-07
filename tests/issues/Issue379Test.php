@@ -12,7 +12,7 @@
 
 namespace Tests\issues;
 
-use Tests\LiveMailboxTestCase;
+use Tests\live\LiveMailboxTestCase;
 use Webklex\PHPIMAP\Exceptions\AuthFailedException;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
 use Webklex\PHPIMAP\Exceptions\EventNotFoundException;
@@ -49,9 +49,6 @@ class Issue379Test extends LiveMailboxTestCase {
      * @throws MaskNotFoundException
      */
     public function testIssue(): void {
-        if (!getenv("LIVE_MAILBOX") ?? false) {
-            $this->markTestSkipped("This test requires a live mailbox. Please set the LIVE_MAILBOX environment variable to run this test.");
-        }
         $folder = $this->getFolder('INBOX');
 
         $message = $this->appendMessageTemplate($folder, "plain.eml");

@@ -10,7 +10,7 @@
 *  -
 */
 
-namespace Tests;
+namespace Tests\live;
 
 use PHPUnit\Framework\TestCase;
 use Webklex\PHPIMAP\Client;
@@ -83,6 +83,9 @@ abstract class LiveMailboxTestCase extends TestCase {
      * @throws MaskNotFoundException
      */
     final protected function getClient(): Client {
+        if (!getenv("LIVE_MAILBOX") ?? false) {
+            $this->markTestSkipped("This test requires a live mailbox. Please set the LIVE_MAILBOX environment variable to run this test.");
+        }
         return $this->getManager()->account('default');
     }
 
@@ -111,13 +114,10 @@ abstract class LiveMailboxTestCase extends TestCase {
      */
     final protected function getFolder(string $folder_path = "INDEX"): Folder {
         $client = $this->getClient();
-        $this->assertNotNull($client);
-
-        //Connect to the IMAP Server
-        $client->connect();
+        self::assertInstanceOf(Client::class, $client->connect());
 
         $folder = $client->getFolderByPath($folder_path);
-        $this->assertNotNull($folder);
+        self::assertInstanceOf(Folder::class, $folder);
 
         return $folder;
     }
@@ -159,7 +159,7 @@ abstract class LiveMailboxTestCase extends TestCase {
         }
 
         $message = $folder->messages()->getMessageByUid($status['uidnext']);
-        $this->assertNotNull($message);
+        self::assertInstanceOf(Message::class, $message);
 
         return $message;
     }
@@ -183,7 +183,7 @@ abstract class LiveMailboxTestCase extends TestCase {
      * @throws RuntimeException
      */
     final protected function appendMessageTemplate(Folder $folder, string $template): Message {
-        $content = file_get_contents(implode(DIRECTORY_SEPARATOR, [__DIR__, "messages", $template]));
+        $content = file_get_contents(implode(DIRECTORY_SEPARATOR, [__DIR__, "..", "messages", $template]));
         return $this->appendMessage($folder, $content);
     }
 
