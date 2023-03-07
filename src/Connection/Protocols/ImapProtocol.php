@@ -812,14 +812,13 @@ class ImapProtocol extends Protocol {
      * @throws MessageNotFoundException
      */
     public function getMessageNumber(string $id): Response {
-        $ids = $this->getUid();
-        foreach ($ids as $k => $v) {
+        foreach ($this->getUid()->data() as $k => $v) {
             if ($v == $id) {
                 return Response::empty($this->debug)->setResult((int)$k);
             }
         }
 
-        throw new MessageNotFoundException('message number not found');
+        throw new MessageNotFoundException('message number not found: ' . $id);
     }
 
     /**
