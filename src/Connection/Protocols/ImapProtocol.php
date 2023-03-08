@@ -1122,6 +1122,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function expunge(): Response {
+        $this->uid_cache = [];
         return $this->requestAndResponse('EXPUNGE');
     }
 
