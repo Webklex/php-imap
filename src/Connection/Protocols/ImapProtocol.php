@@ -189,7 +189,7 @@ class ImapProtocol extends Protocol {
                 $token = substr($token, 1);
             }
             if ($token[0] == '"') {
-                if (preg_match('%^\(*"((.|\\\\|\")*?)" *%', $line, $matches)) {
+                if (preg_match('%^\(*\"((.|\\\|\")*?)\"( |$)%', $line, $matches)) {
                     $tokens[] = $matches[1];
                     $line = substr($line, strlen($matches[0]));
                     continue;
@@ -812,14 +812,13 @@ class ImapProtocol extends Protocol {
      * @throws MessageNotFoundException
      */
     public function getMessageNumber(string $id): Response {
-        $ids = $this->getUid();
-        foreach ($ids as $k => $v) {
+        foreach ($this->getUid()->data() as $k => $v) {
             if ($v == $id) {
                 return Response::empty($this->debug)->setResult((int)$k);
             }
         }
 
-        throw new MessageNotFoundException('message number not found');
+        throw new MessageNotFoundException('message number not found: ' . $id);
     }
 
     /**
@@ -844,6 +843,7 @@ class ImapProtocol extends Protocol {
                 if (count($item) != 4 || $item[0] != 'LIST') {
                     continue;
                 }
+                $item[3] = str_replace("\\\\", "\\", str_replace("\\\"", "\"", $item[3]));
                 $result[$item[3]] = ['delimiter' => $item[2], 'flags' => $item[1]];
             }
         }
@@ -1009,7 +1009,6 @@ class ImapProtocol extends Protocol {
      */
     public function moveManyMessages(array $messages, string $folder, int|string $uid = IMAP::ST_UID): Response {
         $command = $this->buildUIDCommand("MOVE", $uid);
-
         $set = implode(',', $messages);
         $tokens = [$set, $this->escapeString($folder)];
 
@@ -1164,7 +1163,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function getQuotaRoot(string $quota_root = 'INBOX'): Response {
-        $command = "QUOTA";
+        $command = "GETQUOTAROOT";
         $params = [$quota_root];
 
         return $this->requestAndResponse($command, $params);
@@ -1244,12 +1243,14 @@ class ImapProtocol extends Protocol {
                 $ids[] = $id;
             }
         }
-        $headers = $this->headers($ids, "RFC822", $uid);
-        $response->stack($headers);
-        foreach ($headers->data() as $id => $raw_header) {
-            $result[$id] = (new Header($raw_header, false))->getAttributes();
+        if (!empty($ids)) {
+            $headers = $this->headers($ids, "RFC822", $uid);
+            $response->stack($headers);
+            foreach ($headers->data() as $id => $raw_header) {
+                $result[$id] = (new Header($raw_header, false))->getAttributes();
+            }
         }
-        return $response->setResult($result);
+        return $response->setResult($result)->setCanBeEmpty(true);
     }
 
     /**

@@ -826,8 +826,8 @@ class Message
             return $str;
         }
 
-        if (function_exists('iconv') && $from != 'UTF-7' && $to != 'UTF-7') {
-            return @iconv($from, $to.'//IGNORE', $str);
+        if (function_exists('iconv') && !EncodingAliases::isUtf7($from) && !EncodingAliases::isUtf7($to)) {
+            return @iconv($from, $to . '//IGNORE', $str);
         } else {
             if (! $from) {
                 return mb_convert_encoding($str, $to);

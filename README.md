@@ -28,6 +28,7 @@ Discord: [discord.gg/rd4cN9h6][link-discord]
 - [Documentations](#documentations)
 - [Compatibility](#compatibility)
 - [Basic usage example](#basic-usage-example)
+- [Testing](#testing)
 - [Known issues](#known-issues)
 - [Support](#support)
 - [Features & pull requests](#features--pull-requests)
@@ -94,6 +95,60 @@ foreach($folders as $folder){
         }
     }
 }
+```
+
+
+## Testing
+To run the tests, please execute the following command:
+```bash
+composer test
+```
+
+### Quick-Test / Static Test
+To disable all test which require a live mailbox, please copy the `phpunit.xml.dist` to `phpunit.xml` and adjust the configuration:
+```xml
+<php>
+    <env name="LIVE_MAILBOX" value="false"/>
+</php>
+```
+
+### Full-Test / Live Mailbox Test
+To run all tests, you need to provide a valid imap configuration.
+
+To provide a valid imap configuration, please copy the `phpunit.xml.dist` to `phpunit.xml` and adjust the configuration:
+```xml
+<php>
+    <env name="LIVE_MAILBOX" value="true"/>
+    <env name="LIVE_MAILBOX_DEBUG" value="true"/>
+    <env name="LIVE_MAILBOX_HOST" value="mail.example.local"/>
+    <env name="LIVE_MAILBOX_PORT" value="993"/>
+    <env name="LIVE_MAILBOX_VALIDATE_CERT" value="false"/>
+    <env name="LIVE_MAILBOX_QUOTA_SUPPORT" value="true"/>
+    <env name="LIVE_MAILBOX_ENCRYPTION" value="ssl"/>
+    <env name="LIVE_MAILBOX_USERNAME" value="root@example.local"/>
+    <env name="LIVE_MAILBOX_PASSWORD" value="foobar"/>
+</php>
+```
+
+The test account should **not** contain any important data, as it will be deleted during the test.
+Furthermore, the test account should be able to create new folders, move messages and should **not** be used by any other
+application during the test.
+
+It's recommended to use a dedicated test account for this purpose. You can use the provided `Dockerfile` to create an imap server used for testing purposes.
+
+Build the docker image:
+```bash
+cd .github/docker
+
+docker build -t php-imap-server .
+```
+Run the docker image:
+```bash
+docker run --name imap-server -p 993:993 --rm -d php-imap-server
+```
+Stop the docker image:
+```bash
+docker stop imap-server
 ```
 
 

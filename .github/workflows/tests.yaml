@@ -20,6 +20,16 @@ jobs:
 
     name: PHP ${{ matrix.php }}
 
+    env:
+      LIVE_MAILBOX: true
+      LIVE_MAILBOX_DEBUG: true
+      LIVE_MAILBOX_HOST: mail.example.local
+      LIVE_MAILBOX_PORT: 993
+      LIVE_MAILBOX_USERNAME: root@example.local
+      LIVE_MAILBOX_ENCRYPTION: ssl
+      LIVE_MAILBOX_PASSWORD: foobar
+      LIVE_MAILBOX_QUOTA_SUPPORT: true
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -33,6 +43,8 @@ jobs:
 
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
+
+      - run: "sh .github/docker/dovecot_setup.sh"
 
       - name: Execute tests
         run: vendor/bin/phpunit

@@ -14,6 +14,7 @@
     <testsuite name="PHP-IMAP Test Suite">
       <directory>tests</directory>
       <directory>tests/issues</directory>
+      <directory>tests/live</directory>
     </testsuite>
   </testsuites>
   <logging>
@@ -21,11 +22,13 @@
   </logging>
   <php>
     <env name="LIVE_MAILBOX" value="false"/>
-    <env name="LIVE_MAILBOX_HOST" value="localhost"/>
-    <env name="LIVE_MAILBOX_PORT" value="143"/>
+    <env name="LIVE_MAILBOX_DEBUG" value="false"/>
+    <env name="LIVE_MAILBOX_HOST" value="mail.example.local"/>
+    <env name="LIVE_MAILBOX_PORT" value="993"/>
     <env name="LIVE_MAILBOX_VALIDATE_CERT" value="false"/>
+    <env name="LIVE_MAILBOX_QUOTA_SUPPORT" value="false"/>
     <env name="LIVE_MAILBOX_ENCRYPTION" value=""/>
-    <env name="LIVE_MAILBOX_USERNAME" value="root@example.com"/>
+    <env name="LIVE_MAILBOX_USERNAME" value="root@example.local"/>
     <env name="LIVE_MAILBOX_PASSWORD" value="foobar"/>
   </php>
 </phpunit>

@@ -216,6 +216,15 @@ class Folder {
     }
 
     /**
+     * Get children.
+     *
+     * @return FolderCollection
+     */
+    public function getChildren(): FolderCollection {
+        return $this->children;
+    }
+
+    /**
      * Decode name.
      * It converts UTF7-IMAP encoding to UTF-8.
      * @param $name
@@ -223,7 +232,12 @@ class Folder {
      * @return string|array|bool|string[]|null
      */
     protected function decodeName($name): string|array|bool|null {
-        return mb_convert_encoding($name, "UTF-8", "UTF7-IMAP");
+        $parts = [];
+        foreach (explode($this->delimiter, $name) as $item) {
+            $parts[] = EncodingAliases::convert($item, "UTF7-IMAP", "UTF-8");
+        }
+
+        return implode($this->delimiter, $parts);
     }
 
     /**
@@ -235,7 +249,6 @@ class Folder {
      */
     protected function getSimpleName($delimiter, $full_name): string|bool {
         $arr = explode($delimiter, $full_name);
-
         return end($arr);
     }
 

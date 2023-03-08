@@ -216,6 +216,8 @@ abstract class Protocol implements ProtocolInterface {
     }
 
     /**
+     * Get the current connection timeout
+     *
      * @return int
      */
     public function getConnectionTimeout(): int {
@@ -223,7 +225,9 @@ abstract class Protocol implements ProtocolInterface {
     }
 
     /**
+     * Set the connection timeout
      * @param int $connection_timeout
+     *
      * @return Protocol
      */
     public function setConnectionTimeout(int $connection_timeout): Protocol {
