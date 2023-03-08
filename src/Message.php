@@ -1507,7 +1507,7 @@ class Message {
      *
      * @return Message
      */
-    public function setConfig($config): Message {
+    public function setConfig(array $config): Message {
         $this->config = $config;
 
         return $this;
