@@ -1429,7 +1429,7 @@ class Message {
         return $this->uid == $message->uid
             && $this->message_id->first() == $message->message_id->first()
             && $this->subject->first() == $message->subject->first()
-            && $this->date->toDate()->eq($message->date);
+            && $this->date->toDate()->eq($message->date->toDate());
     }
 
     /**
