@@ -1514,6 +1514,15 @@ class Message {
     }
 
     /**
+     * Get the config
+     *
+     * @return array
+     */
+    public function getConfig(): array {
+        return $this->config;
+    }
+
+    /**
      * Set the available flags
      * @param $available_flags
      *
