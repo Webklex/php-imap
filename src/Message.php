@@ -1535,6 +1535,15 @@ class Message {
     }
 
     /**
+     * Get the available flags
+     *
+     * @return array
+     */
+    public function getAvailableFlags(): array {
+        return $this->available_flags;
+    }
+
+    /**
      * Set the attachment collection
      * @param $attachments
      *
