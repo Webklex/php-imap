@@ -141,7 +141,7 @@ abstract class LiveMailboxTestCase extends TestCase {
      * @throws RuntimeException
      */
     final protected function appendMessage(Folder $folder, string $message): Message {
-        $status = $folder->examine();
+        $status = $folder->select();
         if (!isset($status['uidnext'])) {
             $this->fail("No UIDNEXT returned");
         }
