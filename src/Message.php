@@ -641,7 +641,7 @@ class Message {
             if ($this->getFlags()->get("seen") == null) {
                 $this->unsetFlag("Seen");
             }
-        } elseif ($this->getFlags()->get("seen") != null) {
+        } elseif ($this->getFlags()->get("seen") == null) {
             $this->setFlag("Seen");
         }
     }
