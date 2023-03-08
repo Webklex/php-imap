@@ -55,7 +55,7 @@ class Issue379Test extends LiveMailboxTestCase {
         $this->assertEquals(214, $message->getSize());
 
         // Clean up
-        $this->assertEquals(true, $message->delete(true));
+        $this->assertTrue($message->delete(true));
     }
 
 }
