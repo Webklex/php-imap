@@ -1396,6 +1396,17 @@ class Message {
     }
 
     /**
+     * Check if a flag is set
+     *
+     * @param string $flag
+     * @return boolean
+     */
+    public function hasFlag(string $flag): bool {
+        $flag = str_replace("\\", "", strtolower($flag));
+        return $this->getFlags()->has($flag);
+    }
+
+    /**
      * Get the fetched structure
      *
      * @return Structure|null

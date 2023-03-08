@@ -13,6 +13,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Added
 - `Protocol::sizes()` support added (fetch the message byte size via RFC822.SIZE). Accessible through `Message::getSize()` #379 (thanks @didi1357)
+- `Message::hasFlag()` method added to check if a message has a specific flag
 
 ### Breaking changes
 - NaN
