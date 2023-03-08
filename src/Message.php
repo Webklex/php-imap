@@ -892,7 +892,7 @@ class Message {
         } elseif (property_exists($structure, 'charset')) {
             return EncodingAliases::get($structure->charset, "ISO-8859-2");
         } elseif (is_string($structure) === true) {
-            return mb_detect_encoding($structure);
+            return EncodingAliases::detectEncoding($structure);
         }
 
         return 'UTF-8';
@@ -1503,7 +1503,7 @@ class Message {
 
     /**
      * Set the config
-     * @param $config
+     * @param array $config
      *
      * @return Message
      */
