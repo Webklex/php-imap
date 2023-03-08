@@ -1581,7 +1581,7 @@ class Message {
      */
     public function setClient($client): Message {
         $this->client = $client;
-        $this->client->openFolder($this->folder_path);
+        $this->client?->openFolder($this->folder_path);
 
         return $this;
     }
