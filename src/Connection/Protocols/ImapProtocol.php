@@ -28,6 +28,8 @@ use Webklex\PHPIMAP\IMAP;
  * Class ImapProtocol
  *
  * @package Webklex\PHPIMAP\Connection\Protocols
+ *
+ * @reference https://www.rfc-editor.org/rfc/rfc2087.txt
  */
 class ImapProtocol extends Protocol {
 
@@ -1144,6 +1146,8 @@ class ImapProtocol extends Protocol {
      * @throws ImapBadRequestException
      * @throws ImapServerErrorException
      * @throws RuntimeException
+     *
+     * @Doc https://www.rfc-editor.org/rfc/rfc2087.txt
      */
     public function getQuota($username): Response {
         $command = "GETQUOTA";
@@ -1161,6 +1165,8 @@ class ImapProtocol extends Protocol {
      * @throws ImapBadRequestException
      * @throws ImapServerErrorException
      * @throws RuntimeException
+     *
+     * @Doc https://www.rfc-editor.org/rfc/rfc2087.txt
      */
     public function getQuotaRoot(string $quota_root = 'INBOX'): Response {
         $command = "GETQUOTAROOT";
