@@ -17,6 +17,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - `Message::$client` could not be set to null
 - in_reply_to and references parsing fixed
 - Prevent message body parsing from adding empty lines
+- Don't parse regular inline message parts without name or filename as attachment
 
 ### Added
 - `Protocol::sizes()` support added (fetch the message byte size via RFC822.SIZE). Accessible through `Message::getSize()` #379 (thanks @didi1357)

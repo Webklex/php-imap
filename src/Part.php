@@ -289,6 +289,10 @@ class Part {
                 return false;
             }
         }
+
+        if ($this->disposition === "inline" && $this->filename == null && $this->name == null) {
+            return false;
+        }
         return true;
     }
 
