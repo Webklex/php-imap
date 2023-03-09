@@ -245,20 +245,23 @@ class FolderTest extends LiveMailboxTestCase {
         $folder = $this->getFolder('INBOX');
         self::assertInstanceOf(Folder::class, $folder);
 
+        $folder->select();
+
         // Test empty overview
         $overview = $folder->overview();
         self::assertIsArray($overview);
+        self::assertCount(0, $overview);
 
         $message = $this->appendMessageTemplate($folder, "plain.eml");
-        self::assertInstanceOf(Message::class, $message);
 
         $overview = $folder->overview();
+
         self::assertIsArray($overview);
+        self::assertCount(1, $overview);
 
-        self::assertEquals($message->from, end($overview)["from"]);
+        self::assertEquals($message->from->first()->full, end($overview)["from"]->toString());
 
-        // Clean up
-        $this->assertTrue($message->delete(true));
+        self::assertTrue($message->delete());
     }
 
     /**

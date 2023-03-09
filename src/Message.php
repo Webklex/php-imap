@@ -43,10 +43,10 @@ use Webklex\PHPIMAP\Traits\HasEvents;
  *
  *
 
- * @property integer msglist
- * @property integer uid
- * @property integer msgn
- * @property integer size
+ * @property int msglist
+ * @property int uid
+ * @property int msgn
+ * @property int size
  * @property Attribute subject
  * @property Attribute message_id
  * @property Attribute message_no
@@ -61,11 +61,11 @@ use Webklex\PHPIMAP\Traits\HasEvents;
  * @property Attribute sender
  *
 
- * @method integer getMsglist()
- * @method integer setMsglist($msglist)
- * @method integer getUid()
- * @method integer getMsgn()
- * @method integer getSize()
+ * @method int getMsglist()
+ * @method int setMsglist($msglist)
+ * @method int getUid()
+ * @method int getMsgn()
+ * @method int getSize()
  * @method Attribute getPriority()
  * @method Attribute getSubject()
  * @method Attribute getMessageId()
@@ -415,10 +415,11 @@ class Message
                 $this->attributes[$name] = $this->client->getConnection()->getMessageNumber($this->uid)->validate()->integer();
 
                 return $this->attributes[$name];
-            case "size":
-                if (!isset($this->attributes[$name])) {
+            case 'size':
+                if (! isset($this->attributes[$name])) {
                     $this->fetchSize();
                 }
+
                 return $this->attributes[$name];
         }
 
@@ -588,13 +589,14 @@ class Message
      * @throws ResponseException
      * @throws RuntimeException
      */
-    private function fetchSize(): void {
+    private function fetchSize(): void
+    {
         $sequence_id = $this->getSequenceId();
         $sizes = $this->client->getConnection()->sizes([$sequence_id], $this->sequence)->validatedData();
-         if (!isset($sizes[$sequence_id])) {
-            throw new MessageSizeFetchingException("sizes did not set an array entry for the supplied sequence_id", 0);
+        if (! isset($sizes[$sequence_id])) {
+            throw new MessageSizeFetchingException('sizes did not set an array entry for the supplied sequence_id', 0);
         }
-        $this->attributes["size"] = $sizes[$sequence_id];
+        $this->attributes['size'] = $sizes[$sequence_id];
     }
 
     /**
@@ -615,7 +617,7 @@ class Message
             if ($this->getFlags()->get('seen') == null) {
                 $this->unsetFlag('Seen');
             }
-        } elseif ($this->getFlags()->get('seen') != null) {
+        } elseif ($this->getFlags()->get('seen') == null) {
             $this->setFlag('Seen');
         }
     }
@@ -826,8 +828,8 @@ class Message
             return $str;
         }
 
-        if (function_exists('iconv') && !EncodingAliases::isUtf7($from) && !EncodingAliases::isUtf7($to)) {
-            return @iconv($from, $to . '//IGNORE', $str);
+        if (function_exists('iconv') && ! EncodingAliases::isUtf7($from) && ! EncodingAliases::isUtf7($to)) {
+            return @iconv($from, $to.'//IGNORE', $str);
         } else {
             if (! $from) {
                 return mb_convert_encoding($str, $to);
@@ -851,7 +853,7 @@ class Message
         } elseif (property_exists($structure, 'charset')) {
             return EncodingAliases::get($structure->charset, 'ISO-8859-2');
         } elseif (is_string($structure) === true) {
-            return mb_detect_encoding($structure);
+            return EncodingAliases::detectEncoding($structure);
         }
 
         return 'UTF-8';
@@ -1331,6 +1333,16 @@ class Message
     }
 
     /**
+     * Check if a flag is set
+     */
+    public function hasFlag(string $flag): bool
+    {
+        $flag = str_replace('\\', '', strtolower($flag));
+
+        return $this->getFlags()->has($flag);
+    }
+
+    /**
      * Get the fetched structure
      */
     public function getStructure(): ?Structure
@@ -1350,7 +1362,7 @@ class Message
         return $this->uid == $message->uid
             && $this->message_id->first() == $message->message_id->first()
             && $this->subject->first() == $message->subject->first()
-            && $this->date->toDate()->eq($message->date);
+            && $this->date->toDate()->eq($message->date->toDate());
     }
 
     /**
@@ -1417,11 +1429,19 @@ class Message
     /**
      * Set the config
      */
-    public function setConfig($config): Message
+    public function setConfig(array $config): Message
     {
         $this->config = $config;
 
         return $this;
+    }
+
+    /**
+     * Get the config
+     */
+    public function getConfig(): array
+    {
+        return $this->config;
     }
 
     /**
@@ -1432,6 +1452,14 @@ class Message
         $this->available_flags = $available_flags;
 
         return $this;
+    }
+
+    /**
+     * Get the available flags
+     */
+    public function getAvailableFlags(): array
+    {
+        return $this->available_flags;
     }
 
     /**
@@ -1467,7 +1495,7 @@ class Message
     public function setClient($client): Message
     {
         $this->client = $client;
-        $this->client->openFolder($this->folder_path);
+        $this->client?->openFolder($this->folder_path);
 
         return $this;
     }
@@ -1506,8 +1534,6 @@ class Message
 
     /**
      * Get the current sequence id (either a UID or a message number!)
-     *
-     * @return int
      */
     public function getSequenceId(): int
     {
