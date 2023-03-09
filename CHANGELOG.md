@@ -11,11 +11,11 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Prevent line-breaks in folder path caused by special chars
 - Partial fix for #362 (allow overview response to be empty)
 - `Message::setConfig()` config parameter type set to array
-- Treat `in_reply_to` header as address
 - Reset the protocol uid cache if the session gets expunged
 - Set the "seen" flag only if the flag isn't set and the fetch option isn't IMAP::FT_PEEK
 - `Message::is()` date comparison fixed
 - `Message::$client` could not be set to null
+- in_reply_to and references parsing fixed
 
 ### Added
 - `Protocol::sizes()` support added (fetch the message byte size via RFC822.SIZE). Accessible through `Message::getSize()` #379 (thanks @didi1357)

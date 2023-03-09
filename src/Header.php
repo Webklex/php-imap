@@ -185,10 +185,15 @@ class Header {
             $this->set("subject", $this->decode($header->subject));
         }
         if (property_exists($header, 'references')) {
-            $this->set("references", $this->decode($header->references));
+            $this->set("references", array_map(function ($item) {
+                return str_replace(['<', '>'], '', $item);
+            }, explode(" ", $header->references)));
         }
         if (property_exists($header, 'message_id')) {
             $this->set("message_id", str_replace(['<', '>'], '', $header->message_id));
+        }
+        if (property_exists($header, 'in_reply_to')) {
+            $this->set("in_reply_to", str_replace(['<', '>'], '', $header->in_reply_to));
         }
 
         $this->parseDate($header);
@@ -264,13 +269,6 @@ class Header {
 
         foreach ($headers as $key => $values) {
             if (isset($imap_headers[$key])) {
-                switch ((string)$key) {
-                    case 'in_reply_to':
-                        $value = $this->decodeAddresses($values);
-                        $imap_headers[$key . "address"] = implode(", ", $values);
-                        $imap_headers[$key] = $value;
-                        break;
-                }
                 continue;
             }
             $value = null;
@@ -280,7 +278,6 @@ class Header {
                 case 'cc':
                 case 'bcc':
                 case 'reply_to':
-                case 'in_reply_to':
                 case 'sender':
                     $value = $this->decodeAddresses($values);
                     $headers[$key . "address"] = implode(", ", $values);
@@ -531,7 +528,7 @@ class Header {
      * @param object $header
      */
     private function extractAddresses(object $header): void {
-        foreach (['from', 'to', 'cc', 'bcc', 'reply_to', 'in_reply_to', 'sender'] as $key) {
+        foreach (['from', 'to', 'cc', 'bcc', 'reply_to', 'sender'] as $key) {
             if (property_exists($header, $key)) {
                 $this->set($key, $this->parseAddresses($header->$key));
             }
