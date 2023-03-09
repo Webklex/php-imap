@@ -16,6 +16,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - `Message::is()` date comparison fixed
 - `Message::$client` could not be set to null
 - in_reply_to and references parsing fixed
+- Prevent message body parsing from adding empty lines
 
 ### Added
 - `Protocol::sizes()` support added (fetch the message byte size via RFC822.SIZE). Accessible through `Message::getSize()` #379 (thanks @didi1357)

@@ -326,7 +326,7 @@ class Message {
             $email = str_replace("\n", "\r\n", $email);
         }
         $raw_header = substr($email, 0, strpos($email, "\r\n\r\n"));
-        $raw_body = substr($email, strlen($raw_header)+8);
+        $raw_body = substr($email, strlen($raw_header)+4);
 
         $instance->parseRawHeader($raw_header);
         $instance->parseRawBody($raw_body);
@@ -713,14 +713,27 @@ class Message {
                 $content = $this->convertEncoding($content, $encoding);
             }
 
-            $subtype = strtolower($part->subtype ?? '');
-            $subtype = $subtype == "plain" || $subtype == "" ? "text" : $subtype;
+            $this->addBody($part->subtype ?? '', $content);
+        }
+    }
 
-            if (isset($this->bodies[$subtype])) {
-                $this->bodies[$subtype] .= "\n" . $content;
-            } else {
-                $this->bodies[$subtype] = $content;
+    /**
+     * Add a body to the message
+     * @param string $subtype
+     * @param string $content
+     *
+     * @return void
+     */
+    protected function addBody(string $subtype, string $content): void {
+        $subtype = strtolower($subtype);
+        $subtype = $subtype == "plain" || $subtype == "" ? "text" : $subtype;
+
+        if (isset($this->bodies[$subtype]) && $this->bodies[$subtype] !== null && $this->bodies[$subtype] !== "") {
+            if ($content !== "") {
+                $this->bodies[$subtype] .= "\n".$content;
             }
+        } else {
+            $this->bodies[$subtype] = $content;
         }
     }
 
