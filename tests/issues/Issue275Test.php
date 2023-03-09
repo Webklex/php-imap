@@ -22,7 +22,7 @@ class Issue275Test extends TestCase {
         $message = Message::fromFile($filename);
 
         self::assertSame("Testing 123", (string)$message->subject);
-        self::assertSame("testing123 this is a body", $message->getTextBody());
+        self::assertSame("Asdf testing123 this is a body", $message->getTextBody());
     }
 
     public function testIssueEmail2() {
