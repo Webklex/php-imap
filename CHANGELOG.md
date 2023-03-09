@@ -24,6 +24,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - `Folder::select()` method added to select a folder
 - `Message::getAvailableFlags()` method added to get all available flags
 - Live mailbox tests added
+- `Attribute::map()` method added to map all attribute values
 
 ### Breaking changes
 - NaN
