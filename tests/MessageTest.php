@@ -180,7 +180,7 @@ class MessageTest extends TestCase {
         self::assertSame("znk551MP3TP3WPp9Kl1gnLErrWEgkJFAtvaKqkTgrk3dKI8dX38YT8BaVxRcOERN", $attachment->content);
         self::assertSame("application/octet-stream", $attachment->content_type);
         self::assertSame("6mfFxiU5Yhv9WYJx.txt", $attachment->name);
-        self::assertSame(1, $attachment->part_number);
+        self::assertSame(2, $attachment->part_number);
         self::assertSame("text", $attachment->type);
         self::assertNotEmpty($attachment->id);
         self::assertSame(90, $attachment->size);
