@@ -309,6 +309,30 @@ class Message {
      * @throws MaskNotFoundException
      */
     public static function fromFile($filename): Message {
+        $blob = file_get_contents($filename);
+        if ($blob === false) {
+            throw new RuntimeException("Unable to read file");
+        }
+        return self::fromString($blob);
+    }
+
+    /**
+     * Create a new message instance by reading and loading a string
+     * @param string $blob
+     *
+     * @return Message
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws InvalidMessageDateException
+     * @throws MaskNotFoundException
+     * @throws MessageContentFetchingException
+     * @throws ReflectionException
+     * @throws ResponseException
+     * @throws RuntimeException
+     */
+    public static function fromString(string $blob): Message {
         $reflection = new ReflectionClass(self::class);
         /** @var Message $instance */
         $instance = $reflection->newInstanceWithoutConstructor();
@@ -321,12 +345,11 @@ class Message {
             throw new MaskNotFoundException("Unknown message mask provided");
         }
 
-        $email = file_get_contents($filename);
-        if(!str_contains($email, "\r\n")){
-            $email = str_replace("\n", "\r\n", $email);
+        if(!str_contains($blob, "\r\n")){
+            $blob = str_replace("\n", "\r\n", $blob);
         }
-        $raw_header = substr($email, 0, strpos($email, "\r\n\r\n"));
-        $raw_body = substr($email, strlen($raw_header)+4);
+        $raw_header = substr($blob, 0, strpos($blob, "\r\n\r\n"));
+        $raw_body = substr($blob, strlen($raw_header)+4);
 
         $instance->parseRawHeader($raw_header);
         $instance->parseRawBody($raw_body);
