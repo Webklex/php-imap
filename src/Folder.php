@@ -529,6 +529,21 @@ class Folder {
     }
 
     /**
+     * Select the current folder
+     *
+     * @return array
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws ResponseException
+     * @throws RuntimeException
+     */
+    public function select(): array {
+        return $this->client->getConnection()->selectFolder($this->path)->validatedData();
+    }
+
+    /**
      * Get the current Client instance
      *
      * @return Client
