@@ -6,7 +6,6 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- Extended UTF-7 support added (RFC2060) #383
 - IMAP Quota root command fixed
 - Prevent line-breaks in folder path caused by special chars
 - Partial fix for #362 (allow overview response to be empty)
@@ -21,6 +20,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - `Message::hasTextBody()` and `Message::hasHtmlBody()` should return `false` if the body is empty
 
 ### Added
+- Extended UTF-7 support added (RFC2060) #383
 - `Protocol::sizes()` support added (fetch the message byte size via RFC822.SIZE). Accessible through `Message::getSize()` #379 (thanks @didi1357)
 - `Message::hasFlag()` method added to check if a message has a specific flag
 - `Message::getConfig()` method added to get the current message configuration
