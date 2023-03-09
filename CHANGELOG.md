@@ -28,6 +28,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - `Message::getAvailableFlags()` method added to get all available flags
 - Live mailbox tests added
 - `Attribute::map()` method added to map all attribute values
+- `Header::has()` method added to check if a header attribute / value exist
 
 ### Breaking changes
 - NaN

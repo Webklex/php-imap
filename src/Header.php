@@ -111,6 +111,17 @@ class Header {
     }
 
     /**
+     * Check if a specific attribute exists
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function has(string $name): bool {
+        $name = str_replace(["-", " "], "_", strtolower($name));
+        return isset($this->attributes[$name]);
+    }
+
+    /**
      * Set a specific attribute
      * @param string $name
      * @param array|mixed $value
