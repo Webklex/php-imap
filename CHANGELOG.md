@@ -29,6 +29,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Live mailbox tests added
 - `Attribute::map()` method added to map all attribute values
 - `Header::has()` method added to check if a header attribute / value exist
+- All part attributes are now accessible via linked attribute
 
 ### Breaking changes
 - NaN

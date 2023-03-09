@@ -223,6 +223,8 @@ class Attachment {
                 $this->setName($this->part->subtype);
             }
         }
+
+        $this->attributes = array_merge($this->part->getHeader()->getAttributes(), $this->attributes);
     }
 
     /**
