@@ -2016,7 +2016,7 @@ class MessageTest extends LiveMailboxTestCase {
 
         $message = $this->appendMessageTemplate($folder, "1366671050@github.com.eml");
         self::assertIsArray($message->getReferences()->all());
-        self::assertEquals("<Webklex/php-imap/issues/349@github.com>", $message->getReferences()->first());
+        self::assertEquals("Webklex/php-imap/issues/349@github.com", $message->getReferences()->first());
 
         // Cleanup
         self::assertTrue($message->delete());
