@@ -454,7 +454,7 @@ class Message {
      * @return bool
      */
     public function hasTextBody(): bool {
-        return isset($this->bodies['text']);
+        return isset($this->bodies['text']) && $this->bodies['text'] !== "";
     }
 
     /**
@@ -476,7 +476,7 @@ class Message {
      * @return bool
      */
     public function hasHTMLBody(): bool {
-        return isset($this->bodies['html']);
+        return isset($this->bodies['html']) && $this->bodies['html'] !== "";
     }
 
     /**
