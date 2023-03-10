@@ -28,7 +28,7 @@ class PaginatedCollection extends Collection {
      *
      * @var int $total
      */
-    protected int $total;
+    protected int $total = 0;
 
     /**
      * Paginate the current collection.
