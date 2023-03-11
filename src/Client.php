@@ -661,6 +661,25 @@ class Client {
     }
 
     /**
+     * Set active folder
+     * @param string|null $folder_path
+     *
+     * @return void
+     */
+    public function setActiveFolder(?string $folder_path = null): void {
+        $this->active_folder = $folder_path;
+    }
+
+    /**
+     * Get active folder
+     *
+     * @return string|null
+     */
+    public function getActiveFolder(): ?string {
+        return $this->active_folder;
+    }
+
+    /**
      * Create a new Folder
      * @param string $folder_path
      * @param boolean $expunge
