@@ -413,7 +413,7 @@ class Header {
      *
      * @return mixed
      */
-    private function decode(mixed $value): mixed {
+    public function decode(mixed $value): mixed {
         if (is_array($value)) {
             return $this->decodeArray($value);
         }
