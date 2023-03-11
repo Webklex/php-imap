@@ -29,7 +29,9 @@ use Webklex\PHPIMAP\Support\Masks\AttachmentMask;
  * @property string content_type
  * @property string id
  * @property string name
- * @property string disposition
+ * @property string description
+ * @property string filename
+ * @property ?string disposition
  * @property string img_src
  *
  * @method integer getPartNumber()
@@ -78,6 +80,8 @@ class Attachment {
         'content_type' => null,
         'id' => null,
         'name' => null,
+        'filename' => null,
+        'description' => null,
         'disposition' => null,
         'img_src' => null,
         'size' => null,
@@ -209,19 +213,29 @@ class Attachment {
         $this->disposition = $this->part->disposition;
 
         if (($filename = $this->part->filename) !== null) {
-            $this->setName($filename);
-        } elseif (($name = $this->part->name) !== null) {
-            $this->setName($name);
-        }else {
-            $this->setName("undefined");
+            $this->filename = $this->decodeName($filename);
+        }
+
+        if (($name = $this->part->name) !== null) {
+            $this->name = $this->decodeName($name);
+        }
+        if (!$this->name && $this->filename != "") {
+            $this->name = $this->filename;
         }
 
         if (IMAP::ATTACHMENT_TYPE_MESSAGE == $this->part->type) {
             if ($this->part->ifdescription) {
-                $this->setName($this->part->description);
-            } else {
-                $this->setName($this->part->subtype);
+                if (!$this->name) {
+                    $this->name = $this->part->description;
+                }
+                $this->description = $this->part->description;
+            } else if (!$this->name) {
+                $this->name = $this->part->subtype;
             }
+        }
+
+        if (!$this->filename) {
+            $this->filename = $this->name;
         }
 
         $this->attributes = array_merge($this->part->getHeader()->getAttributes(), $this->attributes);
@@ -241,18 +255,36 @@ class Attachment {
     }
 
     /**
-     * Set the attachment name and try to decode it
+     * Decode a given name
      * @param $name
+     *
+     * @return string
      */
-    public function setName($name): void {
-        $decoder = $this->config['decoder']['attachment'];
+    public function decodeName($name): string {
         if ($name !== null) {
-            if($decoder === 'utf-8' && extension_loaded('imap')) {
-                $this->name = \imap_utf8($name);
-            }else{
-                $this->name = mb_decode_mimeheader($name);
+            if (str_contains($name, "''")) {
+                $parts = explode("''", $name);
+                if (EncodingAliases::has($parts[0])) {
+                    $name = implode("''", array_slice($parts, 1));
+                }
             }
+
+            $decoder = $this->config['decoder']['message'];
+            if($decoder === 'utf-8' && extension_loaded('imap')) {
+                $name = \imap_utf8($name);
+            }
+
+            if (preg_match('/=\?([^?]+)\?(Q|B)\?(.+)\?=/i', $name, $matches)) {
+                $name = $this->part->getHeader()->decode($name);
+            }
+
+            // check if $name is url encoded
+            if (preg_match('/%[0-9A-F]{2}/i', $name)) {
+                $name = urldecode($name);
+            }
+            return $name;
         }
+        return "";
     }
 
     /**
