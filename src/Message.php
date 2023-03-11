@@ -1068,6 +1068,9 @@ class Message {
 
         if (isset($status["uidnext"])) {
             $next_uid = $status["uidnext"];
+            if ((int)$next_uid <= 0) {
+                return null;
+            }
 
             /** @var Folder $folder */
             $folder = $this->client->getFolderByPath($folder_path);
@@ -1107,6 +1110,9 @@ class Message {
 
         if (isset($status["uidnext"])) {
             $next_uid = $status["uidnext"];
+            if ((int)$next_uid <= 0) {
+                return null;
+            }
 
             /** @var Folder $folder */
             $folder = $this->client->getFolderByPath($folder_path);

@@ -24,6 +24,7 @@ use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
 use Webklex\PHPIMAP\Exceptions\MessageContentFetchingException;
 use Webklex\PHPIMAP\Exceptions\MessageFlagException;
 use Webklex\PHPIMAP\Exceptions\MessageNotFoundException;
+use Webklex\PHPIMAP\Exceptions\MessageSizeFetchingException;
 use Webklex\PHPIMAP\Exceptions\ResponseException;
 use Webklex\PHPIMAP\IMAP;
 use Webklex\PHPIMAP\Message;
@@ -80,9 +81,10 @@ class MessageTest extends TestCase {
      * @throws MessageContentFetchingException
      * @throws MessageFlagException
      * @throws MessageNotFoundException
+     * @throws MessageSizeFetchingException
      * @throws ReflectionException
-     * @throws RuntimeException
      * @throws ResponseException
+     * @throws RuntimeException
      */
     public function testMessage(): void {
         $this->createNewProtocolMockup();
@@ -123,16 +125,48 @@ class MessageTest extends TestCase {
     }
 
     /**
-     * @throws RuntimeException
-     * @throws MessageContentFetchingException
-     * @throws ImapServerErrorException
-     * @throws ConnectionFailedException
+     * Test getMessageNumber
+     *
+     * @return void
      * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
      * @throws MessageNotFoundException
      * @throws ResponseException
+     * @throws RuntimeException
+     */
+    public function testGetMessageNumber(): void {
+        $this->createNewProtocolMockup();
+        $this->protocol->expects($this->any())->method('getMessageNumber')->willReturn(Response::empty()->setResult(""));
+
+        self::assertNotEmpty($this->client->openFolder("INBOX"));
+
+        try {
+            $this->client->getConnection()->getMessageNumber(21)->validatedData();
+            $this->fail("Message number should not exist");
+        } catch (ResponseException $e) {
+            self::assertTrue(true);
+        }
+
+    }
+
+    /**
+     * Test loadMessageFromFile
+     *
+     * @return void
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
      * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
      * @throws InvalidMessageDateException
+     * @throws MaskNotFoundException
+     * @throws MessageContentFetchingException
+     * @throws MessageNotFoundException
      * @throws ReflectionException
+     * @throws ResponseException
+     * @throws RuntimeException
+     * @throws MessageSizeFetchingException
      */
     public function testLoadMessageFromFile(): void {
         $filename = implode(DIRECTORY_SEPARATOR, [__DIR__, "messages", "1366671050@github.com.eml"]);
@@ -189,6 +223,21 @@ class MessageTest extends TestCase {
         self::assertSame("text/plain", $attachment->getMimeType());
     }
 
+    /**
+     * Test issue #348
+     *
+     * @return void
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws InvalidMessageDateException
+     * @throws MaskNotFoundException
+     * @throws MessageContentFetchingException
+     * @throws ReflectionException
+     * @throws ResponseException
+     * @throws RuntimeException
+     */
     public function testIssue348() {
         $filename = implode(DIRECTORY_SEPARATOR, [__DIR__, "messages", "issue-348.eml"]);
         $message = Message::fromFile($filename);
@@ -210,7 +259,12 @@ class MessageTest extends TestCase {
         self::assertSame("application/pdf", $attachment->getMimeType());
     }
 
-    protected function createNewProtocolMockup() {
+    /**
+     * Create a new protocol mockup
+     *
+     * @return void
+     */
+    protected function createNewProtocolMockup(): void {
         $this->protocol = $this->createMock(ImapProtocol::class);
 
         $this->protocol->expects($this->any())->method('createStream')->willReturn(true);
