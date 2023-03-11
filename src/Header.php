@@ -433,7 +433,7 @@ class Header {
                     $value = \imap_utf8($value);
                 }
             } elseif ($decoder === 'iconv' && $this->is_uft8($value)) {
-                $value = iconv_mime_decode($value);
+                $value = iconv_mime_decode($value, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, "UTF-8");
             }
 
             if ($this->is_uft8($value)) {
