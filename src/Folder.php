@@ -375,6 +375,10 @@ class Folder {
      */
     public function delete(bool $expunge = true): array {
         $status = $this->client->getConnection()->deleteFolder($this->path)->validatedData();
+        if ($this->client->getActiveFolder() == $this->path){
+            $this->client->setActiveFolder(null);
+        }
+
         if ($expunge) $this->client->expunge();
 
         $event = $this->getEvent("folder", "deleted");

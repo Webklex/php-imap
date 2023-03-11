@@ -731,6 +731,9 @@ class Client {
         $this->checkConnection();
 
         $folder = $this->getFolderByPath($folder_path);
+        if ($this->active_folder == $folder->path){
+            $this->active_folder = null;
+        }
         $status = $this->getConnection()->deleteFolder($folder->path)->validatedData();
         if ($expunge) $this->expunge();
 
