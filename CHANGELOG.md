@@ -18,6 +18,11 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Prevent message body parsing from adding empty lines
 - Don't parse regular inline message parts without name or filename as attachment
 - `Message::hasTextBody()` and `Message::hasHtmlBody()` should return `false` if the body is empty
+- Imap-Protocol "empty response" detection extended to catch an empty response caused by a broken resource stream
+- iconv_mime_decode() is now used with `ICONV_MIME_DECODE_CONTINUE_ON_ERROR` to prevent the decoding from failing
+- Date decoding rules extended to support more date formats
+- Unset the currently active folder if it gets deleted (prevent infinite loop)
+- Attachment name and filename parsing fixed and improved to support more formats
 
 ### Added
 - Extended UTF-7 support added (RFC2060) #383
@@ -26,7 +31,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - `Message::getConfig()` method added to get the current message configuration
 - `Folder::select()` method added to select a folder
 - `Message::getAvailableFlags()` method added to get all available flags
-- Live mailbox tests added
+- Live mailbox and fixture tests added
 - `Attribute::map()` method added to map all attribute values
 - `Header::has()` method added to check if a header attribute / value exist
 - All part attributes are now accessible via linked attribute
