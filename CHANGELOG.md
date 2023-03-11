@@ -11,20 +11,21 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Partial fix for #362 (allow overview response to be empty)
 - `Message::setConfig()` config parameter type set to array
 - Reset the protocol uid cache if the session gets expunged
-- Set the "seen" flag only if the flag isn't set and the fetch option isn't IMAP::FT_PEEK
+- Set the "seen" flag only if the flag isn't set and the fetch option isn't `IMAP::FT_PEEK`
 - `Message::is()` date comparison fixed
 - `Message::$client` could not be set to null
-- in_reply_to and references parsing fixed
-- Prevent message body parsing from adding empty lines
+- `in_reply_to` and `references` parsing fixed
+- Prevent message body parser from injecting empty lines
 - Don't parse regular inline message parts without name or filename as attachment
 - `Message::hasTextBody()` and `Message::hasHtmlBody()` should return `false` if the body is empty
 - Imap-Protocol "empty response" detection extended to catch an empty response caused by a broken resource stream
-- iconv_mime_decode() is now used with `ICONV_MIME_DECODE_CONTINUE_ON_ERROR` to prevent the decoding from failing
+- `iconv_mime_decode()` is now used with `ICONV_MIME_DECODE_CONTINUE_ON_ERROR` to prevent the decoding from failing
 - Date decoding rules extended to support more date formats
 - Unset the currently active folder if it gets deleted (prevent infinite loop)
 - Attachment name and filename parsing fixed and improved to support more formats
 - Check if the next uid is available (after copying or moving a message) before fetching it #381
-- Default pagination $total attribute value set to 0 #385 (thanks @hhniao)
+- Default pagination `$total` attribute value set to 0 #385 (thanks @hhniao)
+- Use attachment ID as fallback filename for saving an attachment
 
 ### Added
 - Extended UTF-7 support added (RFC2060) #383

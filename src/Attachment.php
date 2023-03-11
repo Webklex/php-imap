@@ -249,9 +249,9 @@ class Attachment {
      * @return boolean
      */
     public function save(string $path, string $filename = null): bool {
-        $filename = $filename ?: $this->getName();
+        $filename = $filename ?? $this->filename ?? $this->name ?? $this->id;
 
-        return file_put_contents($path.$filename, $this->getContent()) !== false;
+        return file_put_contents($path.DIRECTORY_SEPARATOR.$filename, $this->getContent()) !== false;
     }
 
     /**
