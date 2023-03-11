@@ -117,7 +117,7 @@ class ImapProtocol extends Protocol {
         while (($next_char = fread($this->stream, 1)) !== false && !in_array($next_char, ["","\n"])) {
             $line .= $next_char;
         }
-        if ($line === "" && $next_char === false) {
+        if ($line === "" && ($next_char === false || $next_char === "")) {
             throw new RuntimeException('empty response');
         }
         $line .= "\n";
