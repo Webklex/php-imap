@@ -24,6 +24,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Unset the currently active folder if it gets deleted (prevent infinite loop)
 - Attachment name and filename parsing fixed and improved to support more formats
 - Check if the next uid is available (after copying or moving a message) before fetching it #381
+- Default pagination $total attribute value set to 0 #385 (thanks @hhniao)
 
 ### Added
 - Extended UTF-7 support added (RFC2060) #383
