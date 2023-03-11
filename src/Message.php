@@ -982,11 +982,9 @@ class Message {
         $this->fetchThreadByInReplyTo($thread, $this->message_id, $folder, $folder, $sent_folder);
         $this->fetchThreadByInReplyTo($thread, $this->message_id, $sent_folder, $folder, $sent_folder);
 
-        if (is_array($this->in_reply_to)) {
-            foreach ($this->in_reply_to as $in_reply_to) {
-                $this->fetchThreadByMessageId($thread, $in_reply_to, $folder, $folder, $sent_folder);
-                $this->fetchThreadByMessageId($thread, $in_reply_to, $sent_folder, $folder, $sent_folder);
-            }
+        foreach ($this->in_reply_to->all() as $in_reply_to) {
+            $this->fetchThreadByMessageId($thread, $in_reply_to, $folder, $folder, $sent_folder);
+            $this->fetchThreadByMessageId($thread, $in_reply_to, $sent_folder, $folder, $sent_folder);
         }
 
         return $thread;
