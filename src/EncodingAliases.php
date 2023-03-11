@@ -578,4 +578,14 @@ class EncodingAliases {
     public static function isUtf7(string $encoding): bool {
         return str_contains(str_replace("-", "", strtolower($encoding)), "utf7");
     }
+
+    /**
+     * Check if an encoding is supported
+     * @param string $encoding
+     *
+     * @return bool
+     */
+    public static function has(string $encoding): bool {
+        return isset(self::$aliases[strtolower($encoding)]);
+    }
 }
