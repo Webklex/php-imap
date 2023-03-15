@@ -583,6 +583,13 @@ class Header {
                 }
             }
 
+            if ($address->host == ".SYNTAX-ERROR.") {
+                $address->host = "";
+            }
+            if ($address->mailbox == "UNEXPECTED_DATA_AFTER_ADDRESS") {
+                $address->mailbox = "";
+            }
+
             $address->mail = ($address->mailbox && $address->host) ? $address->mailbox . '@' . $address->host : false;
             $address->full = ($address->personal) ? $address->personal . ' <' . $address->mail . '>' : $address->mail;
 

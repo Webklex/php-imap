@@ -26,6 +26,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Check if the next uid is available (after copying or moving a message) before fetching it #381
 - Default pagination `$total` attribute value set to 0 #385 (thanks @hhniao)
 - Use attachment ID as fallback filename for saving an attachment
+- Address decoding error detection added #388
 
 ### Added
 - Extended UTF-7 support added (RFC2060) #383
