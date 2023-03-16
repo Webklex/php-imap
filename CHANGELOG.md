@@ -6,6 +6,17 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
+- NaN
+
+### Added
+- NaN
+
+### Breaking changes
+- NaN
+
+
+## [5.1.0] - 2023-03-16
+### Fixed
 - IMAP Quota root command fixed
 - Prevent line-breaks in folder path caused by special chars
 - Partial fix for #362 (allow overview response to be empty)
@@ -40,9 +51,6 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - `Header::has()` method added to check if a header attribute / value exist
 - All part attributes are now accessible via linked attribute
 - Restore a message from string `Message::fromString()`
-
-### Breaking changes
-- NaN
 
 
 ## [5.0.1] - 2023-03-01
