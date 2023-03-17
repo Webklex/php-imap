@@ -6,7 +6,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
+- Use all available methods to detect the attachment extension instead of just one
 
 ### Added
 - NaN
