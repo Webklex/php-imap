@@ -45,6 +45,7 @@ class MultipleNestedAttachmentsTest extends FixtureTestCase {
         $attachment = $attachments[0];
         self::assertInstanceOf(Attachment::class, $attachment);
         self::assertEquals("mleokdgdlgkkecep.png", $attachment->name);
+        self::assertEquals('png', $attachment->getExtension());
         self::assertEquals('text', $attachment->type);
         self::assertEquals("image/png", $attachment->content_type);
         self::assertEquals("e0e99b0bd6d5ea3ced99add53cc98b6f8eea6eae8ddd773fd06f3489289385fb", hash("sha256", $attachment->content));
@@ -56,6 +57,7 @@ class MultipleNestedAttachmentsTest extends FixtureTestCase {
         $attachment = $attachments[1];
         self::assertInstanceOf(Attachment::class, $attachment);
         self::assertEquals("FF4D00-1.png", $attachment->name);
+        self::assertEquals('png', $attachment->getExtension());
         self::assertEquals('text', $attachment->type);
         self::assertEquals("image/png", $attachment->content_type);
         self::assertEquals("e0e99b0bd6d5ea3ced99add53cc98b6f8eea6eae8ddd773fd06f3489289385fb", hash("sha256", $attachment->content));

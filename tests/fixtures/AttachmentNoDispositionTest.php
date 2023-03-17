@@ -41,6 +41,7 @@ class AttachmentNoDispositionTest extends FixtureTestCase {
         self::assertEquals("Prostřeno_2014_poslední volné termíny.xls", $attachment->filename);
         self::assertEquals("Prostřeno_2014_poslední volné termíny.xls", $attachment->name);
         self::assertEquals('text', $attachment->type);
+        self::assertEquals('xls', $attachment->getExtension());
         self::assertEquals("application/vnd.ms-excel", $attachment->content_type);
         self::assertEquals("a0ef7cfbc05b73dbcb298fe0bc224b41900cdaf60f9904e3fea5ba6c7670013c", hash("sha256", $attachment->content));
         self::assertEquals(146, $attachment->size);

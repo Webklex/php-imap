@@ -43,6 +43,7 @@ class StructuredWithAttachmentTest extends FixtureTestCase {
         $attachment = $message->attachments()->first();
         self::assertInstanceOf(Attachment::class, $attachment);
         self::assertEquals("MyFile.txt", $attachment->name);
+        self::assertEquals('txt', $attachment->getExtension());
         self::assertEquals('text', $attachment->type);
         self::assertEquals("text/plain", $attachment->content_type);
         self::assertEquals("MyFileContent", $attachment->content);

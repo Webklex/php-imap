@@ -74,6 +74,7 @@ class ExampleBounceTest extends FixtureTestCase {
         self::assertInstanceOf(Attachment::class, $attachment);
         self::assertEquals("", $attachment->filename);
         self::assertEquals("", $attachment->name);
+        self::assertEquals('', $attachment->getExtension());
         self::assertEquals('text', $attachment->type);
         self::assertEquals("message/delivery-status", $attachment->content_type);
         self::assertEquals("85ac09d1d74b2d85853084dc22abcad205a6bfde62d6056e3a933ffe7e82e45c", hash("sha256", $attachment->content));
@@ -86,6 +87,7 @@ class ExampleBounceTest extends FixtureTestCase {
         self::assertInstanceOf(Attachment::class, $attachment);
         self::assertEquals("", $attachment->filename);
         self::assertEquals("", $attachment->name);
+        self::assertEquals('', $attachment->getExtension());
         self::assertEquals('text', $attachment->type);
         self::assertEquals("message/rfc822", $attachment->content_type);
         self::assertEquals("7525331f5fab23ea77f595b995336aca7b8dad12db00ada14abebe7fe5b96e10", hash("sha256", $attachment->content));

@@ -53,6 +53,7 @@ class EmbeddedEmailTest extends FixtureTestCase {
         self::assertInstanceOf(Attachment::class, $attachment);
         self::assertEquals("demo.eml", $attachment->name);
         self::assertEquals('text', $attachment->type);
+        self::assertEquals('eml', $attachment->getExtension());
         self::assertEquals("message/rfc822", $attachment->content_type);
         self::assertEquals("a1f965f10a9872e902a82dde039a237e863f522d238a1cb1968fe3396dbcac65", hash("sha256", $attachment->content));
         self::assertEquals(893, $attachment->size);

@@ -50,6 +50,7 @@ class EmbeddedEmailWithoutContentDispositionTest extends FixtureTestCase {
         $attachment = $attachments[0];
         self::assertInstanceOf(Attachment::class, $attachment);
         self::assertEquals("file.jpg", $attachment->name);
+        self::assertEquals('jpg', $attachment->getExtension());
         self::assertEquals('text', $attachment->type);
         self::assertEquals("image/jpeg", $attachment->content_type);
         self::assertEquals("6b7fa434f92a8b80aab02d9bf1a12e49ffcae424e4013a1c4f68b67e3d2bbcd0", hash("sha256", $attachment->content));
@@ -62,6 +63,7 @@ class EmbeddedEmailWithoutContentDispositionTest extends FixtureTestCase {
         self::assertInstanceOf(Attachment::class, $attachment);
         self::assertEquals("", $attachment->name);
         self::assertEquals('text', $attachment->type);
+        self::assertEquals('', $attachment->getExtension());
         self::assertEquals("message/rfc822", $attachment->content_type);
         self::assertEquals("2476c8b91a93c6b2fe1bfff593cb55956c2fe8e7ca6de9ad2dc9d101efe7a867", hash("sha256", $attachment->content));
         self::assertEquals(2073, $attachment->size);
@@ -72,6 +74,7 @@ class EmbeddedEmailWithoutContentDispositionTest extends FixtureTestCase {
         $attachment = $attachments[2];
         self::assertInstanceOf(Attachment::class, $attachment);
         self::assertEquals("file3.xlsx", $attachment->name);
+        self::assertEquals('xlsx', $attachment->getExtension());
         self::assertEquals('text', $attachment->type);
         self::assertEquals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $attachment->content_type);
         self::assertEquals("87737d24c106b96e177f9564af6712e2c6d3e932c0632bfbab69c88b0bb934dc", hash("sha256", $attachment->content));
@@ -83,6 +86,7 @@ class EmbeddedEmailWithoutContentDispositionTest extends FixtureTestCase {
         $attachment = $attachments[3];
         self::assertInstanceOf(Attachment::class, $attachment);
         self::assertEquals("file4.zip", $attachment->name);
+        self::assertEquals('zip', $attachment->getExtension());
         self::assertEquals('text', $attachment->type);
         self::assertEquals("application/x-zip-compressed", $attachment->content_type);
         self::assertEquals("87737d24c106b96e177f9564af6712e2c6d3e932c0632bfbab69c88b0bb934dc", hash("sha256", $attachment->content));

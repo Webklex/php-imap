@@ -42,6 +42,7 @@ class AttachmentLongFilenameTest extends FixtureTestCase {
         self::assertEquals("Buchungsbestätigung- Rechnung-Geschäftsbedingungen-Nr.B123-45 - XXXX xxxxxxxxxxxxxxxxx XxxX, Lüdxxxxxxxx - VM Klaus XXXXXX - xxxxxxxx.pdf", $attachment->name);
         self::assertEquals("Buchungsbestätigung- Rechnung-Geschäftsbedingungen-Nr.B123-45 - XXXXX xxxxxxxxxxxxxxxxx XxxX, Lüxxxxxxxxxx - VM Klaus XXXXXX - xxxxxxxx.pdf", $attachment->filename);
         self::assertEquals('text', $attachment->type);
+        self::assertEquals('pdf', $attachment->getExtension());
         self::assertEquals("text/plain", $attachment->content_type);
         self::assertEquals("ca51ce1fb15acc6d69b8a5700256172fcc507e02073e6f19592e341bd6508ab8", hash("sha256", $attachment->content));
         self::assertEquals(4, $attachment->size);
@@ -54,6 +55,7 @@ class AttachmentLongFilenameTest extends FixtureTestCase {
         self::assertEquals('01_A€àäąбيد@Z-0123456789-qwertyuiopasdfghjklzxcvbnmopqrstuvz-0123456789-qwertyuiopasdfghjklzxcvbnmopqrstuvz-0123456789-qwertyuiopasdfghjklzxcvbnmopqrstuvz.txt', $attachment->name);
         self::assertEquals("f7b5181985862431bfc443d26e3af2371e20a0afd676eeb9b9595a26d42e0b73", hash("sha256", $attachment->filename));
         self::assertEquals('text', $attachment->type);
+        self::assertEquals('txt', $attachment->getExtension());
         self::assertEquals("text/plain", $attachment->content_type);
         self::assertEquals("ca51ce1fb15acc6d69b8a5700256172fcc507e02073e6f19592e341bd6508ab8", hash("sha256", $attachment->content));
         self::assertEquals(4, $attachment->size);
@@ -67,6 +69,7 @@ class AttachmentLongFilenameTest extends FixtureTestCase {
         self::assertEquals('02_A€àäąбيد@Z-0123456789-qwertyuiopasdfghjklzxcvbnmopqrstuvz-0123456789-qwertyuiopasdfghjklzxcvbnmopqrstuvz-0123456789-qwertyuiopasdfghjklzxcvbnmopqrstuvz.txt', $attachment->filename);
         self::assertEquals('text', $attachment->type);
         self::assertEquals("text/plain", $attachment->content_type);
+        self::assertEquals('txt', $attachment->getExtension());
         self::assertEquals("ca51ce1fb15acc6d69b8a5700256172fcc507e02073e6f19592e341bd6508ab8", hash("sha256", $attachment->content));
         self::assertEquals(4, $attachment->size);
         self::assertEquals(2, $attachment->part_number);

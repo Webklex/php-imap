@@ -47,6 +47,7 @@ class InlineAttachmentTest extends FixtureTestCase {
         self::assertInstanceOf(Attachment::class, $attachment);
         self::assertEquals("", $attachment->name);
         self::assertEquals('text', $attachment->type);
+        self::assertEquals('', $attachment->getExtension());
         self::assertEquals("image/png", $attachment->content_type);
         self::assertEquals("6568c9e9c35a7fa06f236e89f704d8c9b47183a24f2c978dba6c92e2747e3a13", hash("sha256", $attachment->content));
         self::assertEquals(1486, $attachment->size);

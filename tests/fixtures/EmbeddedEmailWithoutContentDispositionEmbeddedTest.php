@@ -52,6 +52,7 @@ class EmbeddedEmailWithoutContentDispositionEmbeddedTest extends FixtureTestCase
         self::assertInstanceOf(Attachment::class, $attachment);
         self::assertEquals("file1.xlsx", $attachment->name);
         self::assertEquals('text', $attachment->type);
+        self::assertEquals('xlsx', $attachment->getExtension());
         self::assertEquals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $attachment->content_type);
         self::assertEquals("87737d24c106b96e177f9564af6712e2c6d3e932c0632bfbab69c88b0bb934dc", hash("sha256", $attachment->content));
         self::assertEquals(40, $attachment->size);
@@ -62,6 +63,7 @@ class EmbeddedEmailWithoutContentDispositionEmbeddedTest extends FixtureTestCase
         $attachment = $attachments[1];
         self::assertInstanceOf(Attachment::class, $attachment);
         self::assertEquals("file2.xlsx", $attachment->name);
+        self::assertEquals('xlsx', $attachment->getExtension());
         self::assertEquals('text', $attachment->type);
         self::assertEquals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $attachment->content_type);
         self::assertEquals("87737d24c106b96e177f9564af6712e2c6d3e932c0632bfbab69c88b0bb934dc", hash("sha256", $attachment->content));

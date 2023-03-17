@@ -42,6 +42,7 @@ class PlainTextAttachmentTest extends FixtureTestCase {
         $attachment = $message->attachments()->first();
         self::assertInstanceOf(Attachment::class, $attachment);
         self::assertEquals("a.txt", $attachment->name);
+        self::assertEquals('txt', $attachment->getExtension());
         self::assertEquals('text', $attachment->type);
         self::assertNull($attachment->content_type);
         self::assertEquals("Hi!", $attachment->content);

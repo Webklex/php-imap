@@ -51,6 +51,7 @@ class MailThatIsAttachmentTest extends FixtureTestCase {
         $attachment = $message->attachments()->first();
         self::assertInstanceOf(Attachment::class, $attachment);
         self::assertEquals("google.com!yyy.cz!1423872000!1423958399.zip", $attachment->name);
+        self::assertEquals('zip', $attachment->getExtension());
         self::assertEquals('text', $attachment->type);
         self::assertEquals("application/zip", $attachment->content_type);
         self::assertEquals("c0d4f47b6fde124cea7460c3e509440d1a062705f550b0502b8ba0cbf621c97a", hash("sha256", $attachment->content));
