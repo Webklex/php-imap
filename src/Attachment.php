@@ -29,7 +29,9 @@ use Webklex\PHPIMAP\Support\Masks\AttachmentMask;
  * @property string content_type
  * @property string id
  * @property string name
- * @property string disposition
+ * @property string description
+ * @property string filename
+ * @property ?string disposition
  * @property string img_src
  *
  * @method integer getPartNumber()
@@ -78,6 +80,8 @@ class Attachment {
         'content_type' => null,
         'id' => null,
         'name' => null,
+        'filename' => null,
+        'description' => null,
         'disposition' => null,
         'img_src' => null,
         'size' => null,
@@ -209,20 +213,32 @@ class Attachment {
         $this->disposition = $this->part->disposition;
 
         if (($filename = $this->part->filename) !== null) {
-            $this->setName($filename);
-        } elseif (($name = $this->part->name) !== null) {
-            $this->setName($name);
-        }else {
-            $this->setName("undefined");
+            $this->filename = $this->decodeName($filename);
+        }
+
+        if (($name = $this->part->name) !== null) {
+            $this->name = $this->decodeName($name);
+        }
+        if (!$this->name && $this->filename != "") {
+            $this->name = $this->filename;
         }
 
         if (IMAP::ATTACHMENT_TYPE_MESSAGE == $this->part->type) {
             if ($this->part->ifdescription) {
-                $this->setName($this->part->description);
-            } else {
-                $this->setName($this->part->subtype);
+                if (!$this->name) {
+                    $this->name = $this->part->description;
+                }
+                $this->description = $this->part->description;
+            } else if (!$this->name) {
+                $this->name = $this->part->subtype;
             }
         }
+
+        if (!$this->filename) {
+            $this->filename = $this->name;
+        }
+
+        $this->attributes = array_merge($this->part->getHeader()->getAttributes(), $this->attributes);
     }
 
     /**
@@ -233,24 +249,42 @@ class Attachment {
      * @return boolean
      */
     public function save(string $path, string $filename = null): bool {
-        $filename = $filename ?: $this->getName();
+        $filename = $filename ?? $this->filename ?? $this->name ?? $this->id;
 
-        return file_put_contents($path.$filename, $this->getContent()) !== false;
+        return file_put_contents($path.DIRECTORY_SEPARATOR.$filename, $this->getContent()) !== false;
     }
 
     /**
-     * Set the attachment name and try to decode it
+     * Decode a given name
      * @param $name
+     *
+     * @return string
      */
-    public function setName($name): void {
-        $decoder = $this->config['decoder']['attachment'];
+    public function decodeName($name): string {
         if ($name !== null) {
-            if($decoder === 'utf-8' && extension_loaded('imap')) {
-                $this->name = \imap_utf8($name);
-            }else{
-                $this->name = mb_decode_mimeheader($name);
+            if (str_contains($name, "''")) {
+                $parts = explode("''", $name);
+                if (EncodingAliases::has($parts[0])) {
+                    $name = implode("''", array_slice($parts, 1));
+                }
             }
+
+            $decoder = $this->config['decoder']['message'];
+            if($decoder === 'utf-8' && extension_loaded('imap')) {
+                $name = \imap_utf8($name);
+            }
+
+            if (preg_match('/=\?([^?]+)\?(Q|B)\?(.+)\?=/i', $name, $matches)) {
+                $name = $this->part->getHeader()->decode($name);
+            }
+
+            // check if $name is url encoded
+            if (preg_match('/%[0-9A-F]{2}/i', $name)) {
+                $name = urldecode($name);
+            }
+            return $name;
         }
+        return "";
     }
 
     /**
@@ -268,21 +302,25 @@ class Attachment {
      * @return string|null
      */
     public function getExtension(): ?string {
+        $extension = null;
         $guesser = "\Symfony\Component\Mime\MimeTypes";
         if (class_exists($guesser) !== false) {
             /** @var Symfony\Component\Mime\MimeTypes $guesser */
             $extensions = $guesser::getDefault()->getExtensions($this->getMimeType());
-            return $extensions[0] ?? null;
+            $extension = $extensions[0] ?? null;
         }
-
-        $deprecated_guesser = "\Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser";
-        if (class_exists($deprecated_guesser) !== false){
-            /** @var \Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser $deprecated_guesser */
-            return $deprecated_guesser::getInstance()->guess($this->getMimeType());
+        if ($extension === null) {
+            $deprecated_guesser = "\Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser";
+            if (class_exists($deprecated_guesser) !== false){
+                /** @var \Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser $deprecated_guesser */
+                $extension = $deprecated_guesser::getInstance()->guess($this->getMimeType());
+            }
         }
-
-        $extensions = explode(".", $this->part->filename ?: $this->part->name);
-        return end($extensions);
+        if ($extension === null) {
+            $extensions = explode(".", $this->filename);
+            $extension = end($extensions);
+        }
+        return $extension;
     }
 
     /**

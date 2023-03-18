@@ -314,4 +314,12 @@ class Attribute implements ArrayAccess {
     public function offsetUnset(mixed $offset): void {
         $this->remove($offset);
     }
+
+    /**
+     * @param callable $callback
+     * @return array
+     */
+    public function map(callable $callback): array {
+        return array_map($callback, $this->values);
+    }
 }

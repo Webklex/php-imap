@@ -543,4 +543,13 @@ class WhereQuery extends Query {
 
         return $this;
     }
+
+    /**
+     * Get all available search criteria
+     *
+     * @return array|string[]
+     */
+    public function getAvailableCriteria(): array {
+        return $this->available_criteria;
+    }
 }

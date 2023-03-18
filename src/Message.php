@@ -42,7 +42,6 @@ use Webklex\PHPIMAP\Traits\HasEvents;
  * Class Message
  *
  *
-
  * @property int msglist
  * @property int uid
  * @property int msgn
@@ -60,7 +59,6 @@ use Webklex\PHPIMAP\Traits\HasEvents;
  * @property Attribute in_reply_to
  * @property Attribute sender
  *
-
  * @method int getMsglist()
  * @method int setMsglist($msglist)
  * @method int getUid()
@@ -282,6 +280,30 @@ class Message
      */
     public static function fromFile($filename): Message
     {
+        $blob = file_get_contents($filename);
+        if ($blob === false) {
+            throw new RuntimeException('Unable to read file');
+        }
+
+        return self::fromString($blob);
+    }
+
+    /**
+     * Create a new message instance by reading and loading a string
+     *
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws InvalidMessageDateException
+     * @throws MaskNotFoundException
+     * @throws MessageContentFetchingException
+     * @throws ReflectionException
+     * @throws ResponseException
+     * @throws RuntimeException
+     */
+    public static function fromString(string $blob): Message
+    {
         $reflection = new ReflectionClass(self::class);
         /** @var Message $instance */
         $instance = $reflection->newInstanceWithoutConstructor();
@@ -294,12 +316,11 @@ class Message
             throw new MaskNotFoundException('Unknown message mask provided');
         }
 
-        $email = file_get_contents($filename);
-        if (! str_contains($email, "\r\n")) {
-            $email = str_replace("\n", "\r\n", $email);
+        if (! str_contains($blob, "\r\n")) {
+            $blob = str_replace("\n", "\r\n", $blob);
         }
-        $raw_header = substr($email, 0, strpos($email, "\r\n\r\n"));
-        $raw_body = substr($email, strlen($raw_header) + 8);
+        $raw_header = substr($blob, 0, strpos($blob, "\r\n\r\n"));
+        $raw_body = substr($blob, strlen($raw_header) + 4);
 
         $instance->parseRawHeader($raw_header);
         $instance->parseRawBody($raw_body);
@@ -431,7 +452,7 @@ class Message
      */
     public function hasTextBody(): bool
     {
-        return isset($this->bodies['text']);
+        return isset($this->bodies['text']) && $this->bodies['text'] !== '';
     }
 
     /**
@@ -451,7 +472,7 @@ class Message
      */
     public function hasHTMLBody(): bool
     {
-        return isset($this->bodies['html']);
+        return isset($this->bodies['html']) && $this->bodies['html'] !== '';
     }
 
     /**
@@ -688,14 +709,24 @@ class Message
                 $content = $this->convertEncoding($content, $encoding);
             }
 
-            $subtype = strtolower($part->subtype ?? '');
-            $subtype = $subtype == 'plain' || $subtype == '' ? 'text' : $subtype;
+            $this->addBody($part->subtype ?? '', $content);
+        }
+    }
 
-            if (isset($this->bodies[$subtype])) {
+    /**
+     * Add a body to the message
+     */
+    protected function addBody(string $subtype, string $content): void
+    {
+        $subtype = strtolower($subtype);
+        $subtype = $subtype == 'plain' || $subtype == '' ? 'text' : $subtype;
+
+        if (isset($this->bodies[$subtype]) && $this->bodies[$subtype] !== null && $this->bodies[$subtype] !== '') {
+            if ($content !== '') {
                 $this->bodies[$subtype] .= "\n".$content;
-            } else {
-                $this->bodies[$subtype] = $content;
             }
+        } else {
+            $this->bodies[$subtype] = $content;
         }
     }
 
@@ -906,11 +937,9 @@ class Message
         $this->fetchThreadByInReplyTo($thread, $this->message_id, $folder, $folder, $sent_folder);
         $this->fetchThreadByInReplyTo($thread, $this->message_id, $sent_folder, $folder, $sent_folder);
 
-        if (is_array($this->in_reply_to)) {
-            foreach ($this->in_reply_to as $in_reply_to) {
-                $this->fetchThreadByMessageId($thread, $in_reply_to, $folder, $folder, $sent_folder);
-                $this->fetchThreadByMessageId($thread, $in_reply_to, $sent_folder, $folder, $sent_folder);
-            }
+        foreach ($this->in_reply_to->all() as $in_reply_to) {
+            $this->fetchThreadByMessageId($thread, $in_reply_to, $folder, $folder, $sent_folder);
+            $this->fetchThreadByMessageId($thread, $in_reply_to, $sent_folder, $folder, $sent_folder);
         }
 
         return $thread;
@@ -984,6 +1013,9 @@ class Message
 
         if (isset($status['uidnext'])) {
             $next_uid = $status['uidnext'];
+            if ((int) $next_uid <= 0) {
+                return null;
+            }
 
             /** @var Folder $folder */
             $folder = $this->client->getFolderByPath($folder_path);
@@ -1021,6 +1053,9 @@ class Message
 
         if (isset($status['uidnext'])) {
             $next_uid = $status['uidnext'];
+            if ((int) $next_uid <= 0) {
+                return null;
+            }
 
             /** @var Folder $folder */
             $folder = $this->client->getFolderByPath($folder_path);
@@ -1061,7 +1096,6 @@ class Message
         if ($this->sequence === IMAP::ST_UID) {
             $sequence_id = $next_uid;
         } else {
-            // $sequence_id = $this->client->getConnection()->getMessageNumber($next_uid)->validatedData();
             $sequence_id = $this->client->getConnection()->getMessageNumber($next_uid);
         }
 

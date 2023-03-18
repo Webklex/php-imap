@@ -289,7 +289,20 @@ class Part {
                 return false;
             }
         }
+
+        if ($this->disposition === "inline" && $this->filename == null && $this->name == null && !$this->header->has("content_id")) {
+            return false;
+        }
         return true;
+    }
+
+    /**
+     * Get the part header
+     *
+     * @return Header|null
+     */
+    public function getHeader(): ?Header {
+        return $this->header;
     }
 
 }
