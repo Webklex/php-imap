@@ -838,7 +838,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function folders(string $reference = '', string $folder = '*'): Response {
-        $response = $this->requestAndResponse('LIST', $this->escapeString($reference, $folder));
+        $response = $this->requestAndResponse('LIST', $this->escapeString($reference, $folder))->setCanBeEmpty(true);
         $list = $response->data();
 
         $result = [];
