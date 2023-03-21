@@ -519,6 +519,7 @@ class Client {
     /**
      * Get a folder instance by a folder name
      * @param $folder_name
+     * @param bool $soft_fail If true, it will return null instead of throwing an exception
      *
      * @return Folder|null
      * @throws FolderFetchingException
@@ -529,14 +530,16 @@ class Client {
      * @throws RuntimeException
      * @throws ResponseException
      */
-    public function getFolderByName($folder_name): ?Folder {
-        return $this->getFolders(false)->where("name", $folder_name)->first();
+    public function getFolderByName($folder_name, bool $soft_fail = false): ?Folder {
+        return $this->getFolders(false, null, $soft_fail)->where("name", $folder_name)->first();
     }
 
     /**
      * Get a folder instance by a folder path
      * @param $folder_path
      * @param bool $utf7
+     * @param bool $soft_fail If true, it will return null instead of throwing an exception
+     *
      * @return Folder|null
      * @throws AuthFailedException
      * @throws ConnectionFailedException
@@ -546,9 +549,9 @@ class Client {
      * @throws ResponseException
      * @throws RuntimeException
      */
-    public function getFolderByPath($folder_path, bool $utf7 = false): ?Folder {
+    public function getFolderByPath($folder_path, bool $utf7 = false, bool $soft_fail = false): ?Folder {
         if (!$utf7) $folder_path = EncodingAliases::convert($folder_path, "utf-8", "utf7-imap");
-        return $this->getFolders(false)->where("path", $folder_path)->first();
+        return $this->getFolders(false, null, $soft_fail)->where("path", $folder_path)->first();
     }
 
     /**
@@ -557,17 +560,18 @@ class Client {
      *
      * @param boolean $hierarchical
      * @param string|null $parent_folder
+     * @param bool $soft_fail If true, it will return an empty collection instead of throwing an exception
      *
      * @return FolderCollection
+     * @throws AuthFailedException
      * @throws ConnectionFailedException
      * @throws FolderFetchingException
-     * @throws AuthFailedException
      * @throws ImapBadRequestException
      * @throws ImapServerErrorException
-     * @throws RuntimeException
      * @throws ResponseException
+     * @throws RuntimeException
      */
-    public function getFolders(bool $hierarchical = true, string $parent_folder = null): FolderCollection {
+    public function getFolders(bool $hierarchical = true, string $parent_folder = null, bool $soft_fail = false): FolderCollection {
         $this->checkConnection();
         $folders = FolderCollection::make([]);
 
@@ -581,7 +585,7 @@ class Client {
                 if ($hierarchical && $folder->hasChildren()) {
                     $pattern = $folder->full_name.$folder->delimiter.'%';
 
-                    $children = $this->getFolders(true, $pattern);
+                    $children = $this->getFolders(true, $pattern, $soft_fail);
                     $folder->setChildren($children);
                 }
 
@@ -589,9 +593,11 @@ class Client {
             }
 
             return $folders;
-        }else{
+        }else if (!$soft_fail){
             throw new FolderFetchingException("failed to fetch any folders");
         }
+
+        return $folders;
     }
 
     /**
@@ -600,6 +606,7 @@ class Client {
      *
      * @param boolean $hierarchical
      * @param string|null $parent_folder
+     * @param bool $soft_fail If true, it will return an empty collection instead of throwing an exception
      *
      * @return FolderCollection
      * @throws FolderFetchingException
@@ -610,7 +617,7 @@ class Client {
      * @throws RuntimeException
      * @throws ResponseException
      */
-    public function getFoldersWithStatus(bool $hierarchical = true, string $parent_folder = null): FolderCollection {
+    public function getFoldersWithStatus(bool $hierarchical = true, string $parent_folder = null, bool $soft_fail = false): FolderCollection {
         $this->checkConnection();
         $folders = FolderCollection::make([]);
 
@@ -624,7 +631,7 @@ class Client {
                 if ($hierarchical && $folder->hasChildren()) {
                     $pattern = $folder->full_name.$folder->delimiter.'%';
 
-                    $children = $this->getFoldersWithStatus(true, $pattern);
+                    $children = $this->getFoldersWithStatus(true, $pattern, $soft_fail);
                     $folder->setChildren($children);
                 }
 
@@ -633,9 +640,11 @@ class Client {
             }
 
             return $folders;
-        }else{
+        }else if (!$soft_fail){
             throw new FolderFetchingException("failed to fetch any folders");
         }
+
+        return $folders;
     }
 
     /**
