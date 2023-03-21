@@ -138,6 +138,8 @@ class Folder {
         $this->path = $folder_name;
         $this->full_name = $this->decodeName($folder_name);
         $this->name = $this->getSimpleName($this->delimiter, $this->full_name);
+        $this->children = new FolderCollection();
+        $this->has_children = false;
 
         $this->parseAttributes($attributes);
     }
