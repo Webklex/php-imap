@@ -28,6 +28,7 @@ Discord: [discord.gg/rd4cN9h6][link-discord]
 - [Documentations](#documentations)
 - [Compatibility](#compatibility)
 - [Basic usage example](#basic-usage-example)
+- [Sponsors](#sponsors)
 - [Testing](#testing)
 - [Known issues](#known-issues)
 - [Support](#support)
@@ -96,6 +97,9 @@ foreach($folders as $folder){
     }
 }
 ```
+
+## Sponsors
+[![Feline][ico-sponsor-feline]][link-sponsor-feline]
 
 
 ## Testing
@@ -232,3 +236,7 @@ The MIT License (MIT). Please see [License File][link-license] for more informat
 [link-hits]: https://hits.webklex.com
 [link-snyk]: https://snyk.io/vuln/composer:webklex%2Fphp-imap
 [link-discord]: https://discord.gg/rd4cN9h6
+
+
+[ico-sponsor-feline]: https://cdn.feline.dk/public/feline.png
+[link-sponsor-feline]: https://www.feline.dk
