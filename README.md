@@ -4,7 +4,6 @@
 [![Latest release on Packagist][ico-release]][link-packagist]
 [![Latest prerelease on Packagist][ico-prerelease]][link-packagist]
 [![Software License][ico-license]][link-license]
-[![Build Status][ico-travis]][link-scrutinizer]
 [![Total Downloads][ico-downloads]][link-downloads]
 [![Hits][ico-hits]][link-hits]
 [![Discord][ico-discord]][link-discord]
@@ -213,26 +212,17 @@ The MIT License (MIT). Please see [License File][link-license] for more informat
 [ico-release]: https://img.shields.io/packagist/v/Webklex/php-imap.svg?style=flat-square&label=version
 [ico-prerelease]: https://img.shields.io/github/v/release/webklex/php-imap?include_prereleases&style=flat-square&label=pre-release
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
-[ico-travis]: https://img.shields.io/travis/Webklex/php-imap/master.svg?style=flat-square
-[ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/Webklex/php-imap.svg?style=flat-square
-[ico-code-quality]: https://img.shields.io/scrutinizer/g/Webklex/php-imap.svg?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/Webklex/php-imap.svg?style=flat-square
-[ico-build]: https://img.shields.io/scrutinizer/build/g/Webklex/php-imap/master?style=flat-square
-[ico-quality]: https://img.shields.io/scrutinizer/quality/g/Webklex/php-imap/master?style=flat-square
 [ico-hits]: https://hits.webklex.com/svg/webklex/php-imap
 [ico-snyk]: https://snyk-widget.herokuapp.com/badge/composer/webklex/php-imap/badge.svg
 [ico-discord]: https://img.shields.io/static/v1?label=discord&message=open&color=5865f2&style=flat-square
 
 [link-packagist]: https://packagist.org/packages/Webklex/php-imap
-[link-travis]: https://travis-ci.org/Webklex/php-imap
-[link-scrutinizer]: https://scrutinizer-ci.com/g/Webklex/php-imap/code-structure
-[link-code-quality]: https://scrutinizer-ci.com/g/Webklex/php-imap
 [link-downloads]: https://packagist.org/packages/Webklex/php-imap
 [link-author]: https://github.com/webklex
 [link-contributors]: https://github.com/Webklex/php-imap/graphs/contributors
 [link-license]: https://github.com/Webklex/php-imap/blob/master/LICENSE
 [link-changelog]: https://github.com/Webklex/php-imap/blob/master/CHANGELOG.md
-[link-jetbrains]: https://www.jetbrains.com
 [link-hits]: https://hits.webklex.com
 [link-snyk]: https://snyk.io/vuln/composer:webklex%2Fphp-imap
 [link-discord]: https://discord.gg/rd4cN9h6
