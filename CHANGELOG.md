@@ -6,15 +6,23 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
+- NaN
+
+### Added
+- NaN
+
+### Breaking changes
+- NaN
+
+
+## [5.2.0] - 2023-04-11
+### Fixed
 - Use all available methods to detect the attachment extension instead of just one
 - Allow the `LIST` command response to be empty #393
 - Initialize folder children attributes on class initialization
 
 ### Added
 - Soft fail option added to all folder fetching methods. If soft fail is enabled, the method will return an empty collection instead of throwing an exception if the folder doesn't exist
-
-### Breaking changes
-- NaN
 
 
 ## [5.1.0] - 2023-03-16
