@@ -72,7 +72,7 @@ class ExampleBounceTest extends FixtureTestCase {
 
         $attachment = $attachments[0];
         self::assertInstanceOf(Attachment::class, $attachment);
-        self::assertEquals("", $attachment->filename);
+        self::assertMatchesRegularExpression('/^[a-z0-9]{20}$/', $attachment->filename);
         self::assertEquals("", $attachment->name);
         self::assertEquals('', $attachment->getExtension());
         self::assertEquals('text', $attachment->type);

@@ -45,7 +45,7 @@ class InlineAttachmentTest extends FixtureTestCase {
 
         $attachment = $attachments[0];
         self::assertInstanceOf(Attachment::class, $attachment);
-        self::assertEquals("", $attachment->name);
+        self::assertMatchesRegularExpression('/^[a-z0-9]{20}$/', $attachment->name);
         self::assertEquals('text', $attachment->type);
         self::assertEquals('', $attachment->getExtension());
         self::assertEquals("image/png", $attachment->content_type);
