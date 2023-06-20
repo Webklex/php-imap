@@ -216,6 +216,10 @@ class Attachment {
             $this->filename = $this->decodeName($filename);
         }
 
+        if(!$this->filename){
+            $this->filename = bin2hex(random_bytes(10));
+        }
+
         if (($name = $this->part->name) !== null) {
             $this->name = $this->decodeName($name);
         }
@@ -233,11 +237,6 @@ class Attachment {
                 $this->name = $this->part->subtype;
             }
         }
-
-        if (!$this->filename) {
-            $this->filename = $this->name;
-        }
-
         $this->attributes = array_merge($this->part->getHeader()->getAttributes(), $this->attributes);
     }
 
@@ -248,19 +247,19 @@ class Attachment {
      *
      * @return boolean
      */
-    public function save(string $path, string $filename = null): bool {
-        $filename = $filename ?? $this->filename ?? $this->name ?? $this->id;
+    public function save(string $path, ?string $filename = null): bool {
+        $filename = $filename ? $this->decodeName($filename) : $this->filename;
 
         return file_put_contents($path.DIRECTORY_SEPARATOR.$filename, $this->getContent()) !== false;
     }
 
     /**
      * Decode a given name
-     * @param $name
+     * @param string|null $name
      *
      * @return string
      */
-    public function decodeName($name): string {
+    public function decodeName(?string $name): string {
         if ($name !== null) {
             if (str_contains($name, "''")) {
                 $parts = explode("''", $name);
@@ -282,6 +281,11 @@ class Attachment {
             if (preg_match('/%[0-9A-F]{2}/i', $name)) {
                 $name = urldecode($name);
             }
+
+            // sanitize $name
+            // order of '..' is important
+            $name = str_replace(['\\', '/', chr(0), ':', '..'], '', $name);
+
             return $name;
         }
         return "";
@@ -317,8 +321,8 @@ class Attachment {
             }
         }
         if ($extension === null) {
-            $extensions = explode(".", $this->filename);
-            $extension = end($extensions);
+            $parts = explode(".", $this->filename);
+            $extension = count($parts) > 1 ? end($parts) : null;
         }
         return $extension;
     }
