@@ -216,10 +216,6 @@ class Attachment {
             $this->filename = $this->decodeName($filename);
         }
 
-        if(!$this->filename){
-            $this->filename = bin2hex(random_bytes(10));
-        }
-
         if (($name = $this->part->name) !== null) {
             $this->name = $this->decodeName($name);
         }
@@ -238,6 +234,10 @@ class Attachment {
             }
         }
         $this->attributes = array_merge($this->part->getHeader()->getAttributes(), $this->attributes);
+
+        if(!$this->filename){
+            $this->filename = bin2hex(random_bytes(10));
+        }
     }
 
     /**
@@ -322,6 +322,10 @@ class Attachment {
         }
         if ($extension === null) {
             $parts = explode(".", $this->filename);
+            $extension = count($parts) > 1 ? end($parts) : null;
+        }
+        if ($extension === null) {
+            $parts = explode(".", $this->name);
             $extension = count($parts) > 1 ? end($parts) : null;
         }
         return $extension;
