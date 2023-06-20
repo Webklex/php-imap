@@ -61,7 +61,7 @@ class EmbeddedEmailWithoutContentDispositionTest extends FixtureTestCase {
 
         $attachment = $attachments[1];
         self::assertInstanceOf(Attachment::class, $attachment);
-        self::assertMatchesRegularExpression('/^[a-z0-9]{20}$/', $attachment->name);
+        self::assertEquals('', $attachment->name);
         self::assertEquals('text', $attachment->type);
         self::assertEquals('', $attachment->getExtension());
         self::assertEquals("message/rfc822", $attachment->content_type);
