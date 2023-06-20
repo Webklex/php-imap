@@ -33,6 +33,12 @@ by this vulnerability and no immediate action is required.
 
 If you have any questions, please feel to join this issue: https://github.com/Webklex/php-imap/issues/416
 
+#### Timeline
+- 17.06.23 21:30: Vulnerability reported
+- 18.06.23 19:14: Vulnerability confirmed
+- 19.06.23 18:41: Vulnerability fixed via PR #414
+- 20.06.23 13:45: Security patch released
+
 
 ## [5.2.0] - 2023-04-11
 ### Fixed
