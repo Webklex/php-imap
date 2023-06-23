@@ -421,7 +421,7 @@ class Header {
         $decoder = $this->config['decoder']['message'];
 
         if ($value !== null) {
-            if ($decoder === 'utf-8' && extension_loaded('imap')) {
+            if ($decoder === 'utf-8') {
                 $decoded_values = $this->mime_header_decode($value);
                 $tempValue = "";
                 foreach ($decoded_values as $decoded_value) {
@@ -429,14 +429,16 @@ class Header {
                 }
                 if ($tempValue) {
                     $value = $tempValue;
-                } else {
+                } else if (extension_loaded('imap')) {
                     $value = \imap_utf8($value);
+                }else if (function_exists('iconv_mime_decode')){
+                    $value = iconv_mime_decode($value, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, "UTF-8");
+                }else{
+                    $value = mb_decode_mimeheader($value);
                 }
-            } elseif ($decoder === 'iconv' && $this->is_uft8($value)) {
+            }elseif ($decoder === 'iconv') {
                 $value = iconv_mime_decode($value, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, "UTF-8");
-            }
-
-            if ($this->is_uft8($value)) {
+            }else if ($this->is_uft8($value)) {
                 $value = mb_decode_mimeheader($value);
             }
 

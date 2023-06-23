@@ -7,6 +7,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ## [UNRELEASED]
 ### Fixed
 - Legacy protocol support fixed (object to array conversion) #411
+- Header value decoding improved #410
 
 ### Added
 - NaN
