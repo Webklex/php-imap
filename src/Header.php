@@ -716,6 +716,11 @@ class Header {
                         array_splice($parts, -2);
                         $date = implode(' ', $parts);
                         break;
+                    case preg_match('/([A-Z]{2,4}\,\ [0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ [\-|\+][0-9]{4})+$/i', $date) > 0:
+                        $array = explode(',', $date);
+                        array_shift($array);
+                        $date = Carbon::createFromFormat("d M Y H:i:s O", trim(implode(',', $array)));
+                        break;
                     case preg_match('/([0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ UT)+$/i', $date) > 0:
                     case preg_match('/([A-Z]{2,3}\,\ [0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ UT)+$/i', $date) > 0:
                         $date .= 'C';
