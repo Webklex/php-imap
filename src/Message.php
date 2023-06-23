@@ -903,7 +903,11 @@ class Message {
         }
 
         if (function_exists('iconv') && !EncodingAliases::isUtf7($from) && !EncodingAliases::isUtf7($to)) {
-            return @iconv($from, $to . '//IGNORE', $str);
+            try {
+                return iconv($from, $to.'//IGNORE', $str);
+            } catch (\Exception $e) {
+                return @iconv($from, $to, $str);
+            }
         } else {
             if (!$from) {
                 return mb_convert_encoding($str, $to);

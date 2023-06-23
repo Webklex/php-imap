@@ -11,6 +11,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Protocol exception handling improved (bad response message added) #408
 - Prevent fetching singular rfc partials from running indefinitely #407
 - Subject with colon ";" is truncated #401
+- Catching and handling iconv decoding exception #397
 
 ### Added
 - NaN
