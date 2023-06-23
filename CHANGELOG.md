@@ -14,7 +14,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Catching and handling iconv decoding exception #397
 
 ### Added
-- Additional timestamp format added #392 (thanks @esk-ap)
+- Additional timestamp formats added #198 #392 (thanks @esk-ap)
 
 ### Breaking changes
 - NaN
