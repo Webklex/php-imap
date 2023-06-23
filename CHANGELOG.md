@@ -6,7 +6,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
+- Legacy protocol support fixed (object to array conversion) #411
 
 ### Added
 - NaN
@@ -37,6 +37,8 @@ If you have any questions, please feel welcome to join this issue: https://githu
 - 18.06.23 19:14: Vulnerability confirmed
 - 19.06.23 18:41: Vulnerability fixed via PR #414
 - 20.06.23 13:45: Security patch released
+- 21.06.23 20:48: CVE-2023-35169 got assigned
+- 21.06.23 20:58: Advisory released https://github.com/Webklex/php-imap/security/advisories/GHSA-47p7-xfcc-4pv9
 
 
 ## [5.2.0] - 2023-04-11
