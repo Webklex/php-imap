@@ -10,6 +10,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Header value decoding improved #410
 - Protocol exception handling improved (bad response message added) #408
 - Prevent fetching singular rfc partials from running indefinitely #407
+- Subject with colon ";" is truncated #401
 
 ### Added
 - NaN
