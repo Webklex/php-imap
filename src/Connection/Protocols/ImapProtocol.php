@@ -303,10 +303,10 @@ class ImapProtocol extends Protocol {
         if ($tokens[0] == 'OK') {
             return $lines ?: [true];
         } elseif ($tokens[0] == 'NO' || $tokens[0] == 'BAD' || $tokens[0] == 'BYE') {
-            throw new ImapServerErrorException();
+            throw new ImapServerErrorException(implode("\n", $tokens));
         }
 
-        throw new ImapBadRequestException();
+        throw new ImapBadRequestException(implode("\n", $tokens));
     }
 
     /**
