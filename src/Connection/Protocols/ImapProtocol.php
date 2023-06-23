@@ -294,19 +294,22 @@ class ImapProtocol extends Protocol {
             $lines[] = $tokens;
         } while (!$readAll);
 
+        $original = $tokens;
         if ($dontParse) {
             // First two chars are still needed for the response code
             $tokens = [substr($tokens, 0, 2)];
         }
 
+        $original = is_array($original)?$original : [$original];
+
         // last line has response code
         if ($tokens[0] == 'OK') {
             return $lines ?: [true];
         } elseif ($tokens[0] == 'NO' || $tokens[0] == 'BAD' || $tokens[0] == 'BYE') {
-            throw new ImapServerErrorException(implode("\n", $tokens));
+            throw new ImapServerErrorException(implode("\n", $original));
         }
 
-        throw new ImapBadRequestException(implode("\n", $tokens));
+        throw new ImapBadRequestException(implode("\n", $original));
     }
 
     /**
@@ -730,7 +733,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function content(int|array $uids, string $rfc = "RFC822", int|string $uid = IMAP::ST_UID): Response {
-        return $this->fetch(["$rfc.TEXT"], $uids, null, $uid);
+        return $this->fetch(["$rfc.TEXT"], is_array($uids)?$uids:[$uids], null, $uid);
     }
 
     /**
@@ -744,7 +747,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function headers(int|array $uids, string $rfc = "RFC822", int|string $uid = IMAP::ST_UID): Response {
-        return $this->fetch(["$rfc.HEADER"], $uids, null, $uid);
+        return $this->fetch(["$rfc.HEADER"], is_array($uids)?$uids:[$uids], null, $uid);
     }
 
     /**
@@ -757,7 +760,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function flags(int|array $uids, int|string $uid = IMAP::ST_UID): Response {
-        return $this->fetch(["FLAGS"], $uids, null, $uid);
+        return $this->fetch(["FLAGS"], is_array($uids)?$uids:[$uids], null, $uid);
     }
 
     /**
@@ -770,7 +773,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function sizes(int|array $uids, int|string $uid = IMAP::ST_UID): Response {
-        return $this->fetch(["RFC822.SIZE"], $uids, null, $uid);
+        return $this->fetch(["RFC822.SIZE"], is_array($uids)?$uids:[$uids], null, $uid);
     }
 
     /**

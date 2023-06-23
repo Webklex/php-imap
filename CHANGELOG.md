@@ -9,6 +9,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Legacy protocol support fixed (object to array conversion) #411
 - Header value decoding improved #410
 - Protocol exception handling improved (bad response message added) #408
+- Prevent fetching singular rfc partials from running indefinitely #407
 
 ### Added
 - NaN
