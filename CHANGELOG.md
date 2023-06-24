@@ -6,6 +6,17 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
+- NaN
+
+### Added
+- NaN
+
+### Breaking changes
+- NaN
+
+
+## [5.4.0] - 2023-06-24
+### Fixed
 - Legacy protocol support fixed (object to array conversion) #411
 - Header value decoding improved #410
 - Protocol exception handling improved (bad response message added) #408
@@ -15,9 +26,6 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Added
 - Additional timestamp formats added #198 #392 (thanks @esk-ap)
-
-### Breaking changes
-- NaN
 
 
 ## [5.3.0] - Security patch - 2023-06-20
