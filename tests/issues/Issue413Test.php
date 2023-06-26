@@ -43,9 +43,10 @@ class Issue413Test extends LiveMailboxTestCase {
         $folder = $this->getFolder('INBOX');
         self::assertInstanceOf(Folder::class, $folder);
 
+        /** @var Message $message */
         $_message = $this->appendMessageTemplate($folder, 'issue-413.eml');
 
-        $message = $folder->messages()->all()->get()->last();
+        $message = $folder->messages()->getMessageByMsgn($_message->msgn);
         self::assertEquals($message->uid, $_message->uid);
 
         self::assertSame("Test Message", (string)$message->subject);
