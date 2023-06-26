@@ -22,6 +22,14 @@ class Issue410Test extends TestCase {
         $message = Message::fromFile($filename);
 
         self::assertSame("☆第132号　「ガーデン&エクステリア」専門店のためのＱ&Ａサロン　【月刊エクステリア・ワーク】", (string)$message->subject);
+
+        $attachments = $message->getAttachments();
+
+        self::assertSame(1, $attachments->count());
+
+        $attachment = $attachments->first();
+        self::assertSame("☆第132号　「ガーデン&エクステリア」専門店のためのＱ&Ａサロン　【月刊エクステリア・ワーク】", $attachment->filename);
+        self::assertSame("☆第132号　「ガーデン&エクステリア」専門店のためのＱ&Ａサロン　【月刊エクステリア・ワーク】", $attachment->name);
     }
 
 }
