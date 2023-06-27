@@ -6,7 +6,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
+- Error token length mismatch in `ImapProtocol::readResponse` #400
 
 ### Added
 - NaN

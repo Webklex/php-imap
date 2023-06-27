@@ -297,7 +297,7 @@ class ImapProtocol extends Protocol {
         $original = $tokens;
         if ($dontParse) {
             // First two chars are still needed for the response code
-            $tokens = [substr($tokens, 0, 2)];
+            $tokens = [trim(substr($tokens, 0, 3))];
         }
 
         $original = is_array($original)?$original : [$original];
