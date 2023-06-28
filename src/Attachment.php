@@ -236,6 +236,10 @@ class Attachment {
             $this->filename = $this->decodeName($filename);
         }
 
+        if (($description = $this->part->description) !== null) {
+            $this->description = $this->part->getHeader()->decode($description);
+        }
+
         if (($name = $this->part->name) !== null) {
             $this->name = $this->decodeName($name);
         }
@@ -248,7 +252,6 @@ class Attachment {
                 if (!$this->name) {
                     $this->name = $this->part->description;
                 }
-                $this->description = $this->part->description;
             } else if (!$this->name) {
                 $this->name = $this->part->subtype;
             }
