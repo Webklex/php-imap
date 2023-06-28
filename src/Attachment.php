@@ -269,12 +269,10 @@ class Attachment {
             }
 
             $decoder = $this->config['decoder']['message'];
-            if($decoder === 'utf-8' && extension_loaded('imap')) {
-                $name = \imap_utf8($name);
-            }
-
             if (preg_match('/=\?([^?]+)\?(Q|B)\?(.+)\?=/i', $name, $matches)) {
                 $name = $this->part->getHeader()->decode($name);
+            } elseif ($decoder === 'utf-8' && extension_loaded('imap')) {
+                $name = \imap_utf8($name);
             }
 
             // check if $name is url encoded
@@ -284,9 +282,7 @@ class Attachment {
 
             // sanitize $name
             // order of '..' is important
-            $name = str_replace(['\\', '/', chr(0), ':', '..'], '', $name);
-
-            return $name;
+            return str_replace(['\\', '/', chr(0), ':', '..'], '', $name);
         }
         return "";
     }
