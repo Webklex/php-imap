@@ -243,9 +243,6 @@ class Attachment {
         if (($name = $this->part->name) !== null) {
             $this->name = $this->decodeName($name);
         }
-        if (!$this->name && $this->filename != "") {
-            $this->name = $this->filename;
-        }
 
         if (IMAP::ATTACHMENT_TYPE_MESSAGE == $this->part->type) {
             if ($this->part->ifdescription) {
@@ -258,8 +255,12 @@ class Attachment {
         }
         $this->attributes = array_merge($this->part->getHeader()->getAttributes(), $this->attributes);
 
-        if(!$this->filename){
-            $this->filename = bin2hex(random_bytes(10));
+        if (!$this->filename) {
+            $this->filename = $this->hash;
+        }
+
+        if (!$this->name && $this->filename != "") {
+            $this->name = $this->filename;
         }
     }
 

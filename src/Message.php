@@ -767,7 +767,7 @@ class Message {
     protected function fetchAttachment(Part $part): void {
         $oAttachment = new Attachment($this, $part);
 
-        if ($oAttachment->getName() !== null && $oAttachment->getSize() > 0) {
+        if ($oAttachment->getSize() > 0) {
             if ($oAttachment->getId() !== null && $this->attachments->offsetExists($oAttachment->getId())) {
                 $this->attachments->put($oAttachment->getId(), $oAttachment);
             } else {
