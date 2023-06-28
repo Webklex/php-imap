@@ -44,6 +44,7 @@ class Issue410Test extends TestCase {
         self::assertSame(1, $attachments->count());
 
         $attachment = $attachments->first();
+        self::assertSame("2021_Mängelliste_0819306.xlsx", $attachment->description);
         self::assertSame("2021_Mängelliste_0819306.xlsx", $attachment->filename);
         self::assertSame("2021_Mängelliste_0819306.xlsx", $attachment->name);
     }

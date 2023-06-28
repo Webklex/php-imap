@@ -39,7 +39,8 @@ class AttachmentNoDispositionTest extends FixtureTestCase {
         $attachment = $message->attachments()->first();
 
         self::assertInstanceOf(Attachment::class, $attachment);
-        self::assertMatchesRegularExpression('/^[a-z0-9]{20}$/', $attachment->filename);
+        self::assertEquals('26ed3dd2', $attachment->filename);
+        self::assertEquals('26ed3dd2', $attachment->id);
         self::assertEquals("Prostřeno_2014_poslední volné termíny.xls", $attachment->name);
         self::assertEquals('text', $attachment->type);
         self::assertEquals('xls', $attachment->getExtension());
@@ -49,5 +50,6 @@ class AttachmentNoDispositionTest extends FixtureTestCase {
         self::assertEquals(0, $attachment->part_number);
         self::assertNull($attachment->disposition);
         self::assertNotEmpty($attachment->id);
+        self::assertEmpty($attachment->content_id);
     }
 }
