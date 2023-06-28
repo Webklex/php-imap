@@ -28,6 +28,7 @@ use Webklex\PHPIMAP\Support\Masks\AttachmentMask;
  * @property string type
  * @property string content_type
  * @property string id
+ * @property string hash
  * @property string name
  * @property string description
  * @property string filename
@@ -44,6 +45,8 @@ use Webklex\PHPIMAP\Support\Masks\AttachmentMask;
  * @method string  setContentType(string $content_type)
  * @method string  getId()
  * @method string  setId(string $id)
+ * @method string  getHash()
+ * @method string  setHash(string $hash)
  * @method string  getSize()
  * @method string  setSize(integer $size)
  * @method string  getName()
@@ -74,17 +77,18 @@ class Attachment {
      * @var array $attributes
      */
     protected array $attributes = [
-        'content' => null,
-        'type' => null,
-        'part_number' => 0,
+        'content'      => null,
+        'hash'         => null,
+        'type'         => null,
+        'part_number'  => 0,
         'content_type' => null,
-        'id' => null,
-        'name' => null,
-        'filename' => null,
-        'description' => null,
-        'disposition' => null,
-        'img_src' => null,
-        'size' => null,
+        'id'           => null,
+        'name'         => null,
+        'filename'     => null,
+        'description'  => null,
+        'disposition'  => null,
+        'img_src'      => null,
+        'size'         => null,
     ];
 
     /**
@@ -203,10 +207,26 @@ class Attachment {
         $this->content_type = $this->part->content_type;
         $this->content = $this->oMessage->decodeString($content, $this->part->encoding);
 
+        // Create a hash of the raw part - this can be used to identify the attachment in the message context. However,
+        // it is not guaranteed to be unique and collisions are possible.
+        // Some additional online resources:
+        // - https://en.wikipedia.org/wiki/Hash_collision
+        // - https://www.php.net/manual/en/function.hash.php
+        // - https://php.watch/articles/php-hash-benchmark
+        // Benchmark speeds:
+        // -xxh3    ~15.19(GB/s) (requires php-xxhash extension or >= php8.1)
+        // -crc32c  ~14.12(GB/s)
+        // -sha256  ~0.25(GB/s)
+        // xxh3 would be nice to use, because of its extra speed and 32 instead of 8 bytes, but it is not compatible with
+        // php < 8.1. crc32c is the next fastest and is compatible with php >= 5.1. sha256 is the slowest, but is compatible
+        // with php >= 5.1 and is the most likely to be unique. crc32c is the best compromise between speed and uniqueness.
+        // Unique enough for our purposes, but not so slow that it could be a bottleneck.
+        $this->hash = hash("crc32c", $this->part->getHeader()->raw."\r\n\r\n".$this->part->content);
+
         if (($id = $this->part->id) !== null) {
             $this->id = str_replace(['<', '>'], '', $id);
-        }else{
-            $this->id = hash("sha256", uniqid((string) rand(10000, 99999), true));
+        }else {
+            $this->id = $this->hash;
         }
 
         $this->size = $this->part->bytes;
