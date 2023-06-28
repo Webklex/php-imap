@@ -19,6 +19,18 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - NaN
 
 
+## [5.5.0] - 2023-06-28
+### Fixed
+- Error token length mismatch in `ImapProtocol::readResponse` #400
+- Attachment name parsing fixed #410 #421 (thanks @nuernbergerA)
+- Additional Attachment name fallback added to prevent missing attachments
+- Attachment id is now static (based on the raw part content) and now longer random
+- Always parse the attachment description if it is available
+
+### Added
+- Attachment content hash added
+
+
 ## [5.4.0] - 2023-06-24
 ### Fixed
 - Legacy protocol support fixed (object to array conversion) #411
