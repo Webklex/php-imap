@@ -100,8 +100,8 @@ class Attachment {
 
     /**
      * Attachment constructor.
-     * @param Message   $oMessage
-     * @param Part      $part
+     * @param Message $oMessage
+     * @param Part $part
      */
     public function __construct(Message $oMessage, Part $part) {
         $this->config = ClientManager::get('options');
@@ -112,13 +112,13 @@ class Attachment {
 
         if ($this->oMessage->getClient()) {
             $default_mask = $this->oMessage->getClient()?->getDefaultAttachmentMask();
-            if($default_mask != null) {
+            if ($default_mask != null) {
                 $this->mask = $default_mask;
             }
-        }else{
-            $default_mask  = ClientManager::getMask("attachment");
-            if($default_mask != ""){
-                $this->mask =$default_mask;
+        } else {
+            $default_mask = ClientManager::getMask("attachment");
+            if ($default_mask != "") {
+                $this->mask = $default_mask;
             }
         }
 
@@ -135,15 +135,15 @@ class Attachment {
      * @throws MethodNotFoundException
      */
     public function __call(string $method, array $arguments) {
-        if(strtolower(substr($method, 0, 3)) === 'get') {
+        if (strtolower(substr($method, 0, 3)) === 'get') {
             $name = Str::snake(substr($method, 3));
 
-            if(isset($this->attributes[$name])) {
+            if (isset($this->attributes[$name])) {
                 return $this->attributes[$name];
             }
 
             return null;
-        }elseif (strtolower(substr($method, 0, 3)) === 'set') {
+        } elseif (strtolower(substr($method, 0, 3)) === 'set') {
             $name = Str::snake(substr($method, 3));
 
             $this->attributes[$name] = array_pop($arguments);
@@ -151,7 +151,7 @@ class Attachment {
             return $this->attributes[$name];
         }
 
-        throw new MethodNotFoundException("Method ".self::class.'::'.$method.'() is not supported');
+        throw new MethodNotFoundException("Method " . self::class . '::' . $method . '() is not supported');
     }
 
     /**
@@ -174,7 +174,7 @@ class Attachment {
      * @return mixed|null
      */
     public function __get($name) {
-        if(isset($this->attributes[$name])) {
+        if (isset($this->attributes[$name])) {
             return $this->attributes[$name];
         }
 
@@ -274,7 +274,7 @@ class Attachment {
     public function save(string $path, ?string $filename = null): bool {
         $filename = $filename ? $this->decodeName($filename) : $this->filename;
 
-        return file_put_contents($path.DIRECTORY_SEPARATOR.$filename, $this->getContent()) !== false;
+        return file_put_contents($path . DIRECTORY_SEPARATOR . $filename, $this->getContent()) !== false;
     }
 
     /**
@@ -335,7 +335,7 @@ class Attachment {
         }
         if ($extension === null) {
             $deprecated_guesser = "\Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser";
-            if (class_exists($deprecated_guesser) !== false){
+            if (class_exists($deprecated_guesser) !== false) {
                 /** @var \Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser $deprecated_guesser */
                 $extension = $deprecated_guesser::getInstance()->guess($this->getMimeType());
             }
@@ -374,7 +374,7 @@ class Attachment {
      * @return $this
      */
     public function setMask($mask): Attachment {
-        if(class_exists($mask)){
+        if (class_exists($mask)) {
             $this->mask = $mask;
         }
 
@@ -399,10 +399,10 @@ class Attachment {
      */
     public function mask(string $mask = null): mixed {
         $mask = $mask !== null ? $mask : $this->mask;
-        if(class_exists($mask)){
+        if (class_exists($mask)) {
             return new $mask($this);
         }
 
-        throw new MaskNotFoundException("Unknown mask provided: ".$mask);
+        throw new MaskNotFoundException("Unknown mask provided: " . $mask);
     }
 }
