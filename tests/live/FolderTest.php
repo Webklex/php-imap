@@ -348,6 +348,31 @@ class FolderTest extends LiveMailboxTestCase {
     }
 
     /**
+     * Test Folder::status()
+     *
+     * @return void
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws FolderFetchingException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws MaskNotFoundException
+     * @throws ResponseException
+     * @throws RuntimeException
+     */
+    public function testStatus(): void {
+        $folder = $this->getFolder('INBOX');
+        self::assertInstanceOf(Folder::class, $folder);
+
+        $status = $folder->getStatus();
+        self::assertEquals(0, $status['MESSAGES']);
+        self::assertEquals(0, $status['RECENT']);
+        self::assertEquals(0, $status['UNSEEN']);
+        self::assertGreaterThan(0, $status['UIDNEXT']);
+        self::assertGreaterThan(0, $status['UIDVALIDITY']);
+    }
+
+    /**
      * Test Folder::examine()
      *
      * @return void
