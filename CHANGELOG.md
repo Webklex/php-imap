@@ -6,17 +6,13 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- Error token length mismatch in `ImapProtocol::readResponse` #400
-- Attachment name parsing fixed #410 #421 (thanks @nuernbergerA)
-- Additional Attachment name fallback added to prevent missing attachments
-- Attachment id is now static (based on the raw part content) and now longer random
-- Always parse the attachment description if it is available
+- NaN
 
 ### Added
-- Attachment content hash added
+- IMAP STATUS command support added `Folder::status()` #424 (thanks @InterLinked1)
 
 ### Breaking changes
-- NaN
+- `Folder::getStatus()` no longer returns the results of `EXAMINE` but `STATUS` instead. If you want to use `EXAMINE` you can use the `Folder::examine()` method instead.
 
 
 ## [5.5.0] - 2023-06-28
