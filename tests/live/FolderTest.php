@@ -364,12 +364,12 @@ class FolderTest extends LiveMailboxTestCase {
         $folder = $this->getFolder('INBOX');
         self::assertInstanceOf(Folder::class, $folder);
 
-        $status = $folder->getStatus();
-        self::assertEquals(0, $status['MESSAGES']);
-        self::assertEquals(0, $status['RECENT']);
-        self::assertEquals(0, $status['UNSEEN']);
-        self::assertGreaterThan(0, $status['UIDNEXT']);
-        self::assertGreaterThan(0, $status['UIDVALIDITY']);
+        $status = $folder->status();
+        self::assertEquals(0, $status['messages']);
+        self::assertEquals(0, $status['recent']);
+        self::assertEquals(0, $status['unseen']);
+        self::assertGreaterThan(0, $status['uidnext']);
+        self::assertGreaterThan(0, $status['uidvalidity']);
     }
 
     /**

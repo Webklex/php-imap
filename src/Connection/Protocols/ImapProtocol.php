@@ -636,7 +636,7 @@ class ImapProtocol extends Protocol {
             if ($key === null) {
                 $key = $value;
             } else {
-                $result[$key] = (int)$value;
+                $result[strtolower($key)] = (int)$value;
                 $key = null;
             }
         }
