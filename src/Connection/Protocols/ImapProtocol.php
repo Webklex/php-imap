@@ -536,25 +536,6 @@ class ImapProtocol extends Protocol {
         return $response->setResult($response->validatedData()[0]);
     }
 
-	/**
-	 * Get an array of available STATUS items
-	 *
-	 * @return Response list of STATUS items
-	 *
-	 * @throws ImapBadRequestException
-	 * @throws ImapServerErrorException
-	 * @throws RuntimeException
-	 * @throws ResponseException
-	 */
-	public function getStatus(): Response {
-		$s = implode(" ", $properties);
-		$response = $this->requestAndResponse('STATUS', array($this->escapeString($folder), "(" . $s . ")"));
-
-		if (!$response->getResponse()) return $response;
-
-		return $response->setResult($response->validatedData()[0]);
-	}
-
     /**
      * Examine and select have the same response.
      * @param string $command can be 'EXAMINE' or 'SELECT'
@@ -626,6 +607,42 @@ class ImapProtocol extends Protocol {
      */
     public function examineFolder(string $folder = 'INBOX'): Response {
         return $this->examineOrSelect('EXAMINE', $folder);
+    }
+
+    /**
+     * Get the status of a given folder
+     *
+     * @param string $folder
+     * @param string[] $arguments
+     * @return Response list of STATUS items
+     *
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws ResponseException
+     * @throws RuntimeException
+     */
+    public function folderStatus(string $folder = 'INBOX', $arguments = ['MESSAGES', 'UNSEEN', 'RECENT', 'UIDNEXT', 'UIDVALIDITY']): Response {
+        $response = $this->requestAndResponse('STATUS', [$this->escapeString($folder), $this->escapeList($arguments)], false);
+        $data = $response->validatedData();
+
+        if (!isset($data[0]) || !isset($data[0][2])) {
+            throw new RuntimeException("folder status could not be fetched");
+        }
+
+        $result = [];
+        $key = null;
+        foreach($data[0][2] as $value) {
+            if ($key === null) {
+                $key = $value;
+            } else {
+                $result[$key] = (int)$value;
+                $key = null;
+            }
+        }
+
+        $response->setResult($result);
+
+        return $response;
     }
 
     /**

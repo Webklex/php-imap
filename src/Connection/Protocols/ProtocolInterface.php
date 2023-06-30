@@ -118,6 +118,17 @@ interface ProtocolInterface {
     public function examineFolder(string $folder = 'INBOX'): Response;
 
     /**
+     * Get the status of a given folder
+     *
+     * @return Response list of STATUS items
+     *
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws RuntimeException
+     */
+    public function folderStatus(string $folder = 'INBOX', $arguments = ['MESSAGES', 'UNSEEN', 'RECENT', 'UIDNEXT', 'UIDVALIDITY']): Response;
+
+    /**
      * Fetch message headers
      * @param int|array $uids
      * @param string $rfc

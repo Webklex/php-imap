@@ -237,6 +237,16 @@ class LegacyProtocol extends Protocol {
     }
 
     /**
+     * Get the status of a given folder
+     *
+     * @return Response list of STATUS items
+     * @throws MethodNotSupportedException
+     */
+    public function folderStatus(string $folder = 'INBOX', $arguments = ['MESSAGES', 'UNSEEN', 'RECENT', 'UIDNEXT', 'UIDVALIDITY']): Response {
+        throw new MethodNotSupportedException();
+    }
+
+    /**
      * Fetch message content
      * @param int|array $uids
      * @param string $rfc
