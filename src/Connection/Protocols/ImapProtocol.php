@@ -723,7 +723,7 @@ class ImapProtocol extends Protocol {
     }
 
     /**
-     * Fetch message headers
+     * Fetch message body (without headers)
      * @param int|array $uids
      * @param string $rfc
      * @param int|string $uid set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
