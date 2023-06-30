@@ -491,8 +491,30 @@ class Folder {
         }
     }
 
+	/**
+	 * Get the standard folder status items from STATUS command
+	 *
+	 * @return array
+	 * @throws ConnectionFailedException
+	 * @throws ImapbadRequestException
+	 * @throws ImapServerErrorException
+	 * @throws RuntimeException
+	 * @throws AuthFailedException
+	 * @throws ResponseException
+	 */
+	public function getFolderStatus(string $folder, array $properties): array {
+		$status = $client->getConnection()->getStatus($folder->full_name, array('MESSAGES', 'UNSEEN', 'RECENT', 'UIDNEXT', 'UIDVALIDITY'))->validatedData();
+		$c = count($status[2]);
+		$s = array();
+		for ($i = 0; $i < $c; $i++) {
+			$a = $i++;
+			$s[$status[2][$a]] = $status[2][$i];
+		}
+		return $s;
+	}
+
     /**
-     * Get folder status information
+     * Get folder status information from the EXAMINE command
      *
      * @return array
      * @throws ConnectionFailedException

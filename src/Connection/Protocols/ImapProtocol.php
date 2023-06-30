@@ -536,6 +536,25 @@ class ImapProtocol extends Protocol {
         return $response->setResult($response->validatedData()[0]);
     }
 
+	/**
+	 * Get an array of available STATUS items
+	 *
+	 * @return Response list of STATUS items
+	 *
+	 * @throws ImapBadRequestException
+	 * @throws ImapServerErrorException
+	 * @throws RuntimeException
+	 * @throws ResponseException
+	 */
+	public function getStatus(): Response {
+		$s = implode(" ", $properties);
+		$response = $this->requestAndResponse('STATUS', array($this->escapeString($folder), "(" . $s . ")"));
+
+		if (!$response->getResponse()) return $response;
+
+		return $response->setResult($response->validatedData()[0]);
+	}
+
     /**
      * Examine and select have the same response.
      * @param string $command can be 'EXAMINE' or 'SELECT'
