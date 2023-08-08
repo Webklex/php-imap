@@ -27,7 +27,7 @@ class ImapMimeHeaderDecodeReturnsFalseTest extends FixtureTestCase {
     public function testFixture() : void {
         $message = $this->getFixture("imap_mime_header_decode_returns_false.eml");
 
-        self::assertEquals("?p?#]ݰ?[??W̌N??LL?̍L??NL˜", $message->subject->first());
+        self::assertEquals("=?UTF-8?B?nnDusSNdG92w6Fuw61fMjAxOF8wMy0xMzMyNTMzMTkzLnBkZg==?=", $message->subject->first());
         self::assertEquals("Hi", $message->getTextBody());
         self::assertFalse($message->hasHTMLBody());
         self::assertEquals("2017-09-13 11:05:45", $message->date->first()->setTimezone('UTC')->format("Y-m-d H:i:s"));

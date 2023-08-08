@@ -9,10 +9,61 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - NaN
 
 ### Added
-- NaN
+- IMAP STATUS command support added `Folder::status()` #424 (thanks @InterLinked1)
 
 ### Breaking changes
-- NaN
+- `Folder::getStatus()` no longer returns the results of `EXAMINE` but `STATUS` instead. If you want to use `EXAMINE` you can use the `Folder::examine()` method instead.
+
+
+## [5.5.0] - 2023-06-28
+### Fixed
+- Error token length mismatch in `ImapProtocol::readResponse` #400
+- Attachment name parsing fixed #410 #421 (thanks @nuernbergerA)
+- Additional Attachment name fallback added to prevent missing attachments
+- Attachment id is now static (based on the raw part content) and now longer random
+- Always parse the attachment description if it is available
+
+### Added
+- Attachment content hash added
+
+
+## [5.4.0] - 2023-06-24
+### Fixed
+- Legacy protocol support fixed (object to array conversion) #411
+- Header value decoding improved #410
+- Protocol exception handling improved (bad response message added) #408
+- Prevent fetching singular rfc partials from running indefinitely #407
+- Subject with colon ";" is truncated #401
+- Catching and handling iconv decoding exception #397
+
+### Added
+- Additional timestamp formats added #198 #392 (thanks @esk-ap)
+
+
+## [5.3.0] - Security patch - 2023-06-20
+### Fixed
+- Potential RCE through path traversal fixed #414 (special thanks @angelej)
+
+### Security Impact and Mitigation
+Impacted are all versions below v5.3.0.
+If possible, update to >= v5.3.0 as soon as possible. Impacted was the `Attachment::save`
+method which could be used to write files to the local filesystem. The path was not
+properly sanitized and could be used to write files to arbitrary locations.
+
+However, the `Attachment::save` method is not used by default and has to be called
+manually. If you are using this method without providing a sanitized path, you are
+affected by this vulnerability.
+If you are not using this method or are providing a sanitized path, you are not affected
+by this vulnerability and no immediate action is required.
+
+If you have any questions, please feel welcome to join this issue: https://github.com/Webklex/php-imap/issues/416
+#### Timeline
+- 17.06.23 21:30: Vulnerability reported
+- 18.06.23 19:14: Vulnerability confirmed
+- 19.06.23 18:41: Vulnerability fixed via PR #414
+- 20.06.23 13:45: Security patch released
+- 21.06.23 20:48: CVE-2023-35169 got assigned
+- 21.06.23 20:58: Advisory released https://github.com/Webklex/php-imap/security/advisories/GHSA-47p7-xfcc-4pv9
 
 
 ## [5.2.0] - 2023-04-11

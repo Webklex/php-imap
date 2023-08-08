@@ -492,7 +492,7 @@ class Folder {
     }
 
     /**
-     * Get folder status information
+     * Get folder status information from the EXAMINE command
      *
      * @return array
      * @throws ConnectionFailedException
@@ -502,20 +502,39 @@ class Folder {
      * @throws AuthFailedException
      * @throws ResponseException
      */
-    public function getStatus(): array {
-        return $this->examine();
+    public function status(): array {
+        return $this->client->getConnection()->folderStatus($this->path, ['MESSAGES', 'UNSEEN', 'RECENT', 'UIDNEXT', 'UIDVALIDITY'])->validatedData();
     }
 
     /**
+     * Get folder status information from the EXAMINE command
+     *
+     * @return array
+     * @throws AuthFailedException
      * @throws ConnectionFailedException
      * @throws ImapBadRequestException
      * @throws ImapServerErrorException
-     * @throws RuntimeException
-     * @throws AuthFailedException
      * @throws ResponseException
+     * @throws RuntimeException
+     *
+     * @deprecated Use Folder::status() instead
+     */
+    public function getStatus(): array {
+        return $this->status();
+    }
+
+    /**
+     * Load folder status information from the EXAMINE command
+     * @return Folder
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws ResponseException
+     * @throws RuntimeException
      */
     public function loadStatus(): Folder {
-        $this->status = $this->getStatus();
+        $this->status = $this->examine();
         return $this;
     }
 

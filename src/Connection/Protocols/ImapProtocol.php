@@ -114,7 +114,7 @@ class ImapProtocol extends Protocol {
      */
     public function nextLine(Response $response): string {
         $line = "";
-        while (($next_char = fread($this->stream, 1)) !== false && !in_array($next_char, ["","\n"])) {
+        while (($next_char = fread($this->stream, 1)) !== false && !in_array($next_char, ["", "\n"])) {
             $line .= $next_char;
         }
         if ($line === "" && ($next_char === false || $next_char === "")) {
@@ -294,19 +294,22 @@ class ImapProtocol extends Protocol {
             $lines[] = $tokens;
         } while (!$readAll);
 
+        $original = $tokens;
         if ($dontParse) {
             // First two chars are still needed for the response code
-            $tokens = [substr($tokens, 0, 2)];
+            $tokens = [trim(substr($tokens, 0, 3))];
         }
+
+        $original = is_array($original) ? $original : [$original];
 
         // last line has response code
         if ($tokens[0] == 'OK') {
             return $lines ?: [true];
         } elseif ($tokens[0] == 'NO' || $tokens[0] == 'BAD' || $tokens[0] == 'BYE') {
-            throw new ImapServerErrorException();
+            throw new ImapServerErrorException(implode("\n", $original));
         }
 
-        throw new ImapBadRequestException();
+        throw new ImapBadRequestException(implode("\n", $original));
     }
 
     /**
@@ -489,7 +492,7 @@ class ImapProtocol extends Protocol {
         if (!$this->stream) {
             $this->reset();
             return new Response(0, $this->debug);
-        }elseif ($this->meta()["timed_out"]) {
+        } elseif ($this->meta()["timed_out"]) {
             $this->reset();
             return new Response(0, $this->debug);
         }
@@ -498,7 +501,8 @@ class ImapProtocol extends Protocol {
         try {
             $result = $this->requestAndResponse('LOGOUT', [], true);
             fclose($this->stream);
-        } catch (\Throwable) {}
+        } catch (\Throwable) {
+        }
 
         $this->reset();
 
@@ -604,6 +608,42 @@ class ImapProtocol extends Protocol {
      */
     public function examineFolder(string $folder = 'INBOX'): Response {
         return $this->examineOrSelect('EXAMINE', $folder);
+    }
+
+    /**
+     * Get the status of a given folder
+     *
+     * @param string $folder
+     * @param string[] $arguments
+     * @return Response list of STATUS items
+     *
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws ResponseException
+     * @throws RuntimeException
+     */
+    public function folderStatus(string $folder = 'INBOX', $arguments = ['MESSAGES', 'UNSEEN', 'RECENT', 'UIDNEXT', 'UIDVALIDITY']): Response {
+        $response = $this->requestAndResponse('STATUS', [$this->escapeString($folder), $this->escapeList($arguments)], false);
+        $data = $response->validatedData();
+
+        if (!isset($data[0]) || !isset($data[0][2])) {
+            throw new RuntimeException("folder status could not be fetched");
+        }
+
+        $result = [];
+        $key = null;
+        foreach($data[0][2] as $value) {
+            if ($key === null) {
+                $key = $value;
+            } else {
+                $result[strtolower($key)] = (int)$value;
+                $key = null;
+            }
+        }
+
+        $response->setResult($result);
+
+        return $response;
     }
 
     /**
@@ -720,7 +760,7 @@ class ImapProtocol extends Protocol {
     }
 
     /**
-     * Fetch message headers
+     * Fetch message body (without headers)
      * @param int|array $uids
      * @param string $rfc
      * @param int|string $uid set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
@@ -730,7 +770,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function content(int|array $uids, string $rfc = "RFC822", int|string $uid = IMAP::ST_UID): Response {
-        return $this->fetch(["$rfc.TEXT"], $uids, null, $uid);
+        return $this->fetch(["$rfc.TEXT"], is_array($uids) ? $uids : [$uids], null, $uid);
     }
 
     /**
@@ -744,7 +784,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function headers(int|array $uids, string $rfc = "RFC822", int|string $uid = IMAP::ST_UID): Response {
-        return $this->fetch(["$rfc.HEADER"], $uids, null, $uid);
+        return $this->fetch(["$rfc.HEADER"], is_array($uids) ? $uids : [$uids], null, $uid);
     }
 
     /**
@@ -757,7 +797,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function flags(int|array $uids, int|string $uid = IMAP::ST_UID): Response {
-        return $this->fetch(["FLAGS"], $uids, null, $uid);
+        return $this->fetch(["FLAGS"], is_array($uids) ? $uids : [$uids], null, $uid);
     }
 
     /**
@@ -770,7 +810,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function sizes(int|array $uids, int|string $uid = IMAP::ST_UID): Response {
-        return $this->fetch(["RFC822.SIZE"], $uids, null, $uid);
+        return $this->fetch(["RFC822.SIZE"], is_array($uids) ? $uids : [$uids], null, $uid);
     }
 
     /**

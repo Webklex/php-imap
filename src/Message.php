@@ -767,7 +767,7 @@ class Message {
     protected function fetchAttachment(Part $part): void {
         $oAttachment = new Attachment($this, $part);
 
-        if ($oAttachment->getName() !== null && $oAttachment->getSize() > 0) {
+        if ($oAttachment->getSize() > 0) {
             if ($oAttachment->getId() !== null && $this->attachments->offsetExists($oAttachment->getId())) {
                 $this->attachments->put($oAttachment->getId(), $oAttachment);
             } else {
@@ -903,7 +903,11 @@ class Message {
         }
 
         if (function_exists('iconv') && !EncodingAliases::isUtf7($from) && !EncodingAliases::isUtf7($to)) {
-            return @iconv($from, $to . '//IGNORE', $str);
+            try {
+                return iconv($from, $to.'//IGNORE', $str);
+            } catch (\Exception $e) {
+                return @iconv($from, $to, $str);
+            }
         } else {
             if (!$from) {
                 return mb_convert_encoding($str, $to);

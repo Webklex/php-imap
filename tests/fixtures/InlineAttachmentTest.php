@@ -44,8 +44,11 @@ class InlineAttachmentTest extends FixtureTestCase {
         self::assertCount(1, $attachments);
 
         $attachment = $attachments[0];
+
         self::assertInstanceOf(Attachment::class, $attachment);
-        self::assertEquals("", $attachment->name);
+        self::assertEquals('d2913999', $attachment->name);
+        self::assertEquals('d2913999', $attachment->filename);
+        self::assertEquals('ii_15f0aad691bb745f', $attachment->id);
         self::assertEquals('text', $attachment->type);
         self::assertEquals('', $attachment->getExtension());
         self::assertEquals("image/png", $attachment->content_type);
