@@ -503,7 +503,7 @@ class Message
     private function parseHeader(): void
     {
         $sequence_id = $this->getSequenceId();
-        $headers = $this->client->getConnection()->headers([$sequence_id], 'RFC822', $this->sequence);
+        $headers = $this->client->getConnection()->headers([$sequence_id], 'RFC822', $this->sequence)->validatedData();
         if (! isset($headers[$sequence_id])) {
             throw new MessageHeaderFetchingException('no headers found', 0);
         }
@@ -555,7 +555,7 @@ class Message
 
         $sequence_id = $this->getSequenceId();
         try {
-            $flags = $this->client->getConnection()->flags([$sequence_id], $this->sequence);
+            $flags = $this->client->getConnection()->flags([$sequence_id], $this->sequence)->validatedData();
         } catch (Exceptions\RuntimeException $e) {
             throw new MessageFlagException('flag could not be fetched', 0, $e);
         }
@@ -585,7 +585,7 @@ class Message
 
         $sequence_id = $this->getSequenceId();
         try {
-            $contents = $this->client->getConnection()->content([$sequence_id], 'RFC822', $this->sequence);
+            $contents = $this->client->getConnection()->content([$sequence_id], 'RFC822', $this->sequence)->validatedData();
         } catch (Exceptions\RuntimeException $e) {
             throw new MessageContentFetchingException('failed to fetch content', 0);
         }
@@ -614,7 +614,7 @@ class Message
     private function fetchSize(): void
     {
         $sequence_id = $this->getSequenceId();
-        $sizes = $this->client->getConnection()->sizes([$sequence_id], $this->sequence);
+        $sizes = $this->client->getConnection()->sizes([$sequence_id], $this->sequence)->validatedData();
         if (! isset($sizes[$sequence_id])) {
             throw new MessageSizeFetchingException('sizes did not set an array entry for the supplied sequence_id', 0);
         }
@@ -1015,7 +1015,7 @@ class Message
     public function copy(string $folder_path, bool $expunge = false): ?Message
     {
         $this->client->openFolder($folder_path);
-        $status = $this->client->getConnection()->examineFolder($folder_path);
+        $status = $this->client->getConnection()->examineFolder($folder_path)->validatedData();
 
         if (isset($status['uidnext'])) {
             $next_uid = $status['uidnext'];
@@ -1027,7 +1027,7 @@ class Message
             $folder = $this->client->getFolderByPath($folder_path);
 
             $this->client->openFolder($this->folder_path);
-            if ($this->client->getConnection()->copyMessage($folder->path, $this->getSequenceId(), null, $this->sequence)) {
+            if ($this->client->getConnection()->copyMessage($folder->path, $this->getSequenceId(), null, $this->sequence)->validatedData()) {
                 return $this->fetchNewMail($folder, $next_uid, 'copied', $expunge);
             }
         }
@@ -1055,7 +1055,7 @@ class Message
     public function move(string $folder_path, bool $expunge = false): ?Message
     {
         $this->client->openFolder($folder_path);
-        $status = $this->client->getConnection()->examineFolder($folder_path);
+        $status = $this->client->getConnection()->examineFolder($folder_path)->validatedData();
 
         if (isset($status['uidnext'])) {
             $next_uid = $status['uidnext'];
@@ -1067,7 +1067,7 @@ class Message
             $folder = $this->client->getFolderByPath($folder_path);
 
             $this->client->openFolder($this->folder_path);
-            if ($this->client->getConnection()->moveMessage($folder->path, $this->getSequenceId(), null, $this->sequence)) {
+            if ($this->client->getConnection()->moveMessage($folder->path, $this->getSequenceId(), null, $this->sequence)->validatedData()) {
                 return $this->fetchNewMail($folder, $next_uid, 'moved', $expunge);
             }
         }
@@ -1189,7 +1189,7 @@ class Message
         $flag = '\\'.trim(is_array($flag) ? implode(' \\', $flag) : $flag);
         $sequence_id = $this->getSequenceId();
         try {
-            $status = $this->client->getConnection()->store([$flag], $sequence_id, $sequence_id, '+', true, $this->sequence);
+            $status = $this->client->getConnection()->store([$flag], $sequence_id, $sequence_id, '+', true, $this->sequence)->validatedData();
         } catch (Exceptions\RuntimeException $e) {
             throw new MessageFlagException('flag could not be set', 0, $e);
         }
@@ -1220,7 +1220,7 @@ class Message
         $flag = '\\'.trim(is_array($flag) ? implode(' \\', $flag) : $flag);
         $sequence_id = $this->getSequenceId();
         try {
-            $status = $this->client->getConnection()->store([$flag], $sequence_id, $sequence_id, '-', true, $this->sequence);
+            $status = $this->client->getConnection()->store([$flag], $sequence_id, $sequence_id, '-', true, $this->sequence)->validatedData();
         } catch (Exceptions\RuntimeException $e) {
             throw new MessageFlagException('flag could not be removed', 0, $e);
         }
