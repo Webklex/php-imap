@@ -49,4 +49,18 @@ class Issue410Test extends TestCase {
         self::assertSame("2021_Mängelliste_0819306.xlsx", $attachment->name);
     }
 
+    public function testIssueEmailSymbols() {
+        $filename = implode(DIRECTORY_SEPARATOR, [__DIR__, "..", "messages", "issue-410symbols.eml"]);
+        $message = Message::fromFile($filename);
+
+        $attachments = $message->getAttachments();
+
+        self::assertSame(1, $attachments->count());
+
+        $attachment = $attachments->first();
+        self::assertSame("Checkliste 10.,DAVIDGASSE 76-80;2;2.pdf", $attachment->description);
+        self::assertSame("Checkliste 10.,DAVIDGASSE 76-80;2;2.pdf", $attachment->filename);
+        self::assertSame("Checkliste 10.,DAVIDGASSE 76-80;2;2.pdf", $attachment->name);
+    }
+
 }
