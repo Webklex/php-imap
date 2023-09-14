@@ -13,14 +13,14 @@
 namespace Tests\issues;
 
 use PHPUnit\Framework\TestCase;
+use Tests\fixtures\FixtureTestCase;
 use Webklex\PHPIMAP\ClientManager;
 use Webklex\PHPIMAP\Message;
 
-class Issue410Test extends TestCase {
+class Issue410Test extends FixtureTestCase {
 
     public function testIssueEmail() {
-        $filename = implode(DIRECTORY_SEPARATOR, [__DIR__, "..", "messages", "issue-410.eml"]);
-        $message = Message::fromFile($filename);
+        $message = $this->getFixture("issue-410.eml");
 
         self::assertSame("☆第132号　「ガーデン&エクステリア」専門店のためのＱ&Ａサロン　【月刊エクステリア・ワーク】", (string)$message->subject);
 
@@ -34,8 +34,7 @@ class Issue410Test extends TestCase {
     }
 
     public function testIssueEmailB() {
-        $filename = implode(DIRECTORY_SEPARATOR, [__DIR__, "..", "messages", "issue-410b.eml"]);
-        $message = Message::fromFile($filename);
+        $message = $this->getFixture("issue-410b.eml");
 
         self::assertSame("386 - 400021804 - 19., Heiligenstädter Straße 80 - 0819306 - Anfrage Vergabevorschlag", (string)$message->subject);
 
@@ -50,8 +49,7 @@ class Issue410Test extends TestCase {
     }
 
     public function testIssueEmailSymbols() {
-        $filename = implode(DIRECTORY_SEPARATOR, [__DIR__, "..", "messages", "issue-410symbols.eml"]);
-        $message = Message::fromFile($filename);
+        $message = $this->getFixture("issue-410symbols.eml");
 
         $attachments = $message->getAttachments();
 
