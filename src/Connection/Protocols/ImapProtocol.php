@@ -139,6 +139,24 @@ class ImapProtocol extends Protocol {
     }
 
     /**
+     * Get the next line and check if it starts with a given string
+     * The server can send untagged status updates starting with '*' if we are not looking for a status update,
+     * the untagged lines will be ignored.
+     *
+     * @param string $start
+     *
+     * @return bool
+     * @throws RuntimeException
+     */
+    protected function assumedNextLineIgnoreUntagged(Response $response, string $start): bool {
+        do {
+            $line = $this->nextLine($response);
+        } while (!(str_starts_with($start, '*')) && $this->isUntaggedLine($line));
+
+        return str_starts_with($line, $start);
+    }
+
+    /**
      * Get the next line and split the tag
      * @param string|null $tag reference tag
      *
@@ -155,6 +173,25 @@ class ImapProtocol extends Protocol {
     }
 
     /**
+     * Get the next line and split the tag
+     * The server can send untagged status updates starting with '*', the untagged lines will be ignored.
+     *
+     * @param string|null $tag reference tag
+     *
+     * @return string next line
+     * @throws RuntimeException
+     */
+    protected function nextTaggedLineIgnoreUntagged(Response $response, &$tag): string {
+        do {
+            $line = $this->nextLine($response);
+        } while ($this->isUntaggedLine($line));
+
+        list($tag, $line) = explode(' ', $line, 2);
+
+        return $line;
+    }
+
+    /**
      * Get the next line and check if it contains a given string and split the tag
      * @param Response $response
      * @param string $start
@@ -165,6 +202,32 @@ class ImapProtocol extends Protocol {
      */
     protected function assumedNextTaggedLine(Response $response, string $start, &$tag): bool {
         return str_contains($this->nextTaggedLine($response, $tag), $start);
+    }
+
+    /**
+     * Get the next line and check if it contains a given string and split the tag
+     * @param string $start
+     * @param $tag
+     *
+     * @return bool
+     * @throws RuntimeException
+     */
+    protected function assumedNextTaggedLineIgnoreUntagged(Response $response, string $start, &$tag): bool {
+        $line = $this->nextTaggedLineIgnoreUntagged($response, $tag);
+        return strpos($line, $start) !== false;
+    }
+
+    /**
+     * RFC3501 - 2.2.2
+     * Data transmitted by the server to the client and status responses
+     * that do not indicate command completion are prefixed with the token
+     * "*", and are called untagged responses.
+     *
+     * @param string $line
+     * @return bool
+     */
+    protected function isUntaggedLine(string $line) : bool {
+        return str_starts_with($line, '* ');
     }
 
     /**
@@ -1188,7 +1251,7 @@ class ImapProtocol extends Protocol {
      */
     public function idle() {
         $response = $this->sendRequest("IDLE");
-        if (!$this->assumedNextLine($response, '+ ')) {
+        if (!$this->assumedNextLineIgnoreUntagged($response, '+ ')) {
             throw new RuntimeException('idle failed');
         }
     }
@@ -1200,7 +1263,7 @@ class ImapProtocol extends Protocol {
     public function done(): bool {
         $response = new Response($this->noun, $this->debug);
         $this->write($response, "DONE");
-        if (!$this->assumedNextTaggedLine($response, 'OK', $tags)) {
+        if (!$this->assumedNextTaggedLineIgnoreUntagged($response, 'OK', $tags)) {
             throw new RuntimeException('done failed');
         }
         return true;
