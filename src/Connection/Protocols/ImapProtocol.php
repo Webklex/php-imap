@@ -688,10 +688,12 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function fetch(array|string $items, array|int $from, mixed $to = null, int|string $uid = IMAP::ST_UID): Response {
-        if (is_array($from)) {
+        if (is_array($from) && count($from) > 1) {
             $set = implode(',', $from);
+        } elseif (is_array($from) && count($from) === 1) {
+            $set = $from[0] . ':' . $from[0];
         } elseif ($to === null) {
-            $set = $from;
+            $set = $from . ':' . $from;
         } elseif ($to == INF) {
             $set = $from . ':*';
         } else {
