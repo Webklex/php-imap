@@ -529,7 +529,7 @@ class Message {
      */
     private function parseHeader(): void {
         $sequence_id = $this->getSequenceId();
-        $headers = $this->client->getConnection()->headers([$sequence_id], "RFC822", $this->sequence)->validatedData();
+        $headers = $this->client->getConnection()->headers([$sequence_id], "RFC822", $this->sequence)->setCanBeEmpty(true)->validatedData();
         if (!isset($headers[$sequence_id])) {
             throw new MessageHeaderFetchingException("no headers found", 0);
         }
@@ -582,7 +582,7 @@ class Message {
 
         $sequence_id = $this->getSequenceId();
         try {
-            $flags = $this->client->getConnection()->flags([$sequence_id], $this->sequence)->validatedData();
+            $flags = $this->client->getConnection()->flags([$sequence_id], $this->sequence)->setCanBeEmpty(true)->validatedData();
         } catch (Exceptions\RuntimeException $e) {
             throw new MessageFlagException("flag could not be fetched", 0, $e);
         }
