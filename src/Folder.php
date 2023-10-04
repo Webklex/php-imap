@@ -451,8 +451,19 @@ class Folder {
         $sequence = ClientManager::get('options.sequence', IMAP::ST_MSGN);
 
         while (true) {
-            // This polymorphic call is fine - Protocol::idle() will throw an exception beforehand
-            $line = $idle_client->getConnection()->nextLine(Response::empty());
+            try {
+                // This polymorphic call is fine - Protocol::idle() will throw an exception beforehand
+                $line = $idle_client->getConnection()->nextLine(Response::empty());
+            } catch (Exceptions\RuntimeException $e) {
+                if(strpos($e->getMessage(), "empty response") >= 0 && $idle_client->getConnection()->connected()) {
+                    $idle_client->getConnection()->done();
+                    $idle_client->getConnection()->idle();
+                    continue;
+                }
+                if(!str_contains($e->getMessage(), "connection closed")) {
+                    throw $e;
+                }
+            }
 
             if (($pos = strpos($line, "EXISTS")) !== false) {
                 $msgn = (int)substr($line, 2, $pos - 2);
