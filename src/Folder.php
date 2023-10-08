@@ -456,8 +456,6 @@ class Folder {
                 $line = $idle_client->getConnection()->nextLine(Response::empty());
             } catch (Exceptions\RuntimeException $e) {
                 if(strpos($e->getMessage(), "empty response") >= 0 && $idle_client->getConnection()->connected()) {
-                    $idle_client->getConnection()->done();
-                    $idle_client->getConnection()->idle();
                     continue;
                 }
                 if(!str_contains($e->getMessage(), "connection closed")) {
