@@ -111,6 +111,34 @@ class Folder {
     public bool $has_children;
 
     /**
+     * Indicates if folder contains drafts
+     *
+     * @var boolean
+     */
+    public bool $is_draft;
+
+    /**
+     * Indicates if folder contains sent letters
+     *
+     * @var boolean
+     */
+    public bool $is_sent;
+
+    /**
+     * Indicates if folder contains junk letters
+     *
+     * @var boolean
+     */
+    public bool $is_junk;
+
+    /**
+     * Indicates if folder is a trash
+     *
+     * @var boolean
+     */
+    public bool $is_trash;
+
+    /**
      * Indicates if folder refers to others.
      * Not provided by all IMAP servers.
      *
@@ -264,6 +292,10 @@ class Folder {
         $this->marked = in_array('\Marked', $attributes);
         $this->referral = in_array('\Referral', $attributes);
         $this->has_children = in_array('\HasChildren', $attributes);
+        $this->is_draft = in_array('\Drafts', $attributes);
+        $this->is_sent = in_array('\Sent', $attributes);
+        $this->is_junk = in_array('\Junk', $attributes);
+        $this->is_trash = in_array('\Trash', $attributes);
     }
 
     /**
