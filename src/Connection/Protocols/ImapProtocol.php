@@ -91,6 +91,24 @@ class ImapProtocol extends Protocol {
     }
 
     /**
+     * Check if the current session is connected
+     *
+     * @return bool
+     */
+    public function connected(): bool {
+        if ((bool)$this->stream) {
+            try {
+                $this->requestAndResponse('NOOP');
+                return true;
+            }
+            catch (ImapServerErrorException|RuntimeException) {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Enable tls on the current connection
      *
      * @throws ConnectionFailedException
