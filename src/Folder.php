@@ -334,7 +334,7 @@ class Folder {
     public function overview(string $sequence = null): array {
         $this->client->openFolder($this->path);
         $sequence = $sequence === null ? "1:*" : $sequence;
-        $uid = ClientManager::get('options.sequence', IMAP::ST_MSGN);
+        $uid = $this->client->getConfig()->get('options.sequence', IMAP::ST_MSGN);
         $response = $this->client->getConnection()->overview($sequence, $uid);
         return $response->validatedData();
     }
@@ -472,7 +472,7 @@ class Folder {
 
         $last_action = Carbon::now()->addSeconds($timeout);
 
-        $sequence = ClientManager::get('options.sequence', IMAP::ST_MSGN);
+        $sequence = $this->client->getConfig()->get('options.sequence', IMAP::ST_MSGN);
 
         while(true) {
             // This polymorphic call is fine - Protocol::idle() will throw an exception beforehand
@@ -607,7 +607,7 @@ class Folder {
      */
     public function setDelimiter($delimiter): void {
         if(in_array($delimiter, [null, '', ' ', false]) === true){
-            $delimiter = ClientManager::get('options.delimiter', '/');
+            $delimiter = $this->client->getConfig()->get('options.delimiter', '/');
         }
 
         $this->delimiter = $delimiter;

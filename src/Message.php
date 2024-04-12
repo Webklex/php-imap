@@ -97,11 +97,18 @@ class Message {
     protected string $mask = MessageMask::class;
 
     /**
-     * Used config
+     * Used options
      *
-     * @var array $config
+     * @var array $options
      */
-    protected array $config = [];
+    protected array $options = [];
+
+    /**
+     * All library configs
+     *
+     * @var Config $config
+     */
+    protected Config $config;
 
     /**
      * Attribute holder
@@ -205,7 +212,7 @@ class Message {
      * @throws ResponseException
      */
     public function __construct(int $uid, ?int $msglist, Client $client, int $fetch_options = null, bool $fetch_body = false, bool $fetch_flags = false, int $sequence = null) {
-        $this->boot();
+        $this->boot($client->getConfig());
 
         $default_mask = $client->getDefaultMessageMask();
         if ($default_mask != null) {
@@ -269,7 +276,7 @@ class Message {
         $reflection = new ReflectionClass(self::class);
         /** @var Message $instance */
         $instance = $reflection->newInstanceWithoutConstructor();
-        $instance->boot();
+        $instance->boot($client->getConfig());
 
         $default_mask = $client->getDefaultMessageMask();
         if ($default_mask != null) {
@@ -296,29 +303,8 @@ class Message {
 
     /**
      * Create a new message instance by reading and loading a file or remote location
-     *
-     * @throws RuntimeException
-     * @throws MessageContentFetchingException
-     * @throws ResponseException
-     * @throws ImapBadRequestException
-     * @throws InvalidMessageDateException
-     * @throws ConnectionFailedException
-     * @throws ImapServerErrorException
-     * @throws ReflectionException
-     * @throws AuthFailedException
-     * @throws MaskNotFoundException
-     */
-    public static function fromFile($filename): Message {
-        $blob = file_get_contents($filename);
-        if ($blob === false) {
-            throw new RuntimeException("Unable to read file");
-        }
-        return self::fromString($blob);
-    }
-
-    /**
-     * Create a new message instance by reading and loading a string
-     * @param string $blob
+     * @param string $filename
+     * @param ?Config $config
      *
      * @return Message
      * @throws AuthFailedException
@@ -332,13 +318,38 @@ class Message {
      * @throws ResponseException
      * @throws RuntimeException
      */
-    public static function fromString(string $blob): Message {
+    public static function fromFile(string $filename, Config $config = null): Message {
+        $blob = file_get_contents($filename);
+        if ($blob === false) {
+            throw new RuntimeException("Unable to read file");
+        }
+        return self::fromString($blob, $config);
+    }
+
+    /**
+     * Create a new message instance by reading and loading a string
+     * @param string $blob
+     * @param ?Config $config
+     *
+     * @return Message
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws InvalidMessageDateException
+     * @throws MaskNotFoundException
+     * @throws MessageContentFetchingException
+     * @throws ReflectionException
+     * @throws ResponseException
+     * @throws RuntimeException
+     */
+    public static function fromString(string $blob, Config $config = null): Message {
         $reflection = new ReflectionClass(self::class);
         /** @var Message $instance */
         $instance = $reflection->newInstanceWithoutConstructor();
-        $instance->boot();
+        $instance->boot($config);
 
-        $default_mask  = ClientManager::getMask("message");
+        $default_mask  = $instance->getConfig()->getMask("message");
         if($default_mask != ""){
             $instance->setMask($default_mask);
         }else{
@@ -361,15 +372,18 @@ class Message {
 
     /**
      * Boot a new instance
+     * @param ?Config $config
      */
-    public function boot(): void {
+    public function boot(Config $config = null): void {
         $this->attributes = [];
+        $this->client = null;
+        $this->config = $config ?? Config::make();
 
-        $this->config = ClientManager::get('options');
-        $this->available_flags = ClientManager::get('flags');
+        $this->options = $this->config->get('options');
+        $this->available_flags = $this->config->get('flags');
 
-        $this->attachments = AttachmentCollection::make([]);
-        $this->flags = FlagCollection::make([]);
+        $this->attachments = AttachmentCollection::make();
+        $this->flags = FlagCollection::make();
     }
 
     /**
@@ -543,7 +557,7 @@ class Message {
      * @throws InvalidMessageDateException
      */
     public function parseRawHeader(string $raw_header): void {
-        $this->header = new Header($raw_header);
+        $this->header = new Header($raw_header, $this->getConfig());
     }
 
     /**
@@ -786,7 +800,7 @@ class Message {
         if (is_long($option) === true) {
             $this->fetch_options = $option;
         } elseif (is_null($option) === true) {
-            $config = ClientManager::get('options.fetch', IMAP::FT_UID);
+            $config = $this->config->get('options.fetch', IMAP::FT_UID);
             $this->fetch_options = is_long($config) ? $config : 1;
         }
 
@@ -803,7 +817,7 @@ class Message {
         if (is_long($sequence)) {
             $this->sequence = $sequence;
         } elseif (is_null($sequence)) {
-            $config = ClientManager::get('options.sequence', IMAP::ST_MSGN);
+            $config = $this->config->get('options.sequence', IMAP::ST_MSGN);
             $this->sequence = is_long($config) ? $config : IMAP::ST_MSGN;
         }
 
@@ -820,7 +834,7 @@ class Message {
         if (is_bool($option)) {
             $this->fetch_body = $option;
         } elseif (is_null($option)) {
-            $config = ClientManager::get('options.fetch_body', true);
+            $config = $this->config->get('options.fetch_body', true);
             $this->fetch_body = is_bool($config) ? $config : true;
         }
 
@@ -837,7 +851,7 @@ class Message {
         if (is_bool($option)) {
             $this->fetch_flags = $option;
         } elseif (is_null($option)) {
-            $config = ClientManager::get('options.fetch_flags', true);
+            $config = $this->config->get('options.fetch_flags', true);
             $this->fetch_flags = is_bool($config) ? $config : true;
         }
 
@@ -973,7 +987,7 @@ class Message {
     public function thread(Folder $sent_folder = null, MessageCollection &$thread = null, Folder $folder = null): MessageCollection {
         $thread = $thread ?: MessageCollection::make([]);
         $folder = $folder ?: $this->getFolder();
-        $sent_folder = $sent_folder ?: $this->client->getFolderByPath(ClientManager::get("options.common_folders.sent", "INBOX/Sent"));
+        $sent_folder = $sent_folder ?: $this->client->getFolderByPath($this->config->get("options.common_folders.sent", "INBOX/Sent"));
 
         /** @var Message $message */
         foreach ($thread as $message) {
@@ -1547,11 +1561,11 @@ class Message {
 
     /**
      * Set the config
-     * @param array $config
+     * @param Config $config
      *
      * @return Message
      */
-    public function setConfig(array $config): Message {
+    public function setConfig(Config $config): Message {
         $this->config = $config;
 
         return $this;
@@ -1560,10 +1574,31 @@ class Message {
     /**
      * Get the config
      *
+     * @return Config
+     */
+    public function getConfig(): Config {
+        return $this->config;
+    }
+
+    /**
+     * Set the options
+     * @param array $options
+     *
+     * @return Message
+     */
+    public function setOptions(array $options): Message {
+        $this->options = $options;
+
+        return $this;
+    }
+
+    /**
+     * Get the options
+     *
      * @return array
      */
-    public function getConfig(): array {
-        return $this->config;
+    public function getOptions(): array {
+        return $this->options;
     }
 
     /**

@@ -13,6 +13,8 @@
 namespace Webklex\PHPIMAP\Connection\Protocols;
 
 use Exception;
+use Throwable;
+use Webklex\PHPIMAP\Config;
 use Webklex\PHPIMAP\Exceptions\AuthFailedException;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
 use Webklex\PHPIMAP\Exceptions\ImapBadRequestException;
@@ -41,10 +43,12 @@ class ImapProtocol extends Protocol {
 
     /**
      * Imap constructor.
+     * @param Config $config
      * @param bool $cert_validation set to false to skip SSL certificate validation
      * @param mixed $encryption Connection encryption method
      */
-    public function __construct(bool $cert_validation = true, mixed $encryption = false) {
+    public function __construct(Config $config, bool $cert_validation = true, mixed $encryption = false) {
+        $this->config = $config;
         $this->setCertValidation($cert_validation);
         $this->encryption = $encryption;
     }
@@ -1314,7 +1318,7 @@ class ImapProtocol extends Protocol {
             $headers = $this->headers($ids, "RFC822", $uid);
             $response->stack($headers);
             foreach ($headers->data() as $id => $raw_header) {
-                $result[$id] = (new Header($raw_header, false))->getAttributes();
+                $result[$id] = (new Header($raw_header, $this->config))->getAttributes();
             }
         }
         return $response->setResult($result)->setCanBeEmpty(true);

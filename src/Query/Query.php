@@ -18,7 +18,6 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use ReflectionException;
 use Webklex\PHPIMAP\Client;
-use Webklex\PHPIMAP\ClientManager;
 use Webklex\PHPIMAP\Exceptions\AuthFailedException;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
 use Webklex\PHPIMAP\Exceptions\EventNotFoundException;
@@ -93,18 +92,19 @@ class Query {
      */
     public function __construct(Client $client, array $extensions = []) {
         $this->setClient($client);
+        $config = $this->client->getConfig();
 
-        $this->sequence = ClientManager::get('options.sequence', IMAP::ST_MSGN);
-        if (ClientManager::get('options.fetch') === IMAP::FT_PEEK) $this->leaveUnread();
+        $this->sequence = $config->get('options.sequence', IMAP::ST_MSGN);
+        if ($config->get('options.fetch') === IMAP::FT_PEEK) $this->leaveUnread();
 
-        if (ClientManager::get('options.fetch_order') === 'desc') {
+        if ($config->get('options.fetch_order') === 'desc') {
             $this->fetch_order = 'desc';
         } else {
             $this->fetch_order = 'asc';
         }
 
-        $this->date_format = ClientManager::get('date_format', 'd M y');
-        $this->soft_fail = ClientManager::get('options.soft_fail', false);
+        $this->date_format = $config->get('date_format', 'd M y');
+        $this->soft_fail = $config->get('options.soft_fail', false);
 
         $this->setExtensions($extensions);
         $this->query = new Collection();
@@ -235,6 +235,7 @@ class Query {
         $uids = $available_messages->forPage($this->page, $this->limit)->toArray();
         $extensions = $this->getExtensions();
         if (empty($extensions) === false && method_exists($this->client->getConnection(), "fetch")) {
+            // this polymorphic call is fine - the method exists at this point
             $extensions = $this->client->getConnection()->fetch($extensions, $uids, null, $this->sequence)->validatedData();
         }
         $flags = $this->client->getConnection()->flags($uids, $this->sequence)->validatedData();
@@ -336,11 +337,12 @@ class Query {
      * @throws ResponseException
      */
     protected function populate(Collection $available_messages): MessageCollection {
-        $messages = MessageCollection::make([]);
+        $messages = MessageCollection::make();
+        $config = $this->client->getConfig();
 
         $messages->total($available_messages->count());
 
-        $message_key = ClientManager::get('options.message_key');
+        $message_key = $config->get('options.message_key');
 
         $raw_messages = $this->fetch($available_messages);
 

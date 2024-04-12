@@ -13,6 +13,7 @@
 namespace Webklex\PHPIMAP\Connection\Protocols;
 
 use Webklex\PHPIMAP\ClientManager;
+use Webklex\PHPIMAP\Config;
 use Webklex\PHPIMAP\Exceptions\AuthFailedException;
 use Webklex\PHPIMAP\Exceptions\ImapBadRequestException;
 use Webklex\PHPIMAP\Exceptions\MethodNotSupportedException;
@@ -32,10 +33,12 @@ class LegacyProtocol extends Protocol {
 
     /**
      * Imap constructor.
+     * @param Config $config
      * @param bool $cert_validation set to false to skip SSL certificate validation
      * @param mixed $encryption Connection encryption method
      */
-    public function __construct(bool $cert_validation = true, mixed $encryption = false) {
+    public function __construct(Config $config, bool $cert_validation = true, mixed $encryption = false) {
+        $this->config = $config;
         $this->setCertValidation($cert_validation);
         $this->encryption = $encryption;
     }
@@ -52,7 +55,7 @@ class LegacyProtocol extends Protocol {
      * @param string $host
      * @param int|null $port
      */
-    public function connect(string $host, int $port = null) {
+    public function connect(string $host, int $port = null): void {
         if ($this->encryption) {
             $encryption = strtolower($this->encryption);
             if ($encryption == "ssl") {
@@ -81,7 +84,7 @@ class LegacyProtocol extends Protocol {
                     $password,
                     0,
                     $attempts = 3,
-                    ClientManager::get('options.open')
+                    $this->config->get('options.open')
                 );
                 $response->addCommand("imap_open");
             } catch (\ErrorException $e) {

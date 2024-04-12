@@ -41,9 +41,16 @@ class Header {
     /**
      * Config holder
      *
-     * @var array $config
+     * @var Config $config
      */
-    protected array $config = [];
+    protected Config $config;
+
+    /**
+     * Config holder
+     *
+     * @var array $options
+     */
+    protected array $options = [];
 
     /**
      * Fallback Encoding
@@ -54,13 +61,15 @@ class Header {
 
     /**
      * Header constructor.
+     * @param Config $config
      * @param string $raw_header
      *
      * @throws InvalidMessageDateException
      */
-    public function __construct(string $raw_header) {
+    public function __construct(string $raw_header, Config $config) {
         $this->raw = $raw_header;
-        $this->config = ClientManager::get('options');
+        $this->config = $config;
+        $this->options = $this->config->get('options');
         $this->parse();
     }
 
@@ -162,7 +171,7 @@ class Header {
      * @return string|null
      */
     public function getBoundary(): ?string {
-        $regex = $this->config["boundary"] ?? "/boundary=(.*?(?=;)|(.*))/i";
+        $regex = $this->options["boundary"] ?? "/boundary=(.*?(?=;)|(.*))/i";
         $boundary = $this->find($regex);
 
         if ($boundary === null) {
@@ -229,7 +238,7 @@ class Header {
     public function rfc822_parse_headers($raw_headers): object {
         $headers = [];
         $imap_headers = [];
-        if (extension_loaded('imap') && $this->config["rfc822"]) {
+        if (extension_loaded('imap') && $this->options["rfc822"]) {
             $raw_imap_headers = (array)\imap_rfc822_parse_headers($raw_headers);
             foreach ($raw_imap_headers as $key => $values) {
                 $key = strtolower(str_replace("-", "_", $key));
@@ -418,7 +427,7 @@ class Header {
             return $this->decodeArray($value);
         }
         $original_value = $value;
-        $decoder = $this->config['decoder']['message'];
+        $decoder = $this->options['decoder']['message'];
 
         if ($value !== null) {
             if ($decoder === 'utf-8') {
@@ -490,7 +499,7 @@ class Header {
     private function decodeAddresses($values): array {
         $addresses = [];
 
-        if (extension_loaded('mailparse') && $this->config["rfc822"]) {
+        if (extension_loaded('mailparse') && $this->options["rfc822"]) {
             foreach ($values as $address) {
                 foreach (\mailparse_rfc822_parse_addresses($address) as $parsed_address) {
                     if (isset($parsed_address['address'])) {
@@ -800,9 +809,38 @@ class Header {
      *
      * @return Header
      */
-    public function setConfig(array $config): Header {
+    public function setOptions(array $config): Header {
+        $this->options = $config;
+        return $this;
+    }
+
+    /**
+     * Get the configuration used for parsing a raw header
+     *
+     * @return array
+     */
+    public function getOptions(): array {
+        return $this->options;
+    }
+
+    /**
+     * Set the configuration used for parsing a raw header
+     * @param Config $config
+     *
+     * @return Header
+     */
+    public function setConfig(Config $config): Header {
         $this->config = $config;
         return $this;
+    }
+
+    /**
+     * Get the configuration used for parsing a raw header
+     *
+     * @return Config
+     */
+    public function getConfig(): Config {
+        return $this->config;
     }
 
 }

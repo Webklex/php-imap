@@ -57,16 +57,23 @@ use Webklex\PHPIMAP\Support\Masks\AttachmentMask;
 class Attachment {
 
     /**
-     * @var Message $oMessage
+     * @var Message $message
      */
-    protected Message $oMessage;
+    protected Message $message;
 
     /**
      * Used config
      *
-     * @var array $config
+     * @var Config $config
      */
-    protected array $config = [];
+    protected Config $config;
+
+    /**
+     * Attachment options
+     *
+     * @var array $options
+     */
+    protected array $options = [];
 
     /** @var Part $part */
     protected Part $part;
@@ -100,23 +107,24 @@ class Attachment {
 
     /**
      * Attachment constructor.
-     * @param Message $oMessage
+     * @param Message $message
      * @param Part $part
      */
-    public function __construct(Message $oMessage, Part $part) {
-        $this->config = ClientManager::get('options');
+    public function __construct(Message $message, Part $part) {
+        $this->message = $message;
+        $this->config = $this->message->getConfig();
+        $this->options = $this->config->get('options');
 
-        $this->oMessage = $oMessage;
         $this->part = $part;
         $this->part_number = $part->part_number;
 
-        if ($this->oMessage->getClient()) {
-            $default_mask = $this->oMessage->getClient()?->getDefaultAttachmentMask();
+        if ($this->message->getClient()) {
+            $default_mask = $this->message->getClient()?->getDefaultAttachmentMask();
             if ($default_mask != null) {
                 $this->mask = $default_mask;
             }
         } else {
-            $default_mask = ClientManager::getMask("attachment");
+            $default_mask = $this->config->getMask("attachment");
             if ($default_mask != "") {
                 $this->mask = $default_mask;
             }
@@ -205,7 +213,7 @@ class Attachment {
         $content = $this->part->content;
 
         $this->content_type = $this->part->content_type;
-        $this->content = $this->oMessage->decodeString($content, $this->part->encoding);
+        $this->content = $this->message->decodeString($content, $this->part->encoding);
 
         // Create a hash of the raw part - this can be used to identify the attachment in the message context. However,
         // it is not guaranteed to be unique and collisions are possible.
@@ -292,7 +300,7 @@ class Attachment {
                 }
             }
 
-            $decoder = $this->config['decoder']['message'];
+            $decoder = $this->options['decoder']['message'];
             if (preg_match('/=\?([^?]+)\?(Q|B)\?(.+)\?=/i', $name, $matches)) {
                 $name = $this->part->getHeader()->decode($name);
             } elseif ($decoder === 'utf-8' && extension_loaded('imap')) {
@@ -364,7 +372,7 @@ class Attachment {
      * @return Message
      */
     public function getMessage(): Message {
-        return $this->oMessage;
+        return $this->message;
     }
 
     /**
@@ -388,6 +396,45 @@ class Attachment {
      */
     public function getMask(): string {
         return $this->mask;
+    }
+
+    /**
+     * Get the attachment options
+     * @return array
+     */
+    public function getOptions(): array {
+        return $this->options;
+    }
+
+    /**
+     * Set the attachment options
+     * @param array $options
+     *
+     * @return $this
+     */
+    public function setOptions(array $options): Attachment {
+        $this->options = $options;
+        return $this;
+    }
+
+    /**
+     * Get the used config
+     *
+     * @return Config
+     */
+    public function getConfig(): Config {
+        return $this->config;
+    }
+
+    /**
+     * Set the used config
+     * @param Config $config
+     *
+     * @return $this
+     */
+    public function setConfig(Config $config): Attachment {
+        $this->config = $config;
+        return $this;
     }
 
     /**
