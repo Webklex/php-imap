@@ -6,21 +6,43 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
+- Fixed date issue if timezone is UT and a 2 digit year #429 (thanks @ferrisbuellers)
+- Make the space optional after a comma separator #437 (thanks @marc0adam)
+- Fix bug when multipart message getHTMLBody() method returns null #455 (thanks @michalkortas)
+- Fix: Improve return type hints and return docblocks for query classes #470 (thanks @olliescase)
+- Fix - Query - Chunked - Resolved infinite loop when start chunk > 1 #477 (thanks @NeekTheNook)
 
 ### Added
 - IMAP STATUS command support added `Folder::status()` #424 (thanks @InterLinked1)
+- Add attributes and special flags #428 (thanks @sazanof)
+- Better connection check for IMAP #449 (thanks @thin-k-design)
+- Config handling moved into a new class `Config::class` to allow class serialization (sponsored by elb-BIT GmbH)
+- Support for Carbon 3 added #483
 
 ### Breaking changes
 - `Folder::getStatus()` no longer returns the results of `EXAMINE` but `STATUS` instead. If you want to use `EXAMINE` you can use the `Folder::examine()` method instead.
-
+- `ClientManager::class` has now longer access to all configs. Config handling has been moved to its own class `Config::class`. If you want to access the config you can use the retriever method `::getConfig()` instead. Example: `$client->getConfig()` or `$message->getConfig()`, etc.
+- `ClientManager::get` isn't available anymore. Use the regular config accessor instead. Example: `$cm->getConfig()`
+- `M̀essage::getConfig()` now returns the client configuration instead of the fetching options configuration. Please use `$message->getOptions()` instead.
+- `Attachment::getConfig()` now returns the client configuration instead of the fetching options configuration. Please use `$attachment->getOptions()` instead.
+- `Header::getConfig()` now returns the client configuration instead of the fetching options configuration. Please use `$header->getOptions()` instead.
+- `M̀essage::setConfig` now expects the client configuration instead of the fetching options configuration. Please use `$message->setOptions` instead.
+- `Attachment::setConfig` now expects the client configuration instead of the fetching options configuration. Please use `$attachment->setOptions` instead.
+- `Header::setConfig` now expects the client configuration instead of the fetching options configuration. Please use `$header->setOptions` instead.
+- All protocol constructors now require a `Config::class` instance 
+- The `Client::class` constructors now require a `Config::class` instance 
+- The `Part::class` constructors now require a `Config::class` instance 
+- The `Header::class` constructors now require a `Config::class` instance 
+- The `Message::fromFile` method now requires a `Config::class` instance 
+- The `Message::fromString` method now requires a `Config::class` instance 
+- The `Message::boot` method now requires a `Config::class` instance 
 
 ## [5.5.0] - 2023-06-28
 ### Fixed
 - Error token length mismatch in `ImapProtocol::readResponse` #400
 - Attachment name parsing fixed #410 #421 (thanks @nuernbergerA)
 - Additional Attachment name fallback added to prevent missing attachments
-- Attachment id is now static (based on the raw part content) and now longer random
+- Attachment id is now static (based on the raw part content) instead of random
 - Always parse the attachment description if it is available
 
 ### Added
