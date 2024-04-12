@@ -15,6 +15,7 @@ namespace Tests;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Webklex\PHPIMAP\Client;
+use Webklex\PHPIMAP\Config;
 use Webklex\PHPIMAP\Connection\Protocols\ImapProtocol;
 use Webklex\PHPIMAP\Connection\Protocols\Response;
 use Webklex\PHPIMAP\Exceptions\AuthFailedException;
@@ -42,18 +43,22 @@ class ClientTest extends TestCase {
      * @throws MaskNotFoundException
      */
     public function setUp(): void {
-        $this->client = new Client([
-                                       'protocol'   => 'imap',
-                                       'encryption' => 'ssl',
-                                       'username'   => 'foo@domain.tld',
-                                       'password'   => 'bar',
-                                       'proxy'      => [
-                                           'socket'          => null,
-                                           'request_fulluri' => false,
-                                           'username'        => null,
-                                           'password'        => null,
-                                       ],
-                                   ]);
+        $config = Config::make([
+            "accounts" => [
+                "default" => [
+                               'protocol'   => 'imap',
+                               'encryption' => 'ssl',
+                               'username'   => 'foo@domain.tld',
+                               'password'   => 'bar',
+                               'proxy'      => [
+                                   'socket'          => null,
+                                   'request_fulluri' => false,
+                                   'username'        => null,
+                                   'password'        => null,
+                               ],
+                           ]]
+                             ]);
+        $this->client = new Client($config);
     }
 
     /**
@@ -274,18 +279,19 @@ class ClientTest extends TestCase {
     }
 
     public function testClientConfig(): void {
-        $config = $this->client->getConfig();
+        $config = $this->client->getConfig()->get("accounts.".$this->client->getConfig()->getDefaultAccount());
         self::assertSame("foo@domain.tld", $config["username"]);
         self::assertSame("bar", $config["password"]);
         self::assertSame("localhost", $config["host"]);
         self::assertSame(true, $config["validate_cert"]);
         self::assertSame(993, $config["port"]);
 
-        $this->client->setConfig([
-                                     "host"     => "domain.tld",
-                                     'password' => 'bar',
-                                 ]);
-        $config = $this->client->getConfig();
+        $this->client->getConfig()->set("accounts.".$this->client->getConfig()->getDefaultAccount(), [
+            "host"     => "domain.tld",
+            'password' => 'bar',
+        ]);
+        $config = $this->client->getConfig()->get("accounts.".$this->client->getConfig()->getDefaultAccount());
+
         self::assertSame("bar", $config["password"]);
         self::assertSame("domain.tld", $config["host"]);
         self::assertSame(true, $config["validate_cert"]);

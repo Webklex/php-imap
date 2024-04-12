@@ -126,7 +126,7 @@ class MessageTest extends LiveMailboxTestCase {
     public function testThread(): void {
         $client = $this->getClient();
 
-        $delimiter = $this->getManager()->get("options.delimiter");
+        $delimiter = $this->getManager()->getConfig()->get("options.delimiter");
         $folder_path = implode($delimiter, ['INBOX', 'thread']);
 
         $folder = $client->getFolder($folder_path);
@@ -420,7 +420,7 @@ class MessageTest extends LiveMailboxTestCase {
     public function testGetMsgn(): void {
         $client = $this->getClient();
 
-        $delimiter = $this->getManager()->get("options.delimiter");
+        $delimiter = $this->getManager()->getConfig()->get("options.delimiter");
         $folder_path = implode($delimiter, ['INBOX', 'test']);
 
         $folder = $client->getFolder($folder_path);
@@ -830,13 +830,13 @@ class MessageTest extends LiveMailboxTestCase {
     public function testSetConfig(): void {
         $message = $this->getDefaultMessage();
 
-        $config = $message->getConfig();
-        self::assertIsArray($config);
+        $options = $message->getOptions();
+        self::assertIsArray($options);
 
-        $message->setConfig(["foo" => "bar"]);
-        self::assertArrayHasKey("foo", $message->getConfig());
+        $message->setOptions(["foo" => "bar"]);
+        self::assertArrayHasKey("foo", $message->getOptions());
 
-        $message->setConfig($config);
+        $message->setOptions($options);
 
         // Cleanup
         self::assertTrue($message->delete());
@@ -1406,7 +1406,7 @@ class MessageTest extends LiveMailboxTestCase {
         $client = $message->getClient();
         self::assertInstanceOf(Client::class, $client);
 
-        $delimiter = $this->getManager()->get("options.delimiter");
+        $delimiter = $this->getManager()->getConfig()->get("options.delimiter");
         $folder_path = implode($delimiter, ['INBOX', 'test']);
 
         $folder = $client->getFolder($folder_path);
@@ -2161,7 +2161,7 @@ class MessageTest extends LiveMailboxTestCase {
         $client = $message->getClient();
         self::assertInstanceOf(Client::class, $client);
 
-        $delimiter = $this->getManager()->get("options.delimiter");
+        $delimiter = $this->getManager()->getConfig()->get("options.delimiter");
         $folder_path = implode($delimiter, ['INBOX', 'test']);
 
         $folder = $client->getFolder($folder_path);

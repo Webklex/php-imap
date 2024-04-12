@@ -16,11 +16,24 @@ use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 use Webklex\PHPIMAP\Address;
 use Webklex\PHPIMAP\Attribute;
+use Webklex\PHPIMAP\Config;
 use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
 use Webklex\PHPIMAP\Header;
 use Webklex\PHPIMAP\IMAP;
 
 class HeaderTest extends TestCase {
+
+    /** @var Config $config */
+    protected Config $config;
+
+    /**
+     * Setup the test environment.
+     *
+     * @return void
+     */
+    public function setUp(): void {
+        $this->config = Config::make();
+    }
 
     /**
      * Test parsing email headers
@@ -35,7 +48,7 @@ class HeaderTest extends TestCase {
 
         $raw_header = substr($email, 0, strpos($email, "\r\n\r\n"));
 
-        $header = new Header($raw_header);
+        $header = new Header($raw_header, $this->config);
         $subject = $header->get("subject");
         $returnPath = $header->get("Return-Path");
         /** @var Carbon $date */
@@ -80,9 +93,9 @@ class HeaderTest extends TestCase {
             ->onlyMethods([])
             ->getMock();
 
-        $config = new \ReflectionProperty($mock, 'config');
+        $config = new \ReflectionProperty($mock, 'options');
         $config->setAccessible(true);
-        $config->setValue($mock, ['rfc822' => true]);
+        $config->setValue($mock, $this->config->get("options"));
 
         $mockHeader = "Content-Type: text/csv; charset=WINDOWS-1252;  name*0=\"TH_Is_a_F ile name example 20221013.c\"; name*1=sv\r\nContent-Transfer-Encoding: quoted-printable\r\nContent-Disposition: attachment; filename*0=\"TH_Is_a_F ile name example 20221013.c\"; filename*1=\"sv\"\r\n";
 

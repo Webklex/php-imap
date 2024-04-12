@@ -18,6 +18,7 @@ use ReflectionException;
 use Webklex\PHPIMAP\Attachment;
 use Webklex\PHPIMAP\Attribute;
 use Webklex\PHPIMAP\Client;
+use Webklex\PHPIMAP\Config;
 use Webklex\PHPIMAP\Connection\Protocols\Response;
 use Webklex\PHPIMAP\Exceptions\EventNotFoundException;
 use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
@@ -51,21 +52,24 @@ class MessageTest extends TestCase {
      * Setup the test environment.
      *
      * @return void
-     * @throws MaskNotFoundException
      */
     public function setUp(): void {
-        $this->client = new Client([
-                                       'protocol'   => 'imap',
-                                       'encryption' => 'ssl',
-                                       'username'   => 'foo@domain.tld',
-                                       'password'   => 'bar',
-                                       'proxy'      => [
-                                           'socket'          => null,
-                                           'request_fulluri' => false,
-                                           'username'        => null,
-                                           'password'        => null,
-                                       ],
-                                   ]);
+        $config = Config::make([
+                                   "accounts" => [
+                                       "default" => [
+                                           'protocol'   => 'imap',
+                                           'encryption' => 'ssl',
+                                           'username'   => 'foo@domain.tld',
+                                           'password'   => 'bar',
+                                           'proxy'      => [
+                                               'socket'          => null,
+                                               'request_fulluri' => false,
+                                               'username'        => null,
+                                               'password'        => null,
+                                           ],
+                                       ]]
+                               ]);
+        $this->client = new Client($config);
     }
 
     /**
