@@ -125,8 +125,6 @@ class LegacyProtocol extends Protocol {
      * @param string $token access token
      *
      * @return Response
-     * @throws AuthFailedException
-     * @throws RuntimeException
      */
     public function authenticate(string $user, string $token): Response {
         return $this->login($user, $token);
@@ -392,7 +390,7 @@ class LegacyProtocol extends Protocol {
     }
 
     /**
-     * Get a message number for a uid
+     * Get the message number of a given uid
      * @param string $id uid
      *
      * @return Response message number

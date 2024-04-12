@@ -274,7 +274,7 @@ abstract class Protocol implements ProtocolInterface {
      *
      * @param array|null $uids
      */
-    public function setUidCache(?array $uids) {
+    public function setUidCache(?array $uids): void {
         if (is_null($uids)) {
             $this->uid_cache = [];
             return;
@@ -336,7 +336,7 @@ abstract class Protocol implements ProtocolInterface {
     }
 
     /**
-     * Retrieves header/meta data from the resource stream
+     * Retrieves header/metadata from the resource stream
      *
      * @return array
      */

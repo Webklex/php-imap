@@ -12,6 +12,7 @@
 
 namespace Webklex\PHPIMAP;
 
+use Exception;
 use ReflectionClass;
 use ReflectionException;
 use Webklex\PHPIMAP\Exceptions\AuthFailedException;
@@ -87,7 +88,7 @@ class Message {
      *
      * @var ?Client
      */
-    private ?Client $client = null;
+    private ?Client $client;
 
     /**
      * Default mask
@@ -565,7 +566,7 @@ class Message {
      * @param array $raw_flags
      */
     public function parseRawFlags(array $raw_flags): void {
-        $this->flags = FlagCollection::make([]);
+        $this->flags = FlagCollection::make();
 
         foreach ($raw_flags as $flag) {
             if (str_starts_with($flag, "\\")) {
@@ -592,7 +593,7 @@ class Message {
      */
     private function parseFlags(): void {
         $this->client->openFolder($this->folder_path);
-        $this->flags = FlagCollection::make([]);
+        $this->flags = FlagCollection::make();
 
         $sequence_id = $this->getSequenceId();
         try {
@@ -628,7 +629,7 @@ class Message {
         try {
             $contents = $this->client->getConnection()->content([$sequence_id], "RFC822", $this->sequence)->validatedData();
         } catch (Exceptions\RuntimeException $e) {
-            throw new MessageContentFetchingException("failed to fetch content", 0);
+            throw new MessageContentFetchingException("failed to fetch content", 0, $e);
         }
         if (!isset($contents[$sequence_id])) {
             throw new MessageContentFetchingException("no content found", 0);
@@ -919,7 +920,7 @@ class Message {
         if (function_exists('iconv') && !EncodingAliases::isUtf7($from) && !EncodingAliases::isUtf7($to)) {
             try {
                 return iconv($from, $to.'//IGNORE', $str);
-            } catch (\Exception $e) {
+            } catch (Exception) {
                 return @iconv($from, $to, $str);
             }
         } else {
@@ -985,7 +986,7 @@ class Message {
      * @throws ResponseException
      */
     public function thread(Folder $sent_folder = null, MessageCollection &$thread = null, Folder $folder = null): MessageCollection {
-        $thread = $thread ?: MessageCollection::make([]);
+        $thread = $thread ?: MessageCollection::make();
         $folder = $folder ?: $this->getFolder();
         $sent_folder = $sent_folder ?: $this->client->getFolderByPath($this->config->get("options.common_folders.sent", "INBOX/Sent"));
 

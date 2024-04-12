@@ -205,7 +205,7 @@ class Header {
             $this->set("subject", $this->decode($header->subject));
         }
         if (property_exists($header, 'references')) {
-            $this->set("references", array_map(function ($item) {
+            $this->set("references", array_map(function($item) {
                 return str_replace(['<', '>'], '', $item);
             }, explode(" ", $header->references)));
         }
@@ -440,14 +440,14 @@ class Header {
                     $value = $tempValue;
                 } else if (extension_loaded('imap')) {
                     $value = \imap_utf8($value);
-                }else if (function_exists('iconv_mime_decode')){
+                } else if (function_exists('iconv_mime_decode')) {
                     $value = iconv_mime_decode($value, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, "UTF-8");
-                }else{
+                } else {
                     $value = mb_decode_mimeheader($value);
                 }
-            }elseif ($decoder === 'iconv') {
+            } elseif ($decoder === 'iconv') {
                 $value = iconv_mime_decode($value, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, "UTF-8");
-            }else if ($this->is_uft8($value)) {
+            } else if ($this->is_uft8($value)) {
                 $value = mb_decode_mimeheader($value);
             }
 
@@ -771,10 +771,10 @@ class Header {
                 try {
                     $parsed_date = Carbon::parse($date);
                 } catch (\Exception $_e) {
-                    if (!isset($this->config["fallback_date"])) {
+                    if (!isset($this->options["fallback_date"])) {
                         throw new InvalidMessageDateException("Invalid message date. ID:" . $this->get("message_id") . " Date:" . $header->date . "/" . $date, 1100, $e);
                     } else {
-                        $parsed_date = Carbon::parse($this->config["fallback_date"]);
+                        $parsed_date = Carbon::parse($this->options["fallback_date"]);
                     }
                 }
             }

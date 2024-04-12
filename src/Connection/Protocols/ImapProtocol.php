@@ -98,14 +98,14 @@ class ImapProtocol extends Protocol {
      * Check if the current session is connected
      *
      * @return bool
+     * @throws ImapBadRequestException
      */
     public function connected(): bool {
         if ((bool)$this->stream) {
             try {
                 $this->requestAndResponse('NOOP');
                 return true;
-            }
-            catch (ImapServerErrorException|RuntimeException) {
+            } catch (ImapServerErrorException|RuntimeException) {
                 return false;
             }
         }
@@ -120,7 +120,7 @@ class ImapProtocol extends Protocol {
      * @throws ImapServerErrorException
      * @throws RuntimeException
      */
-    protected function enableStartTls() {
+    protected function enableStartTls(): void {
         $response = $this->requestAndResponse('STARTTLS');
         $result = $response->successful() && stream_socket_enable_crypto($this->stream, true, $this->getCryptoMethod());
         if (!$result) {
@@ -324,14 +324,33 @@ class ImapProtocol extends Protocol {
 
         $original = is_array($original) ? $original : [$original];
 
+
         // last line has response code
         if ($tokens[0] == 'OK') {
             return $lines ?: [true];
         } elseif ($tokens[0] == 'NO' || $tokens[0] == 'BAD' || $tokens[0] == 'BYE') {
-            throw new ImapServerErrorException(implode("\n", $original));
+            throw new ImapServerErrorException($this->stringifyArray($original));
         }
 
-        throw new ImapBadRequestException(implode("\n", $original));
+        throw new ImapBadRequestException($this->stringifyArray($original));
+    }
+
+    /**
+     * Convert an array to a string
+     * @param array $arr array to stringify
+     *
+     * @return string stringified array
+     */
+    private function stringifyArray(array $arr): string {
+        $string = "";
+        foreach ($arr as $value) {
+            if (is_array($value)) {
+                $string .= "(" . $this->stringifyArray($value) . ")";
+            } else {
+                $string .= $value . " ";
+            }
+        }
+        return $string;
     }
 
     /**
@@ -523,7 +542,7 @@ class ImapProtocol extends Protocol {
         try {
             $result = $this->requestAndResponse('LOGOUT', [], true);
             fclose($this->stream);
-        } catch (\Throwable) {
+        } catch (Throwable) {
         }
 
         $this->reset();
@@ -572,7 +591,7 @@ class ImapProtocol extends Protocol {
 
         $result = [];
         $tokens = []; // define $tokens variable before first use
-        while (!$this->readLine($response, $tokens, $tag, false)) {
+        while (!$this->readLine($response, $tokens, $tag)) {
             if ($tokens[0] == 'FLAGS') {
                 array_shift($tokens);
                 $result['flags'] = $tokens;
@@ -645,7 +664,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function folderStatus(string $folder = 'INBOX', $arguments = ['MESSAGES', 'UNSEEN', 'RECENT', 'UIDNEXT', 'UIDVALIDITY']): Response {
-        $response = $this->requestAndResponse('STATUS', [$this->escapeString($folder), $this->escapeList($arguments)], false);
+        $response = $this->requestAndResponse('STATUS', [$this->escapeString($folder), $this->escapeList($arguments)]);
         $data = $response->validatedData();
 
         if (!isset($data[0]) || !isset($data[0][2])) {
@@ -654,7 +673,7 @@ class ImapProtocol extends Protocol {
 
         $result = [];
         $key = null;
-        foreach($data[0][2] as $value) {
+        foreach ($data[0][2] as $value) {
             if ($key === null) {
                 $key = $value;
             } else {
@@ -1245,7 +1264,7 @@ class ImapProtocol extends Protocol {
      *
      * @throws RuntimeException
      */
-    public function idle() {
+    public function idle(): void {
         $response = $this->sendRequest("IDLE");
         if (!$this->assumedNextLine($response, '+ ')) {
             throw new RuntimeException('idle failed');

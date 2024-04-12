@@ -155,7 +155,7 @@ class WhereQuery extends Query {
      *
      * @throws InvalidWhereQueryCriteriaException
      */
-    protected function push_search_criteria(string $criteria, mixed $value){
+    protected function push_search_criteria(string $criteria, mixed $value): void {
         $criteria = $this->validate_criteria($criteria);
         $value = $this->parse_value($value);
 

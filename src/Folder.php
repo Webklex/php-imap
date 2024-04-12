@@ -252,7 +252,7 @@ class Folder {
     protected function decodeName($name): string|array|bool|null {
         $parts = [];
         foreach(explode($this->delimiter, $name) as $item) {
-            $parts[] = EncodingAliases::convert($item, "UTF7-IMAP", "UTF-8");
+            $parts[] = EncodingAliases::convert($item, "UTF7-IMAP");
         }
 
         return implode($this->delimiter, $parts);
@@ -402,7 +402,7 @@ class Folder {
     public function delete(bool $expunge = true): array {
         $status = $this->client->getConnection()->deleteFolder($this->path)->validatedData();
         if($this->client->getActiveFolder() == $this->path){
-            $this->client->setActiveFolder(null);
+            $this->client->setActiveFolder();
         }
 
         if($expunge) $this->client->expunge();
@@ -527,7 +527,7 @@ class Folder {
      * @throws ResponseException
      */
     public function status(): array {
-        return $this->client->getConnection()->folderStatus($this->path, ['MESSAGES', 'UNSEEN', 'RECENT', 'UIDNEXT', 'UIDVALIDITY'])->validatedData();
+        return $this->client->getConnection()->folderStatus($this->path)->validatedData();
     }
 
     /**
