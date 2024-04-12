@@ -98,6 +98,7 @@ foreach($folders as $folder){
 ```
 
 ## Sponsors
+[![elb-BIT][ico-sponsor-elb-bit]][link-sponsor-elb-bit]
 [![Feline][ico-sponsor-feline]][link-sponsor-feline]
 
 
@@ -230,3 +231,5 @@ The MIT License (MIT). Please see [License File][link-license] for more informat
 
 [ico-sponsor-feline]: https://cdn.feline.dk/public/feline.png
 [link-sponsor-feline]: https://www.feline.dk
+[ico-sponsor-elb-bit]: https://www.elb-bit.de/user/themes/deliver/images/logo_small.png
+[link-sponsor-elb-bit]: https://www.elb-bit.de?ref=webklex/php-imap
