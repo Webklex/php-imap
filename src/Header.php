@@ -628,8 +628,7 @@ class Header {
 
                     // Get all potential extensions
                     $extensions = explode(";", substr($value, $pos + 1));
-                    $previousKey = null;
-                    $previousValue = '';
+                    $extValues = [];
 
                     foreach ($extensions as $extension) {
                         if (($pos = strpos($extension, "=")) !== false) {
@@ -637,26 +636,18 @@ class Header {
                             $key = trim(rtrim(strtolower($key)));
 
                             $matches = [];
-
                             if (preg_match('/^(?P<key_name>\w+)\*/', $key, $matches) !== 0) {
                                 $key = $matches['key_name'];
-                                $previousKey = $key;
 
                                 $value = substr($extension, $pos + 1);
                                 $value = str_replace('"', "", $value);
-                                $previousValue .= trim(rtrim($value));
+
+                                if (!isset($extValues[$key])) {
+                                    $extValues[$key] = '';
+                                }
+                                $extValues[$key] .= trim(rtrim($value));
 
                                 continue;
-                            }
-
-                            if (
-                                $previousKey !== null
-                                && $previousKey !== $key
-                                && isset($this->attributes[$previousKey]) === false
-                            ) {
-                                $this->set($previousKey, $previousValue);
-
-                                $previousValue = '';
                             }
 
                             if (isset($this->attributes[$key]) === false) {
@@ -664,14 +655,15 @@ class Header {
                                 $value = str_replace('"', "", $value);
                                 $value = trim(rtrim($value));
 
-                                $this->set($key, $value);
+                                $extValues[$key] = $value;
                             }
-
-                            $previousKey = $key;
                         }
                     }
-                    if ($previousValue !== '') {
-                        $this->set($previousKey, $previousValue);
+
+                    foreach ($extValues as $k => $v) {
+                        if (!$this->has($k)) {
+                            $this->set($k, $v);
+                        }
                     }
                 }
             }
