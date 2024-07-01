@@ -422,41 +422,29 @@ class Header {
      *
      * @return mixed
      */
-    public function decode(mixed $value): mixed {
+    private function decode($value) {
         if (is_array($value)) {
             return $this->decodeArray($value);
         }
-        $original_value = $value;
-        $decoder = $this->options['decoder']['message'];
 
         if ($value !== null) {
-            if ($decoder === 'utf-8') {
-                $decoded_values = $this->mime_header_decode($value);
-                $tempValue = "";
-                foreach ($decoded_values as $decoded_value) {
-                    $tempValue .= $this->convertEncoding($decoded_value->text, $decoded_value->charset);
-                }
-                if ($tempValue) {
-                    $value = $tempValue;
-                } else if (extension_loaded('imap')) {
-                    $value = \imap_utf8($value);
-                } else if (function_exists('iconv_mime_decode')) {
-                    $value = iconv_mime_decode($value, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, "UTF-8");
-                } else {
-                    $value = mb_decode_mimeheader($value);
-                }
-            } elseif ($decoder === 'iconv') {
-                $value = iconv_mime_decode($value, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, "UTF-8");
-            } else if ($this->is_uft8($value)) {
+            if ($this->isMimeEncoded($value)) {
                 $value = mb_decode_mimeheader($value);
-            }
-
-            if ($this->notDecoded($original_value, $value)) {
-                $value = $this->convertEncoding($original_value, $this->getEncoding($original_value));
+            } else {
+                $value = mb_convert_encoding($value, 'UTF-8', $this->getEncoding($value));
             }
         }
 
         return $value;
+    }
+
+    /**
+     * Check if a string is MIME encoded
+     * @param string $value
+     * @return bool
+     */
+    private function isMimeEncoded($value) {
+        return preg_match('/=\?.+\?=/', $value) === 1;
     }
 
     /**
