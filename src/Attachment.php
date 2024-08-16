@@ -285,11 +285,9 @@ class Attachment {
      */
     public function decodeName(?string $name): string {
         if ($name !== null) {
-            if (str_contains($name, "''")) {
-                $parts = explode("''", $name);
-                if (EncodingAliases::has($parts[0])) {
-                    $name = implode("''", array_slice($parts, 1));
-                }
+            $parts = explode("'", $name, 3);
+            if (EncodingAliases::has($parts[0])) {
+                list($charset, $language, $name) = $parts;
             }
 
             $decoder = $this->config['decoder']['message'];
@@ -302,6 +300,9 @@ class Attachment {
             // check if $name is url encoded
             if (preg_match('/%[0-9A-F]{2}/i', $name)) {
                 $name = urldecode($name);
+                if ($decoder === 'utf-8' && isset($charset)) {
+                    $name = mb_convert_encoding($name, 'UTF-8', $charset);
+                }
             }
 
             // sanitize $name
