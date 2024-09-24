@@ -212,7 +212,7 @@ class Message {
      * @throws RuntimeException
      * @throws ResponseException
      */
-    public function __construct(int $uid, ?int $msglist, Client $client, int $fetch_options = null, bool $fetch_body = false, bool $fetch_flags = false, int $sequence = null) {
+    public function __construct(int $uid, ?int $msglist, Client $client, ?int $fetch_options = null, bool $fetch_body = false, bool $fetch_flags = false, ?int $sequence = null) {
         $this->boot($client->getConfig());
 
         $default_mask = $client->getDefaultMessageMask();
@@ -319,7 +319,7 @@ class Message {
      * @throws ResponseException
      * @throws RuntimeException
      */
-    public static function fromFile(string $filename, Config $config = null): Message {
+    public static function fromFile(string $filename, ?Config $config = null): Message {
         $blob = file_get_contents($filename);
         if ($blob === false) {
             throw new RuntimeException("Unable to read file");
@@ -344,7 +344,7 @@ class Message {
      * @throws ResponseException
      * @throws RuntimeException
      */
-    public static function fromString(string $blob, Config $config = null): Message {
+    public static function fromString(string $blob, ?Config $config = null): Message {
         $reflection = new ReflectionClass(self::class);
         /** @var Message $instance */
         $instance = $reflection->newInstanceWithoutConstructor();
@@ -375,7 +375,7 @@ class Message {
      * Boot a new instance
      * @param ?Config $config
      */
-    public function boot(Config $config = null): void {
+    public function boot(?Config $config = null): void {
         $this->attributes = [];
         $this->client = null;
         $this->config = $config ?? Config::make();
@@ -985,7 +985,7 @@ class Message {
      * @throws RuntimeException
      * @throws ResponseException
      */
-    public function thread(Folder $sent_folder = null, MessageCollection &$thread = null, Folder $folder = null): MessageCollection {
+    public function thread(?Folder $sent_folder = null, ?MessageCollection &$thread = null, ?Folder $folder = null): MessageCollection {
         $thread = $thread ?: MessageCollection::make();
         $folder = $folder ?: $this->getFolder();
         $sent_folder = $sent_folder ?: $this->client->getFolderByPath($this->config->get("options.common_folders.sent", "INBOX/Sent"));
@@ -1205,7 +1205,7 @@ class Message {
      * @throws RuntimeException
      * @throws ResponseException
      */
-    public function delete(bool $expunge = true, string $trash_path = null, bool $force_move = false): bool {
+    public function delete(bool $expunge = true, ?string $trash_path = null, bool $force_move = false): bool {
         $status = $this->setFlag("Deleted");
         if ($force_move) {
             $trash_path = $trash_path === null ? $this->config["common_folders"]["trash"] : $trash_path;
@@ -1480,7 +1480,7 @@ class Message {
      * @param null|Message $message
      * @return boolean
      */
-    public function is(Message $message = null): bool {
+    public function is(?Message $message = null): bool {
         if (is_null($message)) {
             return false;
         }
@@ -1687,7 +1687,7 @@ class Message {
      *
      * @return Message
      */
-    public function setMsgn(int $msgn, int $msglist = null): Message {
+    public function setMsgn(int $msgn, ?int $msglist = null): Message {
         $this->msgn = $msgn;
         $this->msglist = $msglist;
         $this->uid = null;
@@ -1718,7 +1718,7 @@ class Message {
      * @param $uid
      * @param int|null $msglist
      */
-    public function setSequenceId($uid, int $msglist = null): void {
+    public function setSequenceId($uid, ?int $msglist = null): void {
         if ($this->getSequence() === IMAP::ST_UID) {
             $this->setUid($uid);
             $this->setMsglist($msglist);

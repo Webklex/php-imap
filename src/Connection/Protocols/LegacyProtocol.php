@@ -55,7 +55,7 @@ class LegacyProtocol extends Protocol {
      * @param string $host
      * @param int|null $port
      */
-    public function connect(string $host, int $port = null): void {
+    public function connect(string $host, ?int $port = null): void {
         if ($this->encryption) {
             $encryption = strtolower($this->encryption);
             if ($encryption == "ssl") {
@@ -360,7 +360,7 @@ class LegacyProtocol extends Protocol {
      *
      * @return Response message number for given message or all messages as array
      */
-    public function getUid(int $id = null): Response {
+    public function getUid(?int $id = null): Response {
         return $this->response()->wrap(function($response) use ($id) {
             /** @var Response $response */
             if ($id === null) {
@@ -455,7 +455,7 @@ class LegacyProtocol extends Protocol {
      *
      * @return Response new flags if $silent is false, else true or false depending on success
      */
-    public function store(array|string $flags, int $from, int $to = null, string $mode = null, bool $silent = true, int|string $uid = IMAP::ST_UID, string $item = null): Response {
+    public function store(array|string $flags, int $from, ?int $to = null, ?string $mode = null, bool $silent = true, int|string $uid = IMAP::ST_UID, ?string $item = null): Response {
         $flag = trim(is_array($flags) ? implode(" ", $flags) : $flags);
 
         return $this->response()->wrap(function($response) use ($mode, $from, $flag, $uid, $silent) {
@@ -491,7 +491,7 @@ class LegacyProtocol extends Protocol {
      *
      * @return Response
      */
-    public function appendMessage(string $folder, string $message, array $flags = null, mixed $date = null): Response {
+    public function appendMessage(string $folder, string $message, ?array $flags = null, mixed $date = null): Response {
         return $this->response("imap_append")->wrap(function($response) use ($folder, $message, $flags, $date) {
             /** @var Response $response */
             if ($date != null) {
@@ -522,7 +522,7 @@ class LegacyProtocol extends Protocol {
      *
      * @return Response
      */
-    public function copyMessage(string $folder, $from, int $to = null, int|string $uid = IMAP::ST_UID): Response {
+    public function copyMessage(string $folder, $from, ?int $to = null, int|string $uid = IMAP::ST_UID): Response {
         return $this->response("imap_mail_copy")->wrap(function($response) use ($from, $folder, $uid) {
             /** @var Response $response */
 
@@ -572,7 +572,7 @@ class LegacyProtocol extends Protocol {
      *
      * @return Response success
      */
-    public function moveMessage(string $folder, $from, int $to = null, int|string $uid = IMAP::ST_UID): Response {
+    public function moveMessage(string $folder, $from, ?int $to = null, int|string $uid = IMAP::ST_UID): Response {
         return $this->response("imap_mail_move")->wrap(function($response) use ($from, $folder, $uid) {
             if (\imap_mail_move($this->stream, $from, $this->getAddress() . $folder, $uid ? IMAP::ST_UID : IMAP::NIL)) {
                 return [

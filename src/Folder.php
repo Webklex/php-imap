@@ -331,7 +331,7 @@ class Folder {
      * @throws MessageNotFoundException
      * @throws ResponseException
      */
-    public function overview(string $sequence = null): array {
+    public function overview(?string $sequence = null): array {
         $this->client->openFolder($this->path);
         $sequence = $sequence === null ? "1:*" : $sequence;
         $uid = $this->client->getConfig()->get('options.sequence', IMAP::ST_MSGN);
@@ -353,7 +353,7 @@ class Folder {
      * @throws AuthFailedException
      * @throws ResponseException
      */
-    public function appendMessage(string $message, array $options = null, Carbon|string $internal_date = null): array {
+    public function appendMessage(string $message, ?array $options = null, Carbon|string|null $internal_date = null): array {
         /**
          * Check if $internal_date is parsed. If it is null it should not be set. Otherwise, the message can't be stored.
          * If this parameter is set, it will set the INTERNALDATE on the appended message. The parameter should be a

@@ -67,7 +67,7 @@ class ImapProtocol extends Protocol {
      *
      * @throws ConnectionFailedException
      */
-    public function connect(string $host, int $port = null): bool {
+    public function connect(string $host, ?int $port = null): bool {
         $transport = 'tcp';
         $encryption = '';
 
@@ -362,7 +362,7 @@ class ImapProtocol extends Protocol {
      * @return Response
      * @throws RuntimeException
      */
-    public function sendRequest(string $command, array $tokens = [], string &$tag = null): Response {
+    public function sendRequest(string $command, array $tokens = [], ?string &$tag = null): Response {
         if (!$tag) {
             $this->noun++;
             $tag = 'TAG' . $this->noun;
@@ -955,7 +955,7 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function store(
-        array|string $flags, int $from, int $to = null, string $mode = null, bool $silent = true, int|string $uid = IMAP::ST_UID, string $item = null
+        array|string $flags, int $from, ?int $to = null, ?string $mode = null, bool $silent = true, int|string $uid = IMAP::ST_UID, ?string $item = null
     ): Response {
         $flags = $this->escapeList(is_array($flags) ? $flags : [$flags]);
         $set = $this->buildSet($from, $to);
@@ -995,7 +995,7 @@ class ImapProtocol extends Protocol {
      * @throws ImapServerErrorException
      * @throws RuntimeException
      */
-    public function appendMessage(string $folder, string $message, array $flags = null, string $date = null): Response {
+    public function appendMessage(string $folder, string $message, ?array $flags = null, ?string $date = null): Response {
         $tokens = [];
         $tokens[] = $this->escapeString($folder);
         if ($flags !== null) {
@@ -1025,7 +1025,7 @@ class ImapProtocol extends Protocol {
      * @throws ImapServerErrorException
      * @throws RuntimeException
      */
-    public function copyMessage(string $folder, $from, int $to = null, int|string $uid = IMAP::ST_UID): Response {
+    public function copyMessage(string $folder, $from, ?int $to = null, int|string $uid = IMAP::ST_UID): Response {
         $set = $this->buildSet($from, $to);
         $command = $this->buildUIDCommand("COPY", $uid);
 
@@ -1071,7 +1071,7 @@ class ImapProtocol extends Protocol {
      * @throws ImapServerErrorException
      * @throws RuntimeException
      */
-    public function moveMessage(string $folder, $from, int $to = null, int|string $uid = IMAP::ST_UID): Response {
+    public function moveMessage(string $folder, $from, ?int $to = null, int|string $uid = IMAP::ST_UID): Response {
         $set = $this->buildSet($from, $to);
         $command = $this->buildUIDCommand("MOVE", $uid);
 
