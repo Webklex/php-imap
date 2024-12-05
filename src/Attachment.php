@@ -312,6 +312,10 @@ class Attachment {
                 $name = urldecode($name);
             }
 
+            if (EncodingAliases::has($parts[0])) {
+                $name = EncodingAliases::convert($name, $parts[0]);
+            }
+
             // sanitize $name
             // order of '..' is important
             return str_replace(['\\', '/', chr(0), ':', '..'], '', $name);
