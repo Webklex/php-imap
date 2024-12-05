@@ -22,18 +22,18 @@ use Webklex\PHPIMAP\Support\Masks\AttachmentMask;
  *
  * @package Webklex\PHPIMAP
  *
- * @property integer part_number
- * @property integer size
- * @property string content
- * @property string type
- * @property string content_type
- * @property string id
- * @property string hash
- * @property string name
- * @property string description
- * @property string filename
- * @property ?string disposition
- * @property string img_src
+ * @property integer $part_number
+ * @property integer $size
+ * @property string $content
+ * @property string $type
+ * @property string $content_type
+ * @property string $id
+ * @property string $hash
+ * @property string $name
+ * @property string $description
+ * @property string $filename
+ * @property ?string $disposition
+ * @property string $img_src
  *
  * @method integer getPartNumber()
  * @method integer setPartNumber(integer $part_number)

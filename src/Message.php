@@ -44,22 +44,22 @@ use Webklex\PHPIMAP\Traits\HasEvents;
  *
  * @package Webklex\PHPIMAP
  *
- * @property integer msglist
- * @property integer uid
- * @property integer msgn
- * @property integer size
- * @property Attribute subject
- * @property Attribute message_id
- * @property Attribute message_no
- * @property Attribute references
- * @property Attribute date
- * @property Attribute from
- * @property Attribute to
- * @property Attribute cc
- * @property Attribute bcc
- * @property Attribute reply_to
- * @property Attribute in_reply_to
- * @property Attribute sender
+ * @property integer $msglist
+ * @property integer $uid
+ * @property integer $msgn
+ * @property integer $size
+ * @property Attribute $subject
+ * @property Attribute $message_id
+ * @property Attribute $message_no
+ * @property Attribute $references
+ * @property Attribute $date
+ * @property Attribute $from
+ * @property Attribute $to
+ * @property Attribute $cc
+ * @property Attribute $bcc
+ * @property Attribute $reply_to
+ * @property Attribute $in_reply_to
+ * @property Attribute $sender
  *
  * @method integer getMsglist()
  * @method integer setMsglist($msglist)
