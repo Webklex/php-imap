@@ -307,6 +307,7 @@ class Attachment {
             if (str_contains($name, "''")) {
                 $parts = explode("''", $name);
                 if (EncodingAliases::has($parts[0])) {
+                    $encoding = $parts[0];
                     $name = implode("''", array_slice($parts, 1));
                 }
             }
@@ -321,6 +322,10 @@ class Attachment {
             // check if $name is url encoded
             if (preg_match('/%[0-9A-F]{2}/i', $name)) {
                 $name = urldecode($name);
+            }
+
+            if (isset($encoding)) {
+                $name = EncodingAliases::convert($name, $encoding);
             }
 
             // sanitize $name
