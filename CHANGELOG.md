@@ -6,6 +6,16 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
+- NaN
+
+### Added
+- NaN
+
+### Breaking changes
+- NaN
+
+## [6.0.0] - 2025-01-17
+### Fixed
 - Fixed date issue if timezone is UT and a 2 digit year #429 (thanks @ferrisbuellers)
 - Make the space optional after a comma separator #437 (thanks @marc0adam)
 - Fix bug when multipart message getHTMLBody() method returns null #455 (thanks @michalkortas)
