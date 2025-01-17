@@ -773,9 +773,9 @@ class Client {
     /**
      * Get the current active folder
      *
-     * @return string
+     * @return null|string
      */
-    public function getFolderPath(): string {
+    public function getFolderPath(): ?string {
         return $this->active_folder;
     }
 
