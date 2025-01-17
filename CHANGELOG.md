@@ -9,7 +9,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Filename sanitization is now optional (enabled via default)
 
 ### Added
-- NaN
+- Spoofing detection added #40
 
 ### Breaking changes
 - NaN

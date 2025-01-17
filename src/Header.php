@@ -18,6 +18,7 @@ use Webklex\PHPIMAP\Decoder\DecoderInterface;
 use Webklex\PHPIMAP\Exceptions\DecoderNotFoundException;
 use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
 use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
+use Webklex\PHPIMAP\Exceptions\SpoofingAttemptDetectedException;
 
 /**
  * Class Header
@@ -199,6 +200,7 @@ class Header {
      * Parse the raw headers
      *
      * @throws InvalidMessageDateException
+     * @throws SpoofingAttemptDetectedException
      */
     protected function parse(): void {
         $header = $this->rfc822_parse_headers($this->raw);
@@ -230,6 +232,11 @@ class Header {
 
         $this->extractHeaderExtensions();
         $this->findPriority();
+
+        if($this->config->get('security.detect_spoofing', true)) {
+            // Detect spoofing
+            $this->detectSpoofing();
+        }
     }
 
     /**
@@ -413,7 +420,7 @@ class Header {
      * @param object $header
      */
     private function extractAddresses(object $header): void {
-        foreach (['from', 'to', 'cc', 'bcc', 'reply_to', 'sender'] as $key) {
+        foreach (['from', 'to', 'cc', 'bcc', 'reply_to', 'sender', 'return_path', 'envelope_from', 'envelope_to', 'delivered_to'] as $key) {
             if (property_exists($header, $key)) {
                 $this->set($key, $this->parseAddresses($header->$key));
             }
@@ -758,6 +765,27 @@ class Header {
     public function setDecoder(DecoderInterface $decoder): static {
         $this->decoder = $decoder;
         return $this;
+    }
+
+    /**
+     * Detect spoofing by checking the from, reply_to, return_path, sender and envelope_from headers
+     * @throws SpoofingAttemptDetectedException
+     */
+    private function detectSpoofing(): void {
+        $header_keys = ["from", "reply_to", "return_path", "sender", "envelope_from"];
+        $potential_senders = [];
+        foreach($header_keys as $key) {
+            $header = $this->get($key);
+            foreach ($header->toArray() as $address) {
+                $potential_senders[] = $address->mailbox . "@" . $address->host;
+            }
+        }
+        if(count($potential_senders) > 1) {
+            $this->set("spoofed", true);
+            if($this->config->get('security.detect_spoofing_exception', false)) {
+                throw new SpoofingAttemptDetectedException("Potential spoofing detected. Message ID: " . $this->get("message_id") . " Senders: " . implode(", ", $potential_senders));
+            }
+        }
     }
 
 }
