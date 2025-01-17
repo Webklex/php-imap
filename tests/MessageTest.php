@@ -120,7 +120,7 @@ class MessageTest extends TestCase {
         self::assertInstanceOf(Attribute::class, $subject);
         self::assertSame("Re: [Webklex/php-imap] Read all folders? (Issue #349)", $subject->toString());
         self::assertSame("Re: [Webklex/php-imap] Read all folders? (Issue #349)", (string)$message->subject);
-        self::assertSame("<noreply@github.com>", $returnPath->toString());
+        self::assertSame("noreply@github.com", $returnPath->toString());
         self::assertSame("return_path", $returnPath->getName());
         self::assertSame("-4.299", (string)$message->get("X-Spam-Score"));
         self::assertSame("Webklex/php-imap/issues/349/1365266070@github.com", (string)$message->get("Message-ID"));
@@ -182,7 +182,7 @@ class MessageTest extends TestCase {
         self::assertInstanceOf(Attribute::class, $subject);
         self::assertSame("Re: [Webklex/php-imap] Read all folders? (Issue #349)", $subject->toString());
         self::assertSame("Re: [Webklex/php-imap] Read all folders? (Issue #349)", (string)$message->subject);
-        self::assertSame("<noreply@github.com>", $returnPath->toString());
+        self::assertSame("noreply@github.com", $returnPath->toString());
         self::assertSame("return_path", $returnPath->getName());
         self::assertSame("-4.299", (string)$message->get("X-Spam-Score"));
         self::assertSame("Webklex/php-imap/issues/349/1365266070@github.com", (string)$message->get("Message-ID"));
@@ -201,7 +201,7 @@ class MessageTest extends TestCase {
         self::assertInstanceOf(Attribute::class, $subject);
         self::assertSame("ogqMVHhz7swLaq2PfSWsZj0k99w8wtMbrb4RuHdNg53i76B7icIIM0zIWpwGFtnk", $subject->toString());
         self::assertSame("ogqMVHhz7swLaq2PfSWsZj0k99w8wtMbrb4RuHdNg53i76B7icIIM0zIWpwGFtnk", (string)$message->subject);
-        self::assertSame("<someone@domain.tld>", $returnPath->toString());
+        self::assertSame("someone@domain.tld", $returnPath->toString());
         self::assertSame("return_path", $returnPath->getName());
         self::assertSame("1.103", (string)$message->get("X-Spam-Score"));
         self::assertSame("d3a5e91963cb805cee975687d5acb1c6@swift.generated", (string)$message->get("Message-ID"));

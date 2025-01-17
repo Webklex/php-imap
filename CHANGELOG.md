@@ -7,6 +7,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ## [UNRELEASED]
 ### Fixed
 - Filename sanitization is now optional (enabled via default)
+- Address parsing improved and extended to include more cases
 
 ### Added
 - Spoofing detection added #40

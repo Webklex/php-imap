@@ -29,7 +29,13 @@ class ExampleBounceTest extends FixtureTestCase {
     public function testFixture(): void {
         $message = $this->getFixture("example_bounce.eml");
 
-        self::assertEquals("<>", $message->return_path);
+        self::assertEquals([
+                               'personal' => '',
+            'mailbox' => '',
+            'host' => '',
+            'mail' => '',
+            'full' => '',
+                           ], (array)$message->return_path->first());
         self::assertEquals([
             0 => 'from somewhere.your-server.de by somewhere.your-server.de with LMTP id 3TP8LrElAGSOaAAAmBr1xw (envelope-from <>); Thu, 02 Mar 2023 05:27:29 +0100',
             1 => 'from somewhere06.your-server.de ([1b21:2f8:e0a:50e4::2]) by somewhere.your-server.de with esmtps  (TLS1.3) tls TLS_AES_256_GCM_SHA384 (Exim 4.94.2) id 1pXaXR-0006xQ-BN for demo@foo.de; Thu, 02 Mar 2023 05:27:29 +0100',

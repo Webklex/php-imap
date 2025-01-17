@@ -50,7 +50,8 @@ class HeaderTest extends TestCase {
 
         $header = new Header($raw_header, $this->config);
         $subject = $header->get("subject");
-        $returnPath = $header->get("Return-Path");
+        $returnPath = $header->get("return_path");
+        var_dump($returnPath);
         /** @var Carbon $date */
         $date = $header->get("date")->first();
         /** @var Address $from */
@@ -69,7 +70,7 @@ class HeaderTest extends TestCase {
         self::assertInstanceOf(Attribute::class, $subject);
         self::assertSame("Re: [Webklex/php-imap] Read all folders? (Issue #349)", $subject->toString());
         self::assertSame("Re: [Webklex/php-imap] Read all folders? (Issue #349)", (string)$header->subject);
-        self::assertSame("<noreply@github.com>", $returnPath->toString());
+        self::assertSame("noreply@github.com", $returnPath->toString());
         self::assertSame("return_path", $returnPath->getName());
         self::assertSame("-4.299", (string)$header->get("X-Spam-Score"));
         self::assertSame("Webklex/php-imap/issues/349/1365266070@github.com", (string)$header->get("Message-ID"));
@@ -91,7 +92,7 @@ class HeaderTest extends TestCase {
         self::assertInstanceOf(Carbon::class, $date);
         self::assertSame("2022-12-26 08:07:14 GMT-0800", $date->format("Y-m-d H:i:s T"));
 
-        self::assertSame(50, count($header->getAttributes()));
+        self::assertSame(51, count($header->getAttributes()));
     }
 
     public function testRfc822ParseHeaders() {
