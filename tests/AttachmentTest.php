@@ -28,7 +28,7 @@ class AttachmentTest extends FixtureTestCase
     public function decodeNameDataProvider(): array
     {
         return [
-            ['../../../../../../../../../../../var/www/shell.php', '.varwwwshell.php'],
+            ['../../../../../../../../../../../var/www/shell.php', 'varwwwshell.php'],
             ['test..xml', 'test.xml'],
             [chr(0), ''],
             ['C:\\file.txt', 'Cfile.txt'],

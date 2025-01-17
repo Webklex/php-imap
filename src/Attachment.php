@@ -324,13 +324,17 @@ class Attachment {
             }
 
             // sanitize $name
-            // order of '..' is important
             $replaces = [
                 '/\\\\/' => '',
                 '/[\/\0:]+/' => '',
                 '/\.+/' => '.',
             ];
-            return preg_replace(array_keys($replaces), array_values($replaces), $name);
+            $name_starts_with_dots = str_starts_with($name, '..');
+            $name = preg_replace(array_keys($replaces), array_values($replaces), $name);
+            if($name_starts_with_dots) {
+                return substr($name, 1);
+            }
+            return $name;
         }
         return "";
     }
