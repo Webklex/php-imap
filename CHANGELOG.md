@@ -13,6 +13,10 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Fix - Query - Chunked - Resolved infinite loop when start chunk > 1 #477 (thanks @NeekTheNook)
 - Attachment with symbols in filename #436 (thanks @nuernbergerA)
 - Ignore possible untagged lines after IDLE and DONE commands #445 (thanks @gazben)
+- Fix Empty Child Folder Error #474 (thanks @bierpub)
+- Filename sanitization improved #501 (thanks @neolip)
+- `Client::getFolderPath()` return null if folder is not set #506 (thanks @arnolem)
+- Fix implicit marking of parameters as nullable, deprecated in PHP 8.4 #518 (thanks @campbell-m)
 
 ### Added
 - IMAP STATUS command support added `Folder::status()` #424 (thanks @InterLinked1)
@@ -21,6 +25,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Config handling moved into a new class `Config::class` to allow class serialization (sponsored by elb-BIT GmbH)
 - Support for Carbon 3 added #483
 - Custom decoder support added
+- Decoding filename with non-standard encoding #535 (thanks @grnsv)
 
 ### Breaking changes
 - The decoder config has been moved from `options.decoder` to `decoding` and contains now the `decoder` class to used as well as their decoding fallbacks
