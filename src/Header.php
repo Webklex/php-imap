@@ -480,16 +480,23 @@ class Header {
             if (!property_exists($address, 'personal')) {
                 $address->personal = false;
             } else {
-                $personalParts = $this->decoder->mimeHeaderDecode($address->personal);
+                $personal_slices = explode(" ", $address->personal);
+                $address->personal = "";
+                foreach ($personal_slices as $slice) {
+                    $personalParts = $this->decoder->mimeHeaderDecode($slice);
 
-                $address->personal = '';
-                foreach ($personalParts as $p) {
-                    $address->personal .= $this->decoder->convertEncoding($p->text, $this->decoder->getEncoding($p));
-                }
+                    $personal = '';
+                    foreach ($personalParts as $p) {
+                        $personal .= $this->decoder->convertEncoding($p->text, $this->decoder->getEncoding($p));
+                    }
 
-                if (str_starts_with($address->personal, "'")) {
-                    $address->personal = str_replace("'", "", $address->personal);
+                    if (str_starts_with($personal, "'")) {
+                        $personal = str_replace("'", "", $personal);
+                    }
+                    $personal = $this->decoder->decode($personal);
+                    $address->personal .= $personal . " ";
                 }
+                $address->personal = trim(rtrim($address->personal));
             }
 
             if ($address->host == ".SYNTAX-ERROR.") {

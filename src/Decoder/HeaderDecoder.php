@@ -68,11 +68,11 @@ class HeaderDecoder extends Decoder {
         if (property_exists($structure, 'parameters')) {
             foreach ($structure->parameters as $parameter) {
                 if (strtolower($parameter->attribute) == "charset") {
-                    return EncodingAliases::get($parameter->value, $this->fallback_encoding);
+                    return EncodingAliases::get($parameter->value == "default" ? EncodingAliases::detectEncoding($parameter->value) : $parameter->value, $this->fallback_encoding);
                 }
             }
         } elseif (property_exists($structure, 'charset')) {
-            return EncodingAliases::get($structure->charset, $this->fallback_encoding);
+            return EncodingAliases::get($structure->charset == "default" ? EncodingAliases::detectEncoding($structure->charset) : $structure->charset, $this->fallback_encoding);
         } elseif (is_string($structure) === true) {
             $result = mb_detect_encoding($structure);
             return $result === false ? $this->fallback_encoding : $result;
