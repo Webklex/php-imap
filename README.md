@@ -32,6 +32,7 @@ Discord: [discord.gg/rd4cN9h6][link-discord]
 - [Known issues](#known-issues)
 - [Support](#support)
 - [Features & pull requests](#features--pull-requests)
+- [Alternatives & Different Flavors](#alternatives--different-flavors)
 - [Security](#security)
 - [Credits](#credits)
 - [License](#license)
@@ -193,6 +194,14 @@ first, if you're planning to do bigger changes. Of course, you can also create a
 if you're just wishing a feature ;)
 
 
+## Alternatives & Different Flavors
+This library and especially the code flavor It's written in, is certainly not for everyone. If you are looking for a 
+different approach, you might want to check out the following libraries:
+- [ddeboer/imap](https://github.com/ddeboer/imap)
+- [barbushin/php-imap](https://github.com/barbushin/php-imap)
+- [stevebauman/php-imap](https://github.com/stevebauman/php-imap)
+
+
 ## Change log
 Please see [CHANGELOG][link-changelog] for more information what has changed recently.
 
@@ -226,7 +235,7 @@ The MIT License (MIT). Please see [License File][link-license] for more informat
 [link-changelog]: https://github.com/Webklex/php-imap/blob/master/CHANGELOG.md
 [link-hits]: https://hits.webklex.com
 [link-snyk]: https://snyk.io/vuln/composer:webklex%2Fphp-imap
-[link-discord]: https://discord.gg/rd4cN9h6
+[link-discord]: https://discord.gg/vUHrbfbDr9
 
 
 [ico-sponsor-feline]: https://cdn.feline.dk/public/feline.png
