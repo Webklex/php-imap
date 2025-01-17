@@ -159,4 +159,46 @@ class HeaderTest extends TestCase {
         $this->assertArrayHasKey('attribute_test', $mock->getAttributes());
         $this->assertEquals('attribute_test_value', $mock->get('attribute_test'));
     }
+
+    public function testExtractHeaderExtensions2() {
+        $mock = $this->getMockBuilder(Header::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods([])
+            ->getMock();
+
+        $method = new \ReflectionMethod($mock, 'extractHeaderExtensions');
+        $method->setAccessible(true);
+
+        $mockAttributes = [
+            'content_type'              => new Attribute('content_type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; name="=?utf-8?Q?=D0=A2=D0=B8=D0=BF=D0=BE=D0=B2=D0=BE=D0=B9_?= =?utf-8?Q?=D1=80=D0=B0=D1=81=D1=87=D0=B5=D1=82_=D0=BF?= =?utf-8?Q?=D0=BE=D1=82=D1=80=D0=B5=D0=B1=D0=BB=D0=B5=D0=BD?= =?utf-8?Q?=D0=B8=D1=8F_=D1=8D=D0=BB=D0=B5=D0=BA=D1=82?= =?utf-8?Q?=D1=80=D0=BE=D1=8D=D0=BD=D0=B5=D1=80=D0=B3=D0=B8=D0=B8_=D0=B2_?= =?utf-8?Q?=D0=9A=D0=9F_=D0=97=D0=B2=D0=B5=D0=B7=D0=B4?= =?utf-8?Q?=D0=BD=D1=8B=D0=B9=2Exlsx?="'),
+            'content_transfer_encoding' => new Attribute('content_transfer_encoding', 'base64'),
+            'content_disposition'       => new Attribute('content_disposition', 'attachment; name*0*=utf-8\'\'%D0%A2%D0%B8%D0%BF%D0%BE%D0%B2%D0%BE%D0%B9%20; name*1*=%D1%80%D0%B0%D1%81%D1%87%D0%B5%D1%82%20%D0%BF; name*2*=%D0%BE%D1%82%D1%80%D0%B5%D0%B1%D0%BB%D0%B5%D0%BD; name*3*=%D0%B8%D1%8F%20%D1%8D%D0%BB%D0%B5%D0%BA%D1%82; name*4*=%D1%80%D0%BE%D1%8D%D0%BD%D0%B5%D1%80%D0%B3%D0%B8; name*5*=%D0%B8%20%D0%B2%20%D0%9A%D0%9F%20%D0%97%D0%B2%D0%B5%D0%B7%D0%B4; name*6*=%D0%BD%D1%8B%D0%B9.xlsx; filename*0*=utf-8\'\'%D0%A2%D0%B8%D0%BF%D0%BE%D0%B2%D0%BE%D0%B9%20; filename*1*=%D1%80%D0%B0%D1%81%D1%87%D0%B5%D1%82%20%D0%BF; filename*2*=%D0%BE%D1%82%D1%80%D0%B5%D0%B1%D0%BB%D0%B5%D0%BD; filename*3*=%D0%B8%D1%8F%20%D1%8D%D0%BB%D0%B5%D0%BA%D1%82; filename*4*=%D1%80%D0%BE%D1%8D%D0%BD%D0%B5%D1%80%D0%B3%D0%B8; filename*5*=%D0%B8%20%D0%B2%20%D0%9A%D0%9F%20%D0%97; filename*6*=%D0%B2%D0%B5%D0%B7%D0%B4%D0%BD%D1%8B%D0%B9.xlsx; attribute_test=attribute_test_value'),
+        ];
+
+        $attributes = new \ReflectionProperty($mock, 'attributes');
+        $attributes->setAccessible(true);
+        $attributes->setValue($mock, $mockAttributes);
+
+        $method->invoke($mock);
+
+        $this->assertArrayHasKey('filename', $mock->getAttributes());
+        $this->assertArrayNotHasKey('filename*0', $mock->getAttributes());
+        $this->assertEquals('utf-8\'\'%D0%A2%D0%B8%D0%BF%D0%BE%D0%B2%D0%BE%D0%B9%20%D1%80%D0%B0%D1%81%D1%87%D0%B5%D1%82%20%D0%BF%D0%BE%D1%82%D1%80%D0%B5%D0%B1%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F%20%D1%8D%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%BE%D1%8D%D0%BD%D0%B5%D1%80%D0%B3%D0%B8%D0%B8%20%D0%B2%20%D0%9A%D0%9F%20%D0%97%D0%B2%D0%B5%D0%B7%D0%B4%D0%BD%D1%8B%D0%B9.xlsx', $mock->get('filename'));
+
+        $this->assertArrayHasKey('name', $mock->getAttributes());
+        $this->assertArrayNotHasKey('name*0', $mock->getAttributes());
+        $this->assertEquals('=?utf-8?Q?=D0=A2=D0=B8=D0=BF=D0=BE=D0=B2=D0=BE=D0=B9_?= =?utf-8?Q?=D1=80=D0=B0=D1=81=D1=87=D0=B5=D1=82_=D0=BF?= =?utf-8?Q?=D0=BE=D1=82=D1=80=D0=B5=D0=B1=D0=BB=D0=B5=D0=BD?= =?utf-8?Q?=D0=B8=D1=8F_=D1=8D=D0=BB=D0=B5=D0=BA=D1=82?= =?utf-8?Q?=D1=80=D0=BE=D1=8D=D0=BD=D0=B5=D1=80=D0=B3=D0=B8=D0=B8_=D0=B2_?= =?utf-8?Q?=D0=9A=D0=9F_=D0=97=D0=B2=D0=B5=D0=B7=D0=B4?= =?utf-8?Q?=D0=BD=D1=8B=D0=B9=2Exlsx?=', $mock->get('name'));
+
+        $this->assertArrayHasKey('content_type', $mock->getAttributes());
+        $this->assertEquals('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $mock->get('content_type')->last());
+
+        $this->assertArrayHasKey('content_transfer_encoding', $mock->getAttributes());
+        $this->assertEquals('base64', $mock->get('content_transfer_encoding'));
+
+        $this->assertArrayHasKey('content_disposition', $mock->getAttributes());
+        $this->assertEquals('attachment', $mock->get('content_disposition')->last());
+
+        $this->assertArrayHasKey('attribute_test', $mock->getAttributes());
+        $this->assertEquals('attribute_test_value', $mock->get('attribute_test'));
+    }
 }
