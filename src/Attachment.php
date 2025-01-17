@@ -328,17 +328,10 @@ class Attachment {
                 $name = EncodingAliases::convert($name, $encoding);
             }
 
-            // sanitize $name
-            $replaces = [
-                '/\\\\/' => '',
-                '/[\/\0:]+/' => '',
-                '/\.+/' => '.',
-            ];
-            $name_starts_with_dots = str_starts_with($name, '..');
-            $name = preg_replace(array_keys($replaces), array_values($replaces), $name);
-            if($name_starts_with_dots) {
-                return substr($name, 1);
+            if($this->config->get('security.sanitize_filenames', true)) {
+                $name = $this->sanitizeName($name);
             }
+
             return $name;
         }
         return "";
@@ -496,5 +489,27 @@ class Attachment {
     public function setDecoder(DecoderInterface $decoder): static {
         $this->decoder = $decoder;
         return $this;
+    }
+
+    /**
+     * Sanitize a given name to prevent common attacks
+     * !!IMPORTANT!! Do not rely on this method alone - this is just the bare minimum. Additional measures should be taken
+     * to ensure that the file is safe to use.
+     * @param string $name
+     *
+     * @return string
+     */
+    private function sanitizeName(string $name): string {
+        $replaces = [
+            '/\\\\/' => '',
+            '/[\/\0:]+/' => '',
+            '/\.+/' => '.',
+        ];
+        $name_starts_with_dots = str_starts_with($name, '..');
+        $name = preg_replace(array_keys($replaces), array_values($replaces), $name);
+        if($name_starts_with_dots) {
+            return substr($name, 1);
+        }
+        return $name;
     }
 }
