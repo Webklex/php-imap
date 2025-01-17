@@ -167,7 +167,7 @@ return [
 
     /**
      * |--------------------------------------------------------------------------
-     * | Available IMAP options
+     * | Available decoding options
      * |--------------------------------------------------------------------------
      * |
      * | Available php imap config parameters are listed below
