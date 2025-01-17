@@ -18,24 +18,30 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Better connection check for IMAP #449 (thanks @thin-k-design)
 - Config handling moved into a new class `Config::class` to allow class serialization (sponsored by elb-BIT GmbH)
 - Support for Carbon 3 added #483
+- Custom decoder support added
 
 ### Breaking changes
+- The decoder config has been moved from `options.decoder` to `decoding` and contains now the `decoder` class to used as well as their decoding fallbacks
 - `Folder::getStatus()` no longer returns the results of `EXAMINE` but `STATUS` instead. If you want to use `EXAMINE` you can use the `Folder::examine()` method instead.
 - `ClientManager::class` has now longer access to all configs. Config handling has been moved to its own class `Config::class`. If you want to access the config you can use the retriever method `::getConfig()` instead. Example: `$client->getConfig()` or `$message->getConfig()`, etc.
-- `ClientManager::get` isn't available anymore. Use the regular config accessor instead. Example: `$cm->getConfig()`
+- `ClientManager::get` isn't available anymore. Use the regular config accessor instead. Example: `$cm->getConfig()->get($key)`
 - `M̀essage::getConfig()` now returns the client configuration instead of the fetching options configuration. Please use `$message->getOptions()` instead.
 - `Attachment::getConfig()` now returns the client configuration instead of the fetching options configuration. Please use `$attachment->getOptions()` instead.
 - `Header::getConfig()` now returns the client configuration instead of the fetching options configuration. Please use `$header->getOptions()` instead.
 - `M̀essage::setConfig` now expects the client configuration instead of the fetching options configuration. Please use `$message->setOptions` instead.
 - `Attachment::setConfig` now expects the client configuration instead of the fetching options configuration. Please use `$attachment->setOptions` instead.
 - `Header::setConfig` now expects the client configuration instead of the fetching options configuration. Please use `$header->setOptions` instead.
-- All protocol constructors now require a `Config::class` instance 
-- The `Client::class` constructors now require a `Config::class` instance 
-- The `Part::class` constructors now require a `Config::class` instance 
-- The `Header::class` constructors now require a `Config::class` instance 
+- All protocol constructors now require a `Config::class` instance
+- The `Client::class` constructor now require a `Config::class` instance 
+- The `Part::class` constructor now require a `Config::class` instance 
+- The `Header::class` constructor now require a `Config::class` instance 
 - The `Message::fromFile` method now requires a `Config::class` instance 
 - The `Message::fromString` method now requires a `Config::class` instance 
 - The `Message::boot` method now requires a `Config::class` instance 
+- The `Message::decode` method has been removed. Use `Message::getDecoder()->decode($str)` instead.
+- The `Message::getEncoding` method has been removed. Use `Message::getDecoder()->getEncoding($str)` instead.
+- The `Message::convertEncoding` method has been removed. Use `Message::getDecoder()->convertEncoding()` instead.
+- The `Header::decode` method has been removed. Use `Header::getDecoder()->decode($str)` instead.
 
 ## [5.5.0] - 2023-06-28
 ### Fixed

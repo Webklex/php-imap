@@ -12,6 +12,9 @@
 
 namespace Webklex\PHPIMAP;
 
+use Webklex\PHPIMAP\Decoder\DecoderInterface;
+use Webklex\PHPIMAP\Exceptions\DecoderNotFoundException;
+
 /**
  * Class Config
  *
@@ -85,6 +88,32 @@ class Config {
         }else{
             $config = $value;
         }
+    }
+
+    /**
+     * Get the decoder for a given name
+     * @param $name string Decoder name
+     *
+     * @return DecoderInterface
+     * @throws DecoderNotFoundException
+     */
+    public function getDecoder(string $name): DecoderInterface {
+        $default_decoders = $this->get('decoding.decoder', [
+            'header' => \Webklex\PHPIMAP\Decoder\HeaderDecoder::class,
+            'message' => \Webklex\PHPIMAP\Decoder\MessageDecoder::class,
+            'attachment' => \Webklex\PHPIMAP\Decoder\AttachmentDecoder::class
+        ]);
+        $options = $this->get('decoding.options', [
+            'header' => 'utf-8',
+            'message' => 'utf-8',
+            'attachment' => 'utf-8',
+        ]);
+        if (isset($default_decoders[$name])) {
+            if (class_exists($default_decoders[$name])) {
+                return new $default_decoders[$name]($options);
+            }
+        }
+        throw new DecoderNotFoundException();
     }
 
     /**

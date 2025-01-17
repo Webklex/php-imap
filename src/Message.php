@@ -13,10 +13,14 @@
 namespace Webklex\PHPIMAP;
 
 use Exception;
+use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionException;
+use Webklex\PHPIMAP\Decoder\Decoder;
+use Webklex\PHPIMAP\Decoder\DecoderInterface;
 use Webklex\PHPIMAP\Exceptions\AuthFailedException;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
+use Webklex\PHPIMAP\Exceptions\DecoderNotFoundException;
 use Webklex\PHPIMAP\Exceptions\EventNotFoundException;
 use Webklex\PHPIMAP\Exceptions\FolderFetchingException;
 use Webklex\PHPIMAP\Exceptions\GetMessagesFailedException;
@@ -35,7 +39,6 @@ use Webklex\PHPIMAP\Exceptions\RuntimeException;
 use Webklex\PHPIMAP\Support\AttachmentCollection;
 use Webklex\PHPIMAP\Support\FlagCollection;
 use Webklex\PHPIMAP\Support\Masks\MessageMask;
-use Illuminate\Support\Str;
 use Webklex\PHPIMAP\Support\MessageCollection;
 use Webklex\PHPIMAP\Traits\HasEvents;
 
@@ -110,6 +113,13 @@ class Message {
      * @var Config $config
      */
     protected Config $config;
+
+    /**
+     * Decoder instance
+     *
+     * @var DecoderInterface $decoder
+     */
+    protected DecoderInterface $decoder;
 
     /**
      * Attribute holder
@@ -374,11 +384,13 @@ class Message {
     /**
      * Boot a new instance
      * @param ?Config $config
+     * @throws DecoderNotFoundException
      */
     public function boot(Config $config = null): void {
         $this->attributes = [];
         $this->client = null;
         $this->config = $config ?? Config::make();
+        $this->decoder = $this->config->getDecoder("message");
 
         $this->options = $this->config->get('options');
         $this->available_flags = $this->config->get('flags');
@@ -732,9 +744,9 @@ class Message {
         if ($part->isAttachment()) {
             $this->fetchAttachment($part);
         } else {
-            $encoding = $this->getEncoding($part);
+            $encoding = $this->decoder->getEncoding($part);
 
-            $content = $this->decodeString($part->content, $part->encoding);
+            $content = $this->decoder->decode($part->content, $part->encoding);
 
             // We don't need to do convertEncoding() if charset is ASCII (us-ascii):
             //     ASCII is a subset of UTF-8, so all ASCII files are already UTF-8 encoded
@@ -748,7 +760,7 @@ class Message {
             //
             // convertEncoding() function basically means convertToUtf8(), so when we convert ASCII string into UTF-8 it gets broken.
             if ($encoding != 'us-ascii') {
-                $content = $this->convertEncoding($content, $encoding);
+                $content = $this->decoder->convertEncoding($content, $encoding);
             }
 
             $this->addBody($part->subtype ?? '', $content);
@@ -857,100 +869,6 @@ class Message {
         }
 
         return $this;
-    }
-
-    /**
-     * Decode a given string
-     * @param $string
-     * @param $encoding
-     *
-     * @return string
-     */
-    public function decodeString($string, $encoding): string {
-        switch ($encoding) {
-            case IMAP::MESSAGE_ENC_BINARY:
-                if (extension_loaded('imap')) {
-                    return base64_decode(\imap_binary($string));
-                }
-                return base64_decode($string);
-            case IMAP::MESSAGE_ENC_BASE64:
-                return base64_decode($string);
-            case IMAP::MESSAGE_ENC_QUOTED_PRINTABLE:
-                return quoted_printable_decode($string);
-            case IMAP::MESSAGE_ENC_8BIT:
-            case IMAP::MESSAGE_ENC_7BIT:
-            case IMAP::MESSAGE_ENC_OTHER:
-            default:
-                return $string;
-        }
-    }
-
-    /**
-     * Convert the encoding
-     * @param $str
-     * @param string $from
-     * @param string $to
-     *
-     * @return mixed|string
-     */
-    public function convertEncoding($str, string $from = "ISO-8859-2", string $to = "UTF-8"): mixed {
-
-        $from = EncodingAliases::get($from);
-        $to = EncodingAliases::get($to);
-
-        if ($from === $to) {
-            return $str;
-        }
-
-        // We don't need to do convertEncoding() if charset is ASCII (us-ascii):
-        //     ASCII is a subset of UTF-8, so all ASCII files are already UTF-8 encoded
-        //     https://stackoverflow.com/a/11303410
-        //
-        // us-ascii is the same as ASCII:
-        //     ASCII is the traditional name for the encoding system; the Internet Assigned Numbers Authority (IANA)
-        //     prefers the updated name US-ASCII, which clarifies that this system was developed in the US and
-        //     based on the typographical symbols predominantly in use there.
-        //     https://en.wikipedia.org/wiki/ASCII
-        //
-        // convertEncoding() function basically means convertToUtf8(), so when we convert ASCII string into UTF-8 it gets broken.
-        if (strtolower($from ?? '') == 'us-ascii' && $to == 'UTF-8') {
-            return $str;
-        }
-
-        if (function_exists('iconv') && !EncodingAliases::isUtf7($from) && !EncodingAliases::isUtf7($to)) {
-            try {
-                return iconv($from, $to.'//IGNORE', $str);
-            } catch (Exception) {
-                return @iconv($from, $to, $str);
-            }
-        } else {
-            if (!$from) {
-                return mb_convert_encoding($str, $to);
-            }
-            return mb_convert_encoding($str, $to, $from);
-        }
-    }
-
-    /**
-     * Get the encoding of a given abject
-     * @param object|string $structure
-     *
-     * @return string
-     */
-    public function getEncoding(object|string $structure): string {
-        if (property_exists($structure, 'parameters')) {
-            foreach ($structure->parameters as $parameter) {
-                if (strtolower($parameter->attribute) == "charset") {
-                    return EncodingAliases::get($parameter->value, "ISO-8859-2");
-                }
-            }
-        } elseif (property_exists($structure, 'charset')) {
-            return EncodingAliases::get($structure->charset, "ISO-8859-2");
-        } elseif (is_string($structure) === true) {
-            return EncodingAliases::detectEncoding($structure);
-        }
-
-        return 'UTF-8';
     }
 
     /**
@@ -1725,6 +1643,26 @@ class Message {
         } else {
             $this->setMsgn($uid, $msglist);
         }
+    }
+
+    /**
+     * Get the decoder instance
+     *
+     * @return DecoderInterface
+     */
+    public function getDecoder(): DecoderInterface {
+        return $this->decoder;
+    }
+
+    /**
+     * Set the decoder instance
+     * @param DecoderInterface $decoder
+     *
+     * @return $this
+     */
+    public function setDecoder(DecoderInterface $decoder): static {
+        $this->decoder = $decoder;
+        return $this;
     }
 
     /**

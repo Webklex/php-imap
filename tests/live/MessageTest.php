@@ -97,7 +97,7 @@ class MessageTest extends LiveMailboxTestCase {
      */
     public function testConvertEncoding(): void {
         $message = $this->getDefaultMessage();
-        self::assertEquals("Entwürfe+", $message->convertEncoding("Entw&APw-rfe+", "UTF7-IMAP", "UTF-8"));
+        self::assertEquals("Entwürfe+", $message->getDecoder()->convertEncoding("Entw&APw-rfe+", "UTF7-IMAP", "UTF-8"));
 
         // Cleanup
         self::assertTrue($message->delete());
@@ -961,7 +961,7 @@ class MessageTest extends LiveMailboxTestCase {
         $message = $this->getDefaultMessage();
 
         $string = '<p class=3D"MsoNormal">Test<o:p></o:p></p>';
-        self::assertEquals('<p class="MsoNormal">Test<o:p></o:p></p>', $message->decodeString($string, IMAP::MESSAGE_ENC_QUOTED_PRINTABLE));
+        self::assertEquals('<p class="MsoNormal">Test<o:p></o:p></p>', $message->getDecoder()->decode($string, IMAP::MESSAGE_ENC_QUOTED_PRINTABLE));
 
         // Cleanup
         self::assertTrue($message->delete());

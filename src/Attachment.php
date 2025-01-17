@@ -13,6 +13,8 @@
 namespace Webklex\PHPIMAP;
 
 use Illuminate\Support\Str;
+use Webklex\PHPIMAP\Decoder\DecoderInterface;
+use Webklex\PHPIMAP\Exceptions\DecoderNotFoundException;
 use Webklex\PHPIMAP\Exceptions\MaskNotFoundException;
 use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
 use Webklex\PHPIMAP\Support\Masks\AttachmentMask;
@@ -79,6 +81,13 @@ class Attachment {
     protected Part $part;
 
     /**
+     * Decoder instance
+     *
+     * @var DecoderInterface $decoder
+     */
+    protected DecoderInterface $decoder;
+
+    /**
      * Attribute holder
      *
      * @var array $attributes
@@ -109,11 +118,13 @@ class Attachment {
      * Attachment constructor.
      * @param Message $message
      * @param Part $part
+     * @throws DecoderNotFoundException
      */
     public function __construct(Message $message, Part $part) {
         $this->message = $message;
         $this->config = $this->message->getConfig();
         $this->options = $this->config->get('options');
+        $this->decoder = $this->config->getDecoder("attachment");
 
         $this->part = $part;
         $this->part_number = $part->part_number;
@@ -213,7 +224,7 @@ class Attachment {
         $content = $this->part->content;
 
         $this->content_type = $this->part->content_type;
-        $this->content = $this->message->decodeString($content, $this->part->encoding);
+        $this->content = $this->decoder->decode($content, $this->part->encoding);
 
         // Create a hash of the raw part - this can be used to identify the attachment in the message context. However,
         // it is not guaranteed to be unique and collisions are possible.
@@ -245,7 +256,7 @@ class Attachment {
         }
 
         if (($description = $this->part->description) !== null) {
-            $this->description = $this->part->getHeader()->decode($description);
+            $this->description = $this->part->getHeader()->getDecoder()->decode($description);
         }
 
         if (($name = $this->part->name) !== null) {
@@ -300,9 +311,9 @@ class Attachment {
                 }
             }
 
-            $decoder = $this->options['decoder']['message'];
+            $decoder = $this->decoder->getOptions()['message'];
             if (preg_match('/=\?([^?]+)\?(Q|B)\?(.+)\?=/i', $name, $matches)) {
-                $name = $this->part->getHeader()->decode($name);
+                $name = $this->part->getHeader()->getDecoder()->decode($name);
             } elseif ($decoder === 'utf-8' && extension_loaded('imap')) {
                 $name = \imap_utf8($name);
             }
@@ -451,5 +462,25 @@ class Attachment {
         }
 
         throw new MaskNotFoundException("Unknown mask provided: " . $mask);
+    }
+
+    /**
+     * Get the decoder instance
+     *
+     * @return DecoderInterface
+     */
+    public function getDecoder(): DecoderInterface {
+        return $this->decoder;
+    }
+
+    /**
+     * Set the decoder instance
+     * @param DecoderInterface $decoder
+     *
+     * @return $this
+     */
+    public function setDecoder(DecoderInterface $decoder): static {
+        $this->decoder = $decoder;
+        return $this;
     }
 }

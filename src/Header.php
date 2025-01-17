@@ -14,6 +14,8 @@ namespace Webklex\PHPIMAP;
 
 
 use Carbon\Carbon;
+use Webklex\PHPIMAP\Decoder\DecoderInterface;
+use Webklex\PHPIMAP\Exceptions\DecoderNotFoundException;
 use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
 use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
 
@@ -53,11 +55,11 @@ class Header {
     protected array $options = [];
 
     /**
-     * Fallback Encoding
+     * Decoder instance
      *
-     * @var string
+     * @var DecoderInterface $decoder
      */
-    public string $fallback_encoding = 'UTF-8';
+    protected DecoderInterface $decoder;
 
     /**
      * Header constructor.
@@ -65,8 +67,10 @@ class Header {
      * @param string $raw_header
      *
      * @throws InvalidMessageDateException
+     * @throws DecoderNotFoundException
      */
     public function __construct(string $raw_header, Config $config) {
+        $this->decoder = $config->getDecoder("header");
         $this->raw = $raw_header;
         $this->config = $config;
         $this->options = $this->config->get('options');
@@ -202,7 +206,7 @@ class Header {
         $this->extractAddresses($header);
 
         if (property_exists($header, 'subject')) {
-            $this->set("subject", $this->decode($header->subject));
+            $this->set("subject", $this->decoder->decode($header->subject));
         }
         if (property_exists($header, 'references')) {
             $this->set("references", array_map(function($item) {
@@ -332,147 +336,6 @@ class Header {
     }
 
     /**
-     * Decode MIME header elements
-     * @link https://php.net/manual/en/function.imap-mime-header-decode.php
-     * @param string $text The MIME text
-     *
-     * @return array The decoded elements are returned in an array of objects, where each
-     * object has two properties, charset and text.
-     */
-    public function mime_header_decode(string $text): array {
-        if (extension_loaded('imap')) {
-            $result = \imap_mime_header_decode($text);
-            return is_array($result) ? $result : [];
-        }
-        $charset = $this->getEncoding($text);
-        return [(object)[
-            "charset" => $charset,
-            "text"    => $this->convertEncoding($text, $charset)
-        ]];
-    }
-
-    /**
-     * Check if a given pair of strings has been decoded
-     * @param $encoded
-     * @param $decoded
-     *
-     * @return bool
-     */
-    private function notDecoded($encoded, $decoded): bool {
-        return str_starts_with($decoded, '=?')
-            && strlen($decoded) - 2 === strpos($decoded, '?=')
-            && str_contains($encoded, $decoded);
-    }
-
-    /**
-     * Convert the encoding
-     * @param $str
-     * @param string $from
-     * @param string $to
-     *
-     * @return mixed|string
-     */
-    public function convertEncoding($str, string $from = "ISO-8859-2", string $to = "UTF-8"): mixed {
-        $from = EncodingAliases::get($from, $this->fallback_encoding);
-        $to = EncodingAliases::get($to, $this->fallback_encoding);
-
-        if ($from === $to) {
-            return $str;
-        }
-
-        return EncodingAliases::convert($str, $from, $to);
-    }
-
-    /**
-     * Get the encoding of a given abject
-     * @param object|string $structure
-     *
-     * @return string
-     */
-    public function getEncoding(object|string $structure): string {
-        if (property_exists($structure, 'parameters')) {
-            foreach ($structure->parameters as $parameter) {
-                if (strtolower($parameter->attribute) == "charset") {
-                    return EncodingAliases::get($parameter->value, $this->fallback_encoding);
-                }
-            }
-        } elseif (property_exists($structure, 'charset')) {
-            return EncodingAliases::get($structure->charset, $this->fallback_encoding);
-        } elseif (is_string($structure) === true) {
-            $result = mb_detect_encoding($structure);
-            return $result === false ? $this->fallback_encoding : $result;
-        }
-
-        return $this->fallback_encoding;
-    }
-
-    /**
-     * Test if a given value is utf-8 encoded
-     * @param $value
-     *
-     * @return bool
-     */
-    private function is_uft8($value): bool {
-        return str_starts_with(strtolower($value), '=?utf-8?');
-    }
-
-    /**
-     * Try to decode a specific header
-     * @param mixed $value
-     *
-     * @return mixed
-     */
-    public function decode(mixed $value): mixed {
-        if (is_array($value)) {
-            return $this->decodeArray($value);
-        }
-        $original_value = $value;
-        $decoder = $this->options['decoder']['message'];
-
-        if ($value !== null) {
-            if ($decoder === 'utf-8') {
-                $decoded_values = $this->mime_header_decode($value);
-                $tempValue = "";
-                foreach ($decoded_values as $decoded_value) {
-                    $tempValue .= $this->convertEncoding($decoded_value->text, $decoded_value->charset);
-                }
-                if ($tempValue) {
-                    $value = $tempValue;
-                } else if (extension_loaded('imap')) {
-                    $value = \imap_utf8($value);
-                } else if (function_exists('iconv_mime_decode')) {
-                    $value = iconv_mime_decode($value, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, "UTF-8");
-                } else {
-                    $value = mb_decode_mimeheader($value);
-                }
-            } elseif ($decoder === 'iconv') {
-                $value = iconv_mime_decode($value, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, "UTF-8");
-            } else if ($this->is_uft8($value)) {
-                $value = mb_decode_mimeheader($value);
-            }
-
-            if ($this->notDecoded($original_value, $value)) {
-                $value = $this->convertEncoding($original_value, $this->getEncoding($original_value));
-            }
-        }
-
-        return $value;
-    }
-
-    /**
-     * Decode a given array
-     * @param array $values
-     *
-     * @return array
-     */
-    private function decodeArray(array $values): array {
-        foreach ($values as $key => $value) {
-            $values[$key] = $this->decode($value);
-        }
-        return $values;
-    }
-
-    /**
      * Try to extract the priority from a given raw header string
      */
     private function findPriority(): void {
@@ -582,11 +445,11 @@ class Header {
             if (!property_exists($address, 'personal')) {
                 $address->personal = false;
             } else {
-                $personalParts = $this->mime_header_decode($address->personal);
+                $personalParts = $this->decoder->mimeHeaderDecode($address->personal);
 
                 $address->personal = '';
                 foreach ($personalParts as $p) {
-                    $address->personal .= $this->convertEncoding($p->text, $this->getEncoding($p));
+                    $address->personal .= $this->decoder->convertEncoding($p->text, $this->decoder->getEncoding($p));
                 }
 
                 if (str_starts_with($address->personal, "'")) {
@@ -841,6 +704,26 @@ class Header {
      */
     public function getConfig(): Config {
         return $this->config;
+    }
+
+    /**
+     * Get the decoder instance
+     *
+     * @return DecoderInterface
+     */
+    public function getDecoder(): DecoderInterface {
+        return $this->decoder;
+    }
+
+    /**
+     * Set the decoder instance
+     * @param DecoderInterface $decoder
+     *
+     * @return $this
+     */
+    public function setDecoder(DecoderInterface $decoder): static {
+        $this->decoder = $decoder;
+        return $this;
     }
 
 }
