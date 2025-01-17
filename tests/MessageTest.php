@@ -124,7 +124,7 @@ class MessageTest extends TestCase {
         self::assertSame("return_path", $returnPath->getName());
         self::assertSame("-4.299", (string)$message->get("X-Spam-Score"));
         self::assertSame("Webklex/php-imap/issues/349/1365266070@github.com", (string)$message->get("Message-ID"));
-        self::assertSame(6, $message->get("received")->count());
+        self::assertSame(5, $message->get("received")->count());
         self::assertSame(IMAP::MESSAGE_PRIORITY_UNKNOWN, (int)$message->get("priority")());
     }
 
@@ -186,7 +186,7 @@ class MessageTest extends TestCase {
         self::assertSame("return_path", $returnPath->getName());
         self::assertSame("-4.299", (string)$message->get("X-Spam-Score"));
         self::assertSame("Webklex/php-imap/issues/349/1365266070@github.com", (string)$message->get("Message-ID"));
-        self::assertSame(6, $message->get("received")->count());
+        self::assertSame(5, $message->get("received")->count());
         self::assertSame(IMAP::MESSAGE_PRIORITY_UNKNOWN, (int)$message->get("priority")());
 
         self::assertNull($message->getClient());
@@ -205,7 +205,7 @@ class MessageTest extends TestCase {
         self::assertSame("return_path", $returnPath->getName());
         self::assertSame("1.103", (string)$message->get("X-Spam-Score"));
         self::assertSame("d3a5e91963cb805cee975687d5acb1c6@swift.generated", (string)$message->get("Message-ID"));
-        self::assertSame(5, $message->get("received")->count());
+        self::assertSame(4, $message->get("received")->count());
         self::assertSame(IMAP::MESSAGE_PRIORITY_HIGHEST, (int)$message->get("priority")());
 
         self::assertNull($message->getClient());

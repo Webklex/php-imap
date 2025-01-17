@@ -59,6 +59,13 @@ class HeaderTest extends TestCase {
         $to = $header->get("to")->first();
 
         self::assertSame($raw_header, $header->raw);
+        self::assertSame([
+                             0 => 'from mx.domain.tld by localhost with LMTP id SABVMNfGqWP+PAAA0J78UA (envelope-from <noreply@github.com>) for <someone@domain.tld>; Mon, 26 Dec 2022 17:07:51 +0100',
+                             1 => 'from localhost (localhost [127.0.0.1]) by mx.domain.tld (Postfix) with ESMTP id C3828140227 for <someone@domain.tld>; Mon, 26 Dec 2022 17:07:51 +0100 (CET)',
+                             2 => 'from mx.domain.tld ([127.0.0.1]) by localhost (mx.domain.tld [127.0.0.1]) (amavisd-new, port 10024) with ESMTP id JcIS9RuNBTNx for <someone@domain.tld>; Mon, 26 Dec 2022 17:07:21 +0100 (CET)',
+                             3 => 'from smtp.github.com (out-26.smtp.github.com [192.30.252.209]) (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits)) (No client certificate requested) by mx.domain.tld (Postfix) with ESMTPS id 6410B13FEB2 for <someone@domain.tld>; Mon, 26 Dec 2022 17:07:21 +0100 (CET)',
+                             4 => 'from github-lowworker-891b8d2.va3-iad.github.net (github-lowworker-891b8d2.va3-iad.github.net [10.48.109.104]) by smtp.github.com (Postfix) with ESMTP id 176985E0200 for <someone@domain.tld>; Mon, 26 Dec 2022 08:07:14 -0800 (PST)',
+                         ], $header->get("received")->toArray());
         self::assertInstanceOf(Attribute::class, $subject);
         self::assertSame("Re: [Webklex/php-imap] Read all folders? (Issue #349)", $subject->toString());
         self::assertSame("Re: [Webklex/php-imap] Read all folders? (Issue #349)", (string)$header->subject);
@@ -66,7 +73,7 @@ class HeaderTest extends TestCase {
         self::assertSame("return_path", $returnPath->getName());
         self::assertSame("-4.299", (string)$header->get("X-Spam-Score"));
         self::assertSame("Webklex/php-imap/issues/349/1365266070@github.com", (string)$header->get("Message-ID"));
-        self::assertSame(6, $header->get("received")->count());
+        self::assertSame(5, $header->get("received")->count());
         self::assertSame(IMAP::MESSAGE_PRIORITY_UNKNOWN, (int)$header->get("priority")());
 
         self::assertSame("Username", $from->personal);
@@ -84,7 +91,7 @@ class HeaderTest extends TestCase {
         self::assertInstanceOf(Carbon::class, $date);
         self::assertSame("2022-12-26 08:07:14 GMT-0800", $date->format("Y-m-d H:i:s T"));
 
-        self::assertSame(48, count($header->getAttributes()));
+        self::assertSame(50, count($header->getAttributes()));
     }
 
     public function testRfc822ParseHeaders() {

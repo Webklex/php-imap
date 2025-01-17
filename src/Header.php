@@ -484,61 +484,95 @@ class Header {
                 $value = (string)$value;
             }
             // Only parse strings and don't parse any attributes like the user-agent
-            if (!in_array($key, ["user-agent", "subject"])) {
-                if (($pos = strpos($value, ";")) !== false) {
-                    $original = substr($value, 0, $pos);
-                    $this->set($key, trim(rtrim($original)));
-
-                    // Get all potential extensions
-                    $extensions = explode(";", substr($value, $pos + 1));
-                    $previousKey = null;
-                    $previousValue = '';
-
-                    foreach ($extensions as $extension) {
-                        if (($pos = strpos($extension, "=")) !== false) {
-                            $key = substr($extension, 0, $pos);
-                            $key = trim(rtrim(strtolower($key)));
-
-                            $matches = [];
-
-                            if (preg_match('/^(?P<key_name>\w+)\*/', $key, $matches) !== 0) {
-                                $key = $matches['key_name'];
-                                $previousKey = $key;
-
-                                $value = substr($extension, $pos + 1);
-                                $value = str_replace('"', "", $value);
-                                $previousValue .= trim(rtrim($value));
-
-                                continue;
-                            }
-
-                            if (
-                                $previousKey !== null
-                                && $previousKey !== $key
-                                && isset($this->attributes[$previousKey]) === false
-                            ) {
-                                $this->set($previousKey, $previousValue);
-
-                                $previousValue = '';
-                            }
-
-                            if (isset($this->attributes[$key]) === false) {
-                                $value = substr($extension, $pos + 1);
-                                $value = str_replace('"', "", $value);
-                                $value = trim(rtrim($value));
-
-                                $this->set($key, $value);
-                            }
-
-                            $previousKey = $key;
+            if (!in_array($key, ["user-agent", "subject", "received"])) {
+                if (str_contains($value, ";") && str_contains($value, "=")) {
+                    $_attributes = $this->read_attribute($value);
+                    foreach($_attributes as $_key => $_value) {
+                        if($_value === "") {
+                            $this->set($key, $_key);
                         }
-                    }
-                    if ($previousValue !== '') {
-                        $this->set($previousKey, $previousValue);
+                        if (!isset($this->attributes[$_key])) {
+                            $this->set($_key, $_value);
+                        }
                     }
                 }
             }
         }
+    }
+
+    /**
+     * Read a given attribute string
+     * - this isn't pretty, but it works - feel free to improve :)
+     * @param string $raw_attribute
+     * @return array
+     */
+    private function read_attribute(string $raw_attribute): array {
+        $attributes = [];
+        $key = '';
+        $value = '';
+        $inside_word = false;
+        $inside_key = true;
+        $escaped = false;
+        foreach (str_split($raw_attribute) as $char) {
+            if($escaped) {
+                $escaped = false;
+                continue;
+            }
+            if($inside_word) {
+                if($char === '\\') {
+                    $escaped = true;
+                }elseif($char === "\"" && $value !== "") {
+                    $inside_word = false;
+                }else{
+                    $value .= $char;
+                }
+            }else{
+                if($inside_key) {
+                    if($char === '"') {
+                        $inside_word = true;
+                    }elseif($char === ';'){
+                        $attributes[$key] = $value;
+                        $key = '';
+                        $value = '';
+                        $inside_key = true;
+                    }elseif($char === '=') {
+                        $inside_key = false;
+                    }else{
+                        $key .= $char;
+                    }
+                }else{
+                    if($char === '"' && $value === "") {
+                        $inside_word = true;
+                    }elseif($char === ';'){
+                        $attributes[$key] = $value;
+                        $key = '';
+                        $value = '';
+                        $inside_key = true;
+                    }else{
+                        $value .= $char;
+                    }
+                }
+            }
+        }
+        $attributes[$key] = $value;
+        $result = [];
+
+        foreach($attributes as $key => $value) {
+            if (($pos = strpos($key, "*")) !== false) {
+                $key = substr($key, 0, $pos);
+            }
+            $key = trim(rtrim(strtolower($key)));
+
+            if(!isset($result[$key])) {
+                $result[$key] = "";
+            }
+            $value = trim(rtrim(str_replace(["\r", "\n"], "", $value)));
+            if(str_starts_with($value, "\"") && str_ends_with($value, "\"")) {
+                $value = substr($value, 1, -1);
+            }
+            $result[$key] .= $value;
+        }
+        return $result;
     }
 
     /**

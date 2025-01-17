@@ -11,6 +11,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Fix bug when multipart message getHTMLBody() method returns null #455 (thanks @michalkortas)
 - Fix: Improve return type hints and return docblocks for query classes #470 (thanks @olliescase)
 - Fix - Query - Chunked - Resolved infinite loop when start chunk > 1 #477 (thanks @NeekTheNook)
+- Attachment with symbols in filename #436
 
 ### Added
 - IMAP STATUS command support added `Folder::status()` #424 (thanks @InterLinked1)
