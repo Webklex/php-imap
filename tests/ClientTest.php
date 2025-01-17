@@ -83,6 +83,40 @@ class ClientTest extends TestCase {
         self::assertArrayHasKey("new", $this->client->getDefaultEvents("message"));
     }
 
+    /**
+     * @throws MaskNotFoundException
+     */
+    public function testClientClone(): void {
+        $config = Config::make([
+                                   "accounts" => [
+                                       "default" => [
+                                           'host'  => 'example.com',
+                                           'port'  => 993,
+                                           'protocol'  => 'imap', //might also use imap, [pop3 or nntp (untested)]
+                                           'encryption'    => 'ssl', // Supported: false, 'ssl', 'tls'
+                                           'validate_cert' => true,
+                                           'username' => 'root@example.com',
+                                           'password' => 'foo',
+                                           'authentication' => null,
+                                           'rfc' => 'RFC822', // If you are using iCloud, you might want to set this to 'BODY'
+                                           'proxy' => [
+                                               'socket' => null,
+                                               'request_fulluri' => false,
+                                               'username' => null,
+                                               'password' => null,
+                                           ],
+                                           "timeout" => 30,
+                                           "extensions" => []
+                                       ]]
+                               ]);
+        $client = new Client($config);
+        $clone = $client->clone();
+        self::assertInstanceOf(Client::class, $clone);
+        self::assertSame($client->getConfig(), $clone->getConfig());
+        self::assertSame($client->getAccountConfig(), $clone->getAccountConfig());
+        self::assertSame($client->host, $clone->host);
+    }
+
     public function testClientLogout(): void {
         $this->createNewProtocolMockup();
 

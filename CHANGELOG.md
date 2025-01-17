@@ -16,6 +16,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - RFC4315 MOVE fallback added #123 (thanks @freescout-help-desk)
 - Content fetching RFC standard support added #510 (thanks @ybizeul)
 - Support unescaped dates inside the search conditions #542
+- `Client::clone()` looses account configuration #521 (thanks @netpok)
 
 ### Breaking changes
 - NaN

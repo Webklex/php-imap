@@ -224,7 +224,7 @@ class Client {
         $client->default_account_config = $this->default_account_config;
         $config = $this->getAccountConfig();
         foreach($config as $key => $value) {
-            $client->setAccountConfig($key, $this->default_account_config);
+            $client->setAccountConfig($key, $config);
         }
         $client->default_message_mask = $this->default_message_mask;
         $client->default_attachment_mask = $this->default_message_mask;
