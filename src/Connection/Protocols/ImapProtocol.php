@@ -1141,7 +1141,25 @@ class ImapProtocol extends Protocol {
         $set = $this->buildSet($from, $to);
         $command = $this->buildUIDCommand("MOVE", $uid);
 
-        return $this->requestAndResponse($command, [$set, $this->escapeString($folder)], true);
+        $result = $this->requestAndResponse($command, [$set, $this->escapeString($folder)], true);
+        // RFC4315 fallback to COPY, STORE and EXPUNGE.
+        // Required for cases where MOVE isn't supported by the server. So we copy the message to the target folder,
+        // mark the original message as deleted and expunge the mailbox.
+        // See the following links for more information:
+        // - https://github.com/freescout-help-desk/freescout/issues/4313
+        // - https://github.com/Webklex/php-imap/issues/123
+        if (!$result->boolean()) {
+            $result = $this->copyMessage($folder, $from, $to, $uid);
+            if (!$result->boolean()) {
+                return $result;
+            }
+            $result = $this->store(['\Deleted'], $from, $to, null, true, $uid);
+            if (!$result->boolean()) {
+                return $result;
+            }
+            return $this->expunge();
+        }
+        return $result;
     }
 
     /**
@@ -1163,7 +1181,27 @@ class ImapProtocol extends Protocol {
         $set = implode(',', $messages);
         $tokens = [$set, $this->escapeString($folder)];
 
-        return $this->requestAndResponse($command, $tokens, true);
+        $result = $this->requestAndResponse($command, $tokens, true);
+        // RFC4315 fallback to COPY, STORE and EXPUNGE.
+        // Required for cases where MOVE isn't supported by the server. So we copy the message to the target folder,
+        // mark the original message as deleted and expunge the mailbox.
+        // See the following links for more information:
+        // - https://github.com/freescout-help-desk/freescout/issues/4313
+        // - https://github.com/Webklex/php-imap/issues/123
+        if (!$result->boolean()) {
+            $result = $this->copyManyMessages($messages, $folder, $uid);
+            if (!$result->boolean()) {
+                return $result;
+            }
+            foreach ($messages as $message) {
+                $result = $this->store(['\Deleted'], $message, $message, null, true, $uid);
+                if (!$result->boolean()) {
+                    return $result;
+                }
+            }
+            return $this->expunge();
+        }
+        return $result;
     }
 
     /**

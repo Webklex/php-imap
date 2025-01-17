@@ -12,6 +12,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Added
 - Security configuration options added
 - Spoofing detection added #40
+- RFC4315 MOVE fallback added #123 (thanks @freescout-help-desk)
 
 ### Breaking changes
 - NaN
