@@ -15,6 +15,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Spoofing detection added #40
 - RFC4315 MOVE fallback added #123 (thanks @freescout-help-desk)
 - Content fetching RFC standard support added #510 (thanks @ybizeul)
+- Support unescaped dates inside the search conditions #542
 
 ### Breaking changes
 - NaN

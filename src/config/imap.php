@@ -174,6 +174,7 @@ return [
         'soft_fail' => false,
         'rfc822' => true,
         'debug' => false,
+        'unescaped_search_dates' => false,
         'uid_cache' => true,
         // 'fallback_date' => "01.01.1970 00:00:00",
         'boundary' => '/boundary=(.*?(?=;)|(.*))/i',
