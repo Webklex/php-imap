@@ -572,7 +572,7 @@ class Client {
      * @throws ResponseException
      * @throws RuntimeException
      */
-    public function getFolders(bool $hierarchical = true, string $parent_folder = null, bool $soft_fail = false): FolderCollection {
+    public function getFolders(bool $hierarchical = true, ?string $parent_folder = null, bool $soft_fail = false): FolderCollection {
         $this->checkConnection();
         $folders = FolderCollection::make([]);
 
@@ -618,7 +618,7 @@ class Client {
      * @throws RuntimeException
      * @throws ResponseException
      */
-    public function getFoldersWithStatus(bool $hierarchical = true, string $parent_folder = null, bool $soft_fail = false): FolderCollection {
+    public function getFoldersWithStatus(bool $hierarchical = true, ?string $parent_folder = null, bool $soft_fail = false): FolderCollection {
         $this->checkConnection();
         $folders = FolderCollection::make([]);
 
@@ -793,7 +793,7 @@ class Client {
      * @throws RuntimeException
      * @throws ResponseException
      */
-    public function Id(array $ids = null): array {
+    public function Id(?array $ids = null): array {
         $this->checkConnection();
         return $this->connection->ID($ids)->validatedData();
     }

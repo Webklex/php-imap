@@ -74,7 +74,7 @@ class ClientManager {
      * @return Client
      * @throws Exceptions\MaskNotFoundException
      */
-    public function account(string $name = null): Client {
+    public function account(?string $name = null): Client {
         $name = $name ?: $this->config->getDefaultAccount();
 
         // If the connection has not been resolved we will resolve it now as all
