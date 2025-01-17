@@ -243,7 +243,7 @@ class Query {
 
         $contents = [];
         if ($this->getFetchBody()) {
-            $contents = $this->client->getConnection()->content($uids, "RFC822", $this->sequence)->validatedData();
+            $contents = $this->client->getConnection()->content($uids, $this->client->rfc, $this->sequence)->validatedData();
         }
 
         return [

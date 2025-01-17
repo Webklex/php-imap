@@ -128,6 +128,13 @@ class Client {
     public array $extensions;
 
     /**
+     * Account rfc.
+     *
+     * @var string
+     */
+    public string $rfc;
+
+    /**
      * Account authentication method.
      *
      * @var ?string
@@ -168,6 +175,7 @@ class Client {
         'validate_cert' => true,
         'username' => '',
         'password' => '',
+        'rfc' => 'RFC822',
         'authentication' => null,
         "extensions" => [],
         'proxy' => [

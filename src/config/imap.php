@@ -81,6 +81,7 @@ return [
             'username' => 'root@example.com',
             'password' => '',
             'authentication' => null,
+            'rfc' => 'RFC822', // If you are using iCloud, you might want to set this to 'BODY'
             'proxy' => [
                 'socket' => null,
                 'request_fulluri' => false,

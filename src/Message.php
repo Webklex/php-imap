@@ -639,7 +639,7 @@ class Message {
 
         $sequence_id = $this->getSequenceId();
         try {
-            $contents = $this->client->getConnection()->content([$sequence_id], "RFC822", $this->sequence)->validatedData();
+            $contents = $this->client->getConnection()->content([$sequence_id], $this->client->rfc, $this->sequence)->validatedData();
         } catch (Exceptions\RuntimeException $e) {
             throw new MessageContentFetchingException("failed to fetch content", 0, $e);
         }

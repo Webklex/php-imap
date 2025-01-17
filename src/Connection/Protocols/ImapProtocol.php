@@ -877,7 +877,9 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function content(int|array $uids, string $rfc = "RFC822", int|string $uid = IMAP::ST_UID): Response {
-        return $this->fetch(["$rfc.TEXT"], is_array($uids) ? $uids : [$uids], null, $uid);
+        $rfc = $rfc ?? "RFC822";
+        $item = $rfc === "BODY" ? "BODY[TEXT]" : "$rfc.TEXT";
+        return $this->fetch([$item], is_array($uids) ? $uids : [$uids], null, $uid);
     }
 
     /**
