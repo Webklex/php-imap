@@ -236,7 +236,7 @@ class Folder {
     protected function decodeName($name): string|array|bool|null {
         $parts = [];
         foreach (explode($this->delimiter, $name) as $item) {
-            $parts[] = EncodingAliases::convert($item, "UTF7-IMAP", "UTF-8");
+            $parts[] = EncodingAliases::convert($item, "UTF7-IMAP");
         }
 
         return implode($this->delimiter, $parts);
@@ -310,7 +310,7 @@ class Folder {
     public function overview(string $sequence = null): array {
         $this->client->openFolder($this->path);
         $sequence = $sequence === null ? "1:*" : $sequence;
-        $uid = ClientManager::get('options.sequence', IMAP::ST_MSGN);
+        $uid = $this->client->getConfig()->get('options.sequence', IMAP::ST_MSGN);
         $response = $this->client->getConnection()->overview($sequence, $uid);
         return $response->validatedData();
     }
@@ -378,7 +378,7 @@ class Folder {
     public function delete(bool $expunge = true): array {
         $status = $this->client->getConnection()->deleteFolder($this->path)->validatedData();
         if ($this->client->getActiveFolder() == $this->path){
-            $this->client->setActiveFolder(null);
+            $this->client->setActiveFolder();
         }
 
         if ($expunge) $this->client->expunge();
@@ -501,7 +501,7 @@ class Folder {
     }
 
     /**
-     * Get folder status information
+     * Get folder status information from the EXAMINE command
      *
      * @return array
      * @throws ConnectionFailedException
@@ -511,20 +511,39 @@ class Folder {
      * @throws AuthFailedException
      * @throws ResponseException
      */
-    public function getStatus(): array {
-        return $this->examine();
+    public function status(): array {
+        return $this->client->getConnection()->folderStatus($this->path)->validatedData();
     }
 
     /**
+     * Get folder status information from the EXAMINE command
+     *
+     * @return array
+     * @throws AuthFailedException
      * @throws ConnectionFailedException
      * @throws ImapBadRequestException
      * @throws ImapServerErrorException
-     * @throws RuntimeException
-     * @throws AuthFailedException
      * @throws ResponseException
+     * @throws RuntimeException
+     *
+     * @deprecated Use Folder::status() instead
+     */
+    public function getStatus(): array {
+        return $this->status();
+    }
+
+    /**
+     * Load folder status information from the EXAMINE command
+     * @return Folder
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws ResponseException
+     * @throws RuntimeException
      */
     public function loadStatus(): Folder {
-        $this->status = $this->getStatus();
+        $this->status = $this->examine();
         return $this;
     }
 
@@ -573,7 +592,7 @@ class Folder {
      */
     public function setDelimiter($delimiter): void {
         if (in_array($delimiter, [null, '', ' ', false]) === true) {
-            $delimiter = ClientManager::get('options.delimiter', '/');
+            $delimiter = $this->client->getConfig()->get('options.delimiter', '/');
         }
 
         $this->delimiter = $delimiter;
