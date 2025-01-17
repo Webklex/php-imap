@@ -51,7 +51,6 @@ class HeaderTest extends TestCase {
         $header = new Header($raw_header, $this->config);
         $subject = $header->get("subject");
         $returnPath = $header->get("return_path");
-        var_dump($returnPath);
         /** @var Carbon $date */
         $date = $header->get("date")->first();
         /** @var Address $from */

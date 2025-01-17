@@ -132,7 +132,10 @@ class Structure {
      * @throws InvalidMessageDateException
      */
     private function detectParts(string $boundary, string $context, int $part_number = 0): array {
-        $base_parts = explode( $boundary, $context);
+        $base_parts = explode( "--".$boundary, $context);
+        if(count($base_parts) == 0) {
+            $base_parts = explode($boundary, $context);
+        }
         $final_parts = [];
         foreach($base_parts as $ctx) {
             $ctx = substr($ctx, 2);
