@@ -10,6 +10,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Address parsing improved and extended to include more cases
 
 ### Added
+- Security configuration options added
 - Spoofing detection added #40
 
 ### Breaking changes
