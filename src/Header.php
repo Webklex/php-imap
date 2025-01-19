@@ -408,6 +408,24 @@ class Header {
                         "mailbox"  => $mailbox,
                         "host"     => $host,
                     ];
+                }elseif (preg_match(
+                    '/^((?P<name>.+)<)(?P<email>[^<]+?)>$/',
+                    $split_address,
+                    $matches
+                )) {
+                    $name = trim(rtrim($matches["name"]));
+                    if(str_starts_with($name, "\"") && str_ends_with($name, "\"")) {
+                        $name = substr($name, 1, -1);
+                    }elseif(str_starts_with($name, "'") && str_ends_with($name, "'")) {
+                        $name = substr($name, 1, -1);
+                    }
+                    $email = trim(rtrim($matches["email"]));
+                    list($mailbox, $host) = array_pad(explode("@", $email), 2, null);
+                    $addresses[] = (object)[
+                        "personal" => $name,
+                        "mailbox"  => $mailbox,
+                        "host"     => $host,
+                    ];
                 }
             }
         }
@@ -438,7 +456,6 @@ class Header {
 
         if (is_array($list) === false) {
             if(is_string($list)) {
-                // $list = "<noreply@github.com>"
                 if (preg_match(
                     '/^(?:(?P<name>.+)\s)?(?(name)<|<?)(?P<email>[^\s]+?)(?(name)>|>?)$/',
                     $list,
@@ -446,6 +463,32 @@ class Header {
                 )) {
                     $name = trim(rtrim($matches["name"]));
                     $email = trim(rtrim($matches["email"]));
+                    list($mailbox, $host) = array_pad(explode("@", $email), 2, null);
+                    if($mailbox === ">") { // Fix trailing ">" in malformed mailboxes
+                        $mailbox = "";
+                    }
+                    if($name === "" && $mailbox === "" && $host === "") {
+                        return $addresses;
+                    }
+                    $list = [
+                        (object)[
+                            "personal" => $name,
+                            "mailbox"  => $mailbox,
+                            "host"     => $host,
+                        ]
+                    ];
+                }elseif (preg_match(
+                    '/^((?P<name>.+)<)(?P<email>[^<]+?)>$/',
+                    $list,
+                    $matches
+                )) {
+                    $name = trim(rtrim($matches["name"]));
+                    $email = trim(rtrim($matches["email"]));
+                    if(str_starts_with($name, "\"") && str_ends_with($name, "\"")) {
+                        $name = substr($name, 1, -1);
+                    }elseif(str_starts_with($name, "'") && str_ends_with($name, "'")) {
+                        $name = substr($name, 1, -1);
+                    }
                     list($mailbox, $host) = array_pad(explode("@", $email), 2, null);
                     if($mailbox === ">") { // Fix trailing ">" in malformed mailboxes
                         $mailbox = "";
@@ -501,13 +544,14 @@ class Header {
 
             if ($address->host == ".SYNTAX-ERROR.") {
                 $address->host = "";
+            }elseif ($address->host == "UNKNOWN") {
+                $address->host = "";
             }
             if ($address->mailbox == "UNEXPECTED_DATA_AFTER_ADDRESS") {
                 $address->mailbox = "";
+            }elseif ($address->mailbox == "MISSING_MAILBOX_TERMINATOR") {
+                $address->mailbox = "";
             }
-
-            $address->mail = ($address->mailbox && $address->host) ? $address->mailbox . '@' . $address->host : false;
-            $address->full = ($address->personal) ? $address->personal . ' <' . $address->mail . '>' : $address->mail;
 
             $addresses[] = new Address($address);
         }

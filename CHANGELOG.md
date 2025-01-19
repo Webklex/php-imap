@@ -10,6 +10,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Address parsing improved and extended to include more cases
 - Boundary parsing fixed and improved to support more formats #544
 - Decode partially encoded address names #511
+- Enforce RFC822 parsing if enabled #462
 
 ### Added
 - Security configuration options added
