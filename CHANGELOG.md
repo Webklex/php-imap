@@ -6,6 +6,16 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
+- NaN
+
+### Added
+- NaN
+
+### Breaking changes
+- NaN
+
+## [6.1.0] - 2025-01-19
+### Fixed
 - Filename sanitization is now optional (enabled via default)
 - Address parsing improved and extended to include more cases
 - Boundary parsing fixed and improved to support more formats #544
@@ -19,9 +29,6 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Content fetching RFC standard support added #510 (thanks @ybizeul)
 - Support unescaped dates inside the search conditions #542
 - `Client::clone()` looses account configuration #521 (thanks @netpok)
-
-### Breaking changes
-- NaN
 
 ## [6.0.0] - 2025-01-17
 ### Fixed
