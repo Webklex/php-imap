@@ -1096,8 +1096,7 @@ class Message {
         }
 
         $message = $folder->query()->getMessage($sequence_id, null, $this->sequence);
-        $event = $this->getEvent("message", $event);
-        $event::dispatch($this, $message);
+        $this->dispatch("message", $event, $this, $message);
 
         return $message;
     }
@@ -1131,8 +1130,7 @@ class Message {
         }
         if ($expunge) $this->client->expunge();
 
-        $event = $this->getEvent("message", "deleted");
-        $event::dispatch($this);
+        $this->dispatch("message", "deleted", $this);
 
         return $status;
     }
@@ -1155,8 +1153,7 @@ class Message {
         $status = $this->unsetFlag("Deleted");
         if ($expunge) $this->client->expunge();
 
-        $event = $this->getEvent("message", "restored");
-        $event::dispatch($this);
+        $this->dispatch("message", "restored", $this);
 
         return $status;
     }
@@ -1186,8 +1183,7 @@ class Message {
         }
         $this->parseFlags();
 
-        $event = $this->getEvent("flag", "new");
-        $event::dispatch($this, $flag);
+        $this->dispatch("flag", "new", $this, $flag);
 
         return (bool)$status;
     }
@@ -1218,8 +1214,7 @@ class Message {
         }
         $this->parseFlags();
 
-        $event = $this->getEvent("flag", "deleted");
-        $event::dispatch($this, $flag);
+        $this->dispatch("flag", "deleted", $this, $flag);
 
         return (bool)$status;
     }

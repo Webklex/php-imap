@@ -287,8 +287,7 @@ class Folder {
         if ($expunge) $this->client->expunge();
 
         $folder = $this->client->getFolder($new_name);
-        $event = $this->getEvent("folder", "moved");
-        $event::dispatch($this, $folder);
+        $this->dispatch("folder", "moved", $this, $folder);
 
         return $status;
     }
@@ -383,8 +382,7 @@ class Folder {
 
         if ($expunge) $this->client->expunge();
 
-        $event = $this->getEvent("folder", "deleted");
-        $event::dispatch($this);
+        $this->dispatch("folder", "deleted", $this);
 
         return $status;
     }
@@ -494,8 +492,7 @@ class Folder {
                 $message->setSequence($sequence);
                 $callback($message);
 
-                $event = $this->getEvent("message", "new");
-                $event::dispatch($message);
+                $this->dispatch("message", "new", $message);
             }
         }
     }
