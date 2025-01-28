@@ -9,7 +9,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - NaN
 
 ### Added
-- NaN
+- SSL stream context options added #238 #546 (thanks @llemoine)
 
 ### Breaking changes
 - NaN
