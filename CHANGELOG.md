@@ -6,7 +6,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
+- Fix case sensitivity of Folder attribute parsing (\NoSelect, \NoInferiors) #469 (thanks @smajti1)
 
 ### Added
 - SSL stream context options added #238 #546 (thanks @llemoine)
