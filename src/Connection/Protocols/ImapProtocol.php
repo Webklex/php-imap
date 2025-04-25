@@ -940,7 +940,7 @@ class ImapProtocol extends Protocol {
         $uids = $this->uid_cache;
 
         if ($id == null) {
-            return Response::empty($this->debug)->setResult($uids);
+            return Response::empty($this->debug)->setResult($uids)->setCanBeEmpty(true);
         }
 
         foreach ($uids as $k => $v) {
