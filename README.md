@@ -200,7 +200,7 @@ This library and especially the code flavor It's written in, is certainly not fo
 different approach, you might want to check out the following libraries:
 - [ddeboer/imap](https://github.com/ddeboer/imap)
 - [barbushin/php-imap](https://github.com/barbushin/php-imap)
-- [stevebauman/php-imap](https://github.com/stevebauman/php-imap)
+- [DirectoryTree/ImapEngine](https://github.com/DirectoryTree/ImapEngine)
 
 
 ## Change log
