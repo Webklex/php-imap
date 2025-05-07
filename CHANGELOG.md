@@ -6,7 +6,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [UNRELEASED]
 ### Fixed
-- NaN
+- Reading whole lines from stream #576 (thanks @wurst-hans)
 
 ### Added
 - NaN
