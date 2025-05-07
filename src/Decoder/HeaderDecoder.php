@@ -29,7 +29,9 @@ class HeaderDecoder extends Decoder {
         $decoder = $this->options['header'];
 
         if ($value !== null) {
-            if ($decoder === 'utf-8') {
+            if (self::isUTF8($value)) {
+                $value = mb_decode_mimeheader($value);
+            } else if ($decoder === 'utf-8') {
                 $decoded_values = $this->mimeHeaderDecode($value);
                 $tempValue = "";
                 foreach ($decoded_values as $decoded_value) {
@@ -46,8 +48,6 @@ class HeaderDecoder extends Decoder {
                 }
             } elseif ($decoder === 'iconv') {
                 $value = iconv_mime_decode($value, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, "UTF-8");
-            } else if (self::isUTF8($value)) {
-                $value = mb_decode_mimeheader($value);
             }
 
             if (self::notDecoded($original_value, $value)) {
