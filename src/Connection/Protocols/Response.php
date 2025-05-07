@@ -13,6 +13,7 @@
 
 namespace Webklex\PHPIMAP\Connection\Protocols;
 
+use stdClass;
 use Webklex\PHPIMAP\Exceptions\ResponseException;
 
 /**
@@ -347,7 +348,7 @@ class Response {
      * @return bool
      */
     public function verify_data(mixed $data): bool {
-        if (is_array($data)) {
+        if (is_array($data) || $data instanceof stdClass) {
             foreach ($data as $line) {
                 if (is_array($line)) {
                     if(!$this->verify_data($line)){
