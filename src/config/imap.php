@@ -134,6 +134,8 @@ return [
     |       Default TRUE
     |   -Flag download option
     |       Default TRUE
+    |   -Allow single parts option
+    |       Default TRUE - In multipart/xxx structures return internal parts even if there is only one  
     |   -Soft fail
     |       Default FALSE - Set to TRUE if you want to ignore certain exception while fetching bulk messages
     |   -RFC822
@@ -171,6 +173,7 @@ return [
         'sequence' => \Webklex\PHPIMAP\IMAP::ST_UID,
         'fetch_body' => true,
         'fetch_flags' => true,
+        'allow_single_parts' => true,
         'soft_fail' => false,
         'rfc822' => true,
         'debug' => false,

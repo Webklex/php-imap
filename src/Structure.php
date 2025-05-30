@@ -115,7 +115,10 @@ class Structure {
         if (($boundary = $headers->getBoundary()) !== null) {
             $parts = $this->detectParts($boundary, $body, $part_number);
 
-            if(count($parts) > 1) {
+            // we return these parts if there are multiple or if configured to allow a single part here (default)
+            // isolated cases a single part here causes an empty body, to workaround this set
+            // allow_single_parts to false in your config
+            if ( count($parts) > 1 || $config->get("options")['allow_single_parts'] ) {
                 return $parts;
             }
         }

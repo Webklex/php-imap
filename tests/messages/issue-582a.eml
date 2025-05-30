@@ -1,0 +1,41 @@
+Delivered-To: redacted@redacted.com
+Received: by 2002:a05:7001:a40a:b0:662:9c3d:2d8b with SMTP id
+ vo10csp4472717mab; Tue, 27 May 2025 00:20:15 -0700 (PDT)
+Return-Path: <redacted.Services@redacted.co.uk>
+From: redacted.services@redacted.co.uk
+To: redacted@redacted.co.uk
+Date: 27 May 2025 08:20:12 +0100
+Subject: redacted_Balances_GBP_
+Content-Type: multipart/mixed;
+ boundary=--boundary_108_1d32a5ba-d60e-4773-9939-d5614385ac16
+Return-Path: redacted.Services@redacted.co.uk
+Message-ID: <CWLP123MB51345AE20743EB4587D3CA32AC64A@CWLP123MB5134.GBRP123.PROD.OUTLOOK.COM>
+MIME-Version: 1.0
+
+----boundary_108_1d32a5ba-d60e-4773-9939-d5614385ac16
+Content-Type: multipart/mixed;
+ boundary=--boundary_109_fc604310-cc2e-459d-9cb7-9f39cf7d3a80
+
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+Single part body
+
+
+----boundary_108_1d32a5ba-d60e-4773-9939-d5614385ac16
+Content-Type: multipart/mixed;
+ boundary=--boundary_109_fc604310-cc2e-459d-9cb7-9f39cf7d3a80
+
+----boundary_109_fc604310-cc2e-459d-9cb7-9f39cf7d3a80
+Content-Type: text/csv; name=redacted_Balances_GBP_.csv
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="=?utf-8?B?Q2redactedbGFuY2VzX0dCUF8uY3N2?="
+Content-ID: <5df3148f-aa43-4dea-adeb-7d432289d3ea>
+
+77u/cmVwb3J0X2RhdGUsQ3VycmVuY3ksdXNlcm5hbWUsYWNjb3VudF9zdGF0dXMsY3VycmVudF9i
+YWxhbmNlLGxhc3RfdHJhbnNhY3Rpb25fZGF0ZXRpbWUsc3Rha2VfbGltaXQsc29mdF9saW1pdCxo
+
+----boundary_109_fc604310-cc2e-459d-9cb7-9f39cf7d3a80--
+
+----boundary_108_1d32a5ba-d60e-4773-9939-d5614385ac16--

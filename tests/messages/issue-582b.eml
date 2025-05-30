@@ -1,0 +1,37 @@
+Return-Path: <ggg@example.de>
+Date: Thu, 20 Feb 2025 03:44:22 +0100 (CET)
+From: ggg@example.de
+To: contact@your-company.de, ggg@example.de
+Message-ID: <23975424.234.982154931647567.JavaMail.ggg@example.de>
+Subject: html body in multipart related container is parsed as attachment
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_Part_255_1307735605.1740019462622"
+
+------=_Part_255_1307735605.1740019462622
+Content-Type: multipart/related;
+	boundary="----=_Part_256_1484807935.1740019462623"
+
+------=_Part_256_1484807935.1740019462623
+Content-Type: text/html;charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    p {
+      font-family: "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+<p>
+  This is a message in a multipart related container
+</p>
+</body>
+</html>
+------=_Part_256_1484807935.1740019462623--
+
+------=_Part_255_1307735605.1740019462622--
