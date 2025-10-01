@@ -701,6 +701,9 @@ class Header {
                 $parsed_date = Carbon::parse($date);
             } catch (\Exception $e) {
                 switch (true) {
+                    case preg_match('/^(.+)\s+\1$/', $date, $matches) > 0:
+                        $date = $matches[1];
+                        break;
                     case preg_match('/([0-9]{4}\.[0-9]{1,2}\.[0-9]{1,2}\-[0-9]{1,2}\.[0-9]{1,2}.[0-9]{1,2})+$/i', $date) > 0:
                         $date = Carbon::createFromFormat("Y.m.d-H.i.s", $date);
                         break;
