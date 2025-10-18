@@ -19,6 +19,11 @@ use Carbon\Carbon;
  * Class Attribute
  *
  * @package Webklex\PHPIMAP
+ *
+ * @implements ArrayAccess<TKey, TValue>
+ *
+ * @template TKey of array-key
+ * @template TValue
  */
 class Attribute implements ArrayAccess {
 
@@ -28,14 +33,14 @@ class Attribute implements ArrayAccess {
     /**
      * Value holder
      *
-     * @var array $values
+     * @var array<TKey, TValue> $values
      */
     protected array $values = [];
 
     /**
      * Attribute constructor.
      * @param string $name
-     * @param mixed|null $value
+     * @param TValue|TValue[]|null $value
      */
     public function __construct(string $name, mixed $value = null) {
         $this->setName($name);
@@ -57,7 +62,7 @@ class Attribute implements ArrayAccess {
     /**
      * Return the serialized address
      *
-     * @return array
+     * @return array<TKey, TValue>
      */
     public function __serialize(){
         return $this->values;
@@ -84,7 +89,7 @@ class Attribute implements ArrayAccess {
     /**
      * Convert instance to array
      *
-     * @return array
+     * @return array<TKey, TValue>
      */
     public function toArray(): array {
         return $this->__serialize();
@@ -105,7 +110,7 @@ class Attribute implements ArrayAccess {
     /**
      * Determine if a value exists at a given key.
      *
-     * @param int|string $key
+     * @param TKey $key
      * @return bool
      */
     public function has(mixed $key = 0): bool {
@@ -115,7 +120,7 @@ class Attribute implements ArrayAccess {
     /**
      * Determine if a value exists at a given key.
      *
-     * @param int|string $key
+     * @param TKey $key
      * @return bool
      */
     public function exist(mixed $key = 0): bool {
@@ -135,19 +140,20 @@ class Attribute implements ArrayAccess {
     /**
      * Get a value by a given key.
      *
-     * @param int|string $key
-     * @return mixed
+     * @param TKey $key
+     *
+     * @return TValue|null
      */
-    public function get(int|string $key = 0): mixed {
+    public function get(int|string $key = 0) {
         return $this->values[$key] ?? null;
     }
 
     /**
      * Set the value by a given key.
      *
-     * @param mixed $key
-     * @param mixed $value
-     * @return Attribute
+     * @param TKey $key
+     * @param TValue $value
+     * @return $this
      */
     public function set(mixed $value, mixed $key = 0): Attribute {
         if (is_null($key)) {
@@ -161,8 +167,8 @@ class Attribute implements ArrayAccess {
     /**
      * Unset a value by a given key.
      *
-     * @param int|string $key
-     * @return Attribute
+     * @param TKey $key
+     * @return $this
      */
     public function remove(int|string $key = 0): Attribute {
         if (isset($this->values[$key])) {
@@ -173,10 +179,10 @@ class Attribute implements ArrayAccess {
 
     /**
      * Add one or more values to the attribute
-     * @param array|mixed $value
+     * @param TValue|TValue[]|null $value
      * @param boolean $strict
      *
-     * @return Attribute
+     * @return $this
      */
     public function add(mixed $value, bool $strict = false): Attribute {
         if (is_array($value)) {
@@ -190,10 +196,10 @@ class Attribute implements ArrayAccess {
 
     /**
      * Merge a given array of values with the current values array
-     * @param array $values
+     * @param TValue[] $values
      * @param boolean $strict
      *
-     * @return Attribute
+     * @return $this
      */
     public function merge(array $values, bool $strict = false): Attribute {
         foreach ($values as $value) {
@@ -205,9 +211,9 @@ class Attribute implements ArrayAccess {
 
     /**
      * Attach a given value to the current value array
-     * @param $value
+     * @param TValue $value
      * @param bool $strict
-     * @return Attribute
+     * @return $this
      */
     public function attach($value, bool $strict = false): Attribute {
         if ($strict === true) {
@@ -224,7 +230,7 @@ class Attribute implements ArrayAccess {
      * Set the attribute name
      * @param $name
      *
-     * @return Attribute
+     * @return $this
      */
     public function setName($name): Attribute {
         $this->name = $name;
@@ -244,7 +250,7 @@ class Attribute implements ArrayAccess {
     /**
      * Get all values
      *
-     * @return array
+     * @return array<TKey, TValue>
      */
     public function all(): array {
         reset($this->values);
@@ -254,7 +260,7 @@ class Attribute implements ArrayAccess {
     /**
      * Get the first value if possible
      *
-     * @return mixed|null
+     * @return TValue|null
      */
     public function first(): mixed {
         return reset($this->values);
@@ -263,7 +269,7 @@ class Attribute implements ArrayAccess {
     /**
      * Get the last value if possible
      *
-     * @return mixed|null
+     * @return TValue|null
      */
     public function last(): mixed {
         return end($this->values);
@@ -280,7 +286,7 @@ class Attribute implements ArrayAccess {
 
     /**
      * @see  ArrayAccess::offsetExists
-     * @param mixed $offset
+     * @param TKey $offset
      * @return bool
      */
     public function offsetExists(mixed $offset): bool {
@@ -289,8 +295,8 @@ class Attribute implements ArrayAccess {
 
     /**
      * @see  ArrayAccess::offsetGet
-     * @param mixed $offset
-     * @return mixed
+     * @param TKey $offset
+     * @return TValue|null
      */
     public function offsetGet(mixed $offset): mixed {
         return $this->get($offset);
@@ -298,8 +304,8 @@ class Attribute implements ArrayAccess {
 
     /**
      * @see  ArrayAccess::offsetSet
-     * @param mixed $offset
-     * @param mixed $value
+     * @param TKey $offset
+     * @param TValue $value
      * @return void
      */
     public function offsetSet(mixed $offset, mixed $value): void {
@@ -308,7 +314,7 @@ class Attribute implements ArrayAccess {
 
     /**
      * @see  ArrayAccess::offsetUnset
-     * @param mixed $offset
+     * @param TKey $offset
      * @return void
      */
     public function offsetUnset(mixed $offset): void {
@@ -316,8 +322,9 @@ class Attribute implements ArrayAccess {
     }
 
     /**
-     * @param callable $callback
-     * @return array
+     * @template TReturn
+     * @param callable(TValue):TReturn $callback
+     * @return array<TKey, TReturn>
      */
     public function map(callable $callback): array {
         return array_map($callback, $this->values);

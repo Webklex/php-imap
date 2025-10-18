@@ -51,37 +51,37 @@ use Webklex\PHPIMAP\Traits\HasEvents;
  * @property integer $uid
  * @property integer $msgn
  * @property integer $size
- * @property Attribute $subject
- * @property Attribute $message_id
- * @property Attribute $message_no
- * @property Attribute $references
- * @property Attribute $date
- * @property Attribute $from
- * @property Attribute $to
- * @property Attribute $cc
- * @property Attribute $bcc
- * @property Attribute $reply_to
- * @property Attribute $in_reply_to
- * @property Attribute $sender
+ * @property Attribute<int, string> $subject
+ * @property Attribute<int, string> $message_id
+ * @property Attribute<int, int> $message_no
+ * @property Attribute<int, string> $references
+ * @property Attribute<int, \Carbon\Carbon> $date
+ * @property Attribute<int, Address> $from
+ * @property Attribute<int, Address> $to
+ * @property Attribute<int, Address> $cc
+ * @property Attribute<int, Address> $bcc
+ * @property Attribute<int, Address> $reply_to
+ * @property Attribute<int, string> $in_reply_to
+ * @property Attribute<int, Address> $sender
  *
  * @method integer getMsglist()
  * @method integer setMsglist($msglist)
  * @method integer getUid()
  * @method integer getMsgn()
  * @method integer getSize()
- * @method Attribute getPriority()
- * @method Attribute getSubject()
- * @method Attribute getMessageId()
- * @method Attribute getMessageNo()
- * @method Attribute getReferences()
- * @method Attribute getDate()
- * @method Attribute getFrom()
- * @method Attribute getTo()
- * @method Attribute getCc()
- * @method Attribute getBcc()
- * @method Attribute getReplyTo()
- * @method Attribute getInReplyTo()
- * @method Attribute getSender()
+ * @method Attribute<int, string|int> getPriority()
+ * @method Attribute<int, string> getSubject()
+ * @method Attribute<int, string> getMessageId()
+ * @method Attribute<int, int> getMessageNo()
+ * @method Attribute<int, string> getReferences()
+ * @method Attribute<int, \Carbon\Carbon> getDate()
+ * @method Attribute<int, Address> getFrom()
+ * @method Attribute<int, Address> getTo()
+ * @method Attribute<int, Address> getCc()
+ * @method Attribute<int, Address> getBcc()
+ * @method Attribute<int, Address> getReplyTo()
+ * @method Attribute<int, string> getInReplyTo()
+ * @method Attribute<int, Address> getSender()
  */
 class Message {
     use HasEvents;
