@@ -115,7 +115,7 @@ class Structure {
         if (($boundary = $headers->getBoundary()) !== null) {
             $parts = $this->detectParts($boundary, $body, $part_number);
 
-            if(count($parts) > 1) {
+            if (count($parts) > 1 || !empty($parts[0]->subtype)) {
                 return $parts;
             }
         }

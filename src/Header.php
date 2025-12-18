@@ -193,7 +193,7 @@ class Header {
      * @return string
      */
     private function clearBoundaryString(string $str): string {
-        return str_replace(['"', '\r', '\n', "\n", "\r", ";", "\s"], "", $str);
+        return trim(str_replace(['"', '\r', '\n', "\n", "\r", ";", "\s"], "", $str));
     }
 
     /**
