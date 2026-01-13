@@ -263,6 +263,12 @@ class MessageTest extends TestCase {
         self::assertSame("application/pdf", $attachment->getMimeType());
     }
 
+    public function testSanitizeFlag(): void {
+        self::assertEquals('\\Seen', Message::sanitizeFlags('Seen'));
+        self::assertEquals('$Forwarded', Message::sanitizeFlags('$Forwarded'));
+        self::assertEquals('\\Seen $MDNSent $Junk \\Flagged', Message::sanitizeFlags(['Seen', '$MDNSent', '$Junk', 'Flagged']));
+    }
+
     /**
      * Create a new protocol mockup
      *

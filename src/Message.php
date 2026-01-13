@@ -1176,7 +1176,7 @@ class Message {
      */
     public function setFlag(array|string $flag): bool {
         $this->client->openFolder($this->folder_path);
-        $flag = "\\" . trim(is_array($flag) ? implode(" \\", $flag) : $flag);
+        $flag = self::sanitizeFlags($flag);
         $sequence_id = $this->getSequenceId();
         try {
             $status = $this->client->getConnection()->store([$flag], $sequence_id, $sequence_id, "+", true, $this->sequence)->validatedData();
@@ -1207,7 +1207,7 @@ class Message {
     public function unsetFlag(array|string $flag): bool {
         $this->client->openFolder($this->folder_path);
 
-        $flag = "\\" . trim(is_array($flag) ? implode(" \\", $flag) : $flag);
+        $flag = self::sanitizeFlags($flag);
         $sequence_id = $this->getSequenceId();
         try {
             $status = $this->client->getConnection()->store([$flag], $sequence_id, $sequence_id, "-", true, $this->sequence)->validatedData();
@@ -1255,6 +1255,19 @@ class Message {
      */
     public function removeFlag(array|string $flag): bool {
         return $this->unsetFlag($flag);
+    }
+
+    /**
+     * Format the flag string.
+     * Allows keywords like $MDNSent or $Forwarded
+     * @param array|string $flag
+     *
+     * @return string
+     */
+    public static function sanitizeFlags(array|string $flag): string {
+        return trim(is_array($flag)
+            ? (implode(" ", array_map(fn ($flag) => str_starts_with($flag, '$') ? $flag : "\\$flag", $flag)))
+            : (str_starts_with($flag, '$') ? $flag : "\\$flag"));
     }
 
     /**
