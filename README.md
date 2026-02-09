@@ -46,12 +46,12 @@ Discord: [discord.gg/rd4cN9h6][link-discord]
 ## Compatibility
 | Version | PHP 5.6 | PHP 7 | PHP 8 |
 |:--------|:-------:|:-----:|:-----:|
-| v6.x    |    /    |   /   |   X   |
-| v5.x    |    /    |   /   |   X   |
-| v4.x    |    /    |   X   |   X   |
-| v3.x    |    /    |   X   |   /   |
-| v2.x    |    X    |   X   |   /   |
-| v1.x    |    X    |   /   |   /   |
+| v6.x    |    ❌    |   ❌   |   ✅   |
+| v5.x    |    ❌    |   ❌   |   ✅   |
+| v4.x    |    ❌    |   ✅   |   ✅   |
+| v3.x    |    ❌    |   ✅   |   ❌   |
+| v2.x    |    ✅    |   ✅   |   ❌   |
+| v1.x    |    ✅    |   ❌   |   ❌   |
 
 ## Basic usage example
 This is a basic example, which will echo out all Mails within all imap folders
