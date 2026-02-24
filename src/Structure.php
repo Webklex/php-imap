@@ -103,11 +103,23 @@ class Structure {
      * @throws InvalidMessageDateException
      */
     private function parsePart(string $context, int $part_number = 0): array {
+        // Optimize split of headers/body to avoid quadratic memory usage on large messages.
+        // The previous line-by-line substr loop could allocate huge intermediate strings (e.g. when body contains large attachments).
+        $headers = '';
         $body = $context;
-        while (($pos = strpos($body, "\r\n")) > 0) {
-            $body = substr($body, $pos + 2);
+
+        $pos = strpos($context, "\r\n\r\n");
+        if ($pos !== false) {
+            // Keep the first CRLF (line terminator of last header) in headers, like legacy behavior.
+            $headers = substr($context, 0, $pos + 2);
+            $body = substr($context, $pos + 2);
+        } else {
+            while (($pos = strpos($body, "\r\n")) > 0) {
+                $body = substr($body, $pos + 2);
+            }
+            $headers = substr($context, 0, strlen($body) * -1);
         }
-        $headers = substr($context, 0, strlen($body) * -1);
+
         $body = substr($body, 0, -2);
 
         $config = $this->header->getConfig();
