@@ -196,7 +196,7 @@ if you're just wishing a feature ;)
 
 
 ## Alternatives & Different Flavors
-This library and especially the code flavor It's written in, is certainly not for everyone. If you are looking for a 
+This library and especially the code flavor it's written in, is certainly not for everyone. If you are looking for a 
 different approach, you might want to check out the following libraries:
 - [ddeboer/imap](https://github.com/ddeboer/imap)
 - [barbushin/php-imap](https://github.com/barbushin/php-imap)

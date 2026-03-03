@@ -35,8 +35,8 @@
         "phpunit/phpunit": "^9.5.10"
     },
     "suggest": {
-        "symfony/mime": "Recomended for better extension support",
-        "symfony/var-dumper": "Usefull tool for debugging"
+        "symfony/mime": "Recommended for better extension support",
+        "symfony/var-dumper": "Useful tool for debugging"
     },
     "autoload": {
         "psr-4": {
