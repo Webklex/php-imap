@@ -42,6 +42,12 @@ class ImapProtocol extends Protocol {
     protected int $noun = 0;
 
     /**
+     * Whether the connection is currently in IDLE mode
+     * @var bool
+     */
+    protected bool $idling = false;
+
+    /**
      * Imap constructor.
      * @param Config $config
      * @param bool $cert_validation set to false to skip SSL certificate validation
@@ -102,6 +108,10 @@ class ImapProtocol extends Protocol {
      */
     public function connected(): bool {
         if ((bool)$this->stream) {
+            if ($this->idling) {
+                return true;
+            }
+
             try {
                 $this->requestAndResponse('NOOP');
                 return true;
@@ -185,7 +195,7 @@ class ImapProtocol extends Protocol {
     protected function nextTaggedLine(Response $response, ?string &$tag): string {
         $line = $this->nextLine($response);
         if (str_contains($line, ' ')) {
-            list($tag, $line) = explode(' ', $line, 2);
+            [$tag, $line] = explode(' ', $line, 2);
         }
 
         return $line ?? '';
@@ -205,7 +215,7 @@ class ImapProtocol extends Protocol {
             $line = $this->nextLine($response);
         } while ($this->isUntaggedLine($line));
 
-        list($tag, $line) = explode(' ', $line, 2);
+        [$tag, $line] = explode(' ', $line, 2);
 
         return $line;
     }
@@ -1372,6 +1382,7 @@ class ImapProtocol extends Protocol {
         if (!$this->assumedNextLineIgnoreUntagged($response, '+ ')) {
             throw new RuntimeException('idle failed');
         }
+        $this->idling = true;
     }
 
     /**
@@ -1384,6 +1395,7 @@ class ImapProtocol extends Protocol {
         if (!$this->assumedNextTaggedLineIgnoreUntagged($response, 'OK', $tags)) {
             throw new RuntimeException('done failed');
         }
+        $this->idling = false;
         return true;
     }
 
@@ -1426,7 +1438,7 @@ class ImapProtocol extends Protocol {
      */
     public function overview(string $sequence, int|string $uid = IMAP::ST_UID): Response {
         $result = [];
-        list($from, $to) = explode(":", $sequence);
+        [$from, $to] = explode(":", $sequence);
 
         $response = $this->getUid();
         $ids = [];
