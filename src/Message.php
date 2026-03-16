@@ -232,7 +232,7 @@ class Message {
         $this->events["message"] = $client->getDefaultEvents("message");
         $this->events["flag"] = $client->getDefaultEvents("flag");
 
-        $this->folder_path = $client->getFolderPath();
+        $this->setFolderPath($client->getFolderPath());
 
         $this->setSequence($sequence);
         $this->setFetchOption($fetch_options);
@@ -1470,6 +1470,15 @@ class Message {
      * @return Message
      */
     public function setFolderPath($folder_path): Message {
+        if (!is_string($folder_path) || $folder_path === '') {
+            $folder_path = $this->client?->getFolderPath();
+        }
+        if (!is_string($folder_path) || $folder_path === '') {
+            $folder_path = (string)$this->config->get('options.common_folders.inbox', 'INBOX');
+        }
+        if ($folder_path === '') {
+            $folder_path = 'INBOX';
+        }
         $this->folder_path = $folder_path;
 
         return $this;

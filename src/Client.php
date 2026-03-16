@@ -400,13 +400,21 @@ class Client {
      * @throws ResponseException
      */
     public function checkConnection(): bool {
+        $active_folder = $this->active_folder;
         try {
             if (!$this->isConnected()) {
                 $this->connect();
+                if ($active_folder !== null) {
+                    $this->openFolder($active_folder, true);
+                }
                 return true;
             }
         } catch (\Throwable) {
             $this->connect();
+            if ($active_folder !== null) {
+                $this->openFolder($active_folder, true);
+            }
+            return true;
         }
         return false;
     }
