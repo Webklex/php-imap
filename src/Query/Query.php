@@ -246,7 +246,8 @@ class Query {
 
         $contents = [];
         if ($this->getFetchBody()) {
-            $contents = $this->client->getConnection()->content($uids, $this->client->rfc, $this->sequence)->validatedData();
+            $usePeek = ($this->getFetchOptions() === IMAP::FT_PEEK);
+            $contents = $this->client->getConnection()->content($uids, $this->client->rfc, $this->sequence, $usePeek)->validatedData();
         }
 
         return [

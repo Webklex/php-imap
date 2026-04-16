@@ -815,9 +815,23 @@ class ImapProtocol extends Protocol {
 
             // if we only want one item we return that one directly
             if (count($items) == 1) {
-                if ($tokens[2][0] == $items[0]) {
+                $expectedItem = (string) $items[0];
+                $itemMatches = static function($actual, $expected): bool {
+                    $actualNorm = strtoupper((string) $actual);
+                    $expectedNorm = strtoupper((string) $expected);
+                    if ($actualNorm === $expectedNorm) {
+                        return true;
+                    }
+                    // IMAP may answer BODY[...] even when request used BODY.PEEK[...].
+                    if (str_replace('.PEEK', '', $actualNorm) === str_replace('.PEEK', '', $expectedNorm)) {
+                        return true;
+                    }
+                    return false;
+                };
+
+                if ($itemMatches($tokens[2][0] ?? '', $expectedItem)) {
                     $data = $tokens[2][1];
-                } elseif ($uid === IMAP::ST_UID && $tokens[2][2] == $items[0]) {
+                } elseif ($uid === IMAP::ST_UID && $itemMatches($tokens[2][2] ?? '', $expectedItem)) {
                     $data = $tokens[2][3];
                 } else {
                     $expectedResponse = 0;
@@ -825,7 +839,7 @@ class ImapProtocol extends Protocol {
                     $count = count($tokens[2]);
                     // we start with 2, because 0 was already checked
                     for ($i = 2; $i < $count; $i += 2) {
-                        if ($tokens[2][$i] != $items[0]) {
+                        if (!$itemMatches($tokens[2][$i] ?? '', $expectedItem)) {
                             continue;
                         }
                         $data = $tokens[2][$i + 1];
@@ -869,13 +883,19 @@ class ImapProtocol extends Protocol {
      * @param string $rfc
      * @param int|string $uid set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
      * message numbers instead.
+     * @param bool $peek true to fetch body using PEEK (do not set \Seen)
      *
      * @return Response
      * @throws RuntimeException
      */
-    public function content(int|array $uids, string $rfc = "RFC822", int|string $uid = IMAP::ST_UID): Response {
+    public function content(int|array $uids, string $rfc = "RFC822", int|string $uid = IMAP::ST_UID, bool $peek = false): Response {
         $rfc = $rfc ?? "RFC822";
-        $item = $rfc === "BODY" ? "BODY[TEXT]" : "$rfc.TEXT";
+        if ($peek && ($rfc === "RFC822" || $rfc === "BODY")) {
+            // BODY.PEEK keeps the message unread at protocol level.
+            $item = "BODY.PEEK[TEXT]";
+        } else {
+            $item = $rfc === "BODY" ? "BODY[TEXT]" : "$rfc.TEXT";
+        }
         return $this->fetch([$item], is_array($uids) ? $uids : [$uids], null, $uid);
     }
 

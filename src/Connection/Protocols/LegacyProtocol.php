@@ -252,18 +252,23 @@ class LegacyProtocol extends Protocol {
      * @param int|array $uids
      * @param string $rfc
      * @param int|string $uid set to IMAP::ST_UID if you pass message unique identifiers instead of numbers.
+     * @param bool $peek true to fetch body without setting \Seen
      *
      * @return Response
      */
-    public function content(int|array $uids, string $rfc = "RFC822", int|string $uid = IMAP::ST_UID): Response {
-        return $this->response()->wrap(function($response) use ($uids, $uid) {
+    public function content(int|array $uids, string $rfc = "RFC822", int|string $uid = IMAP::ST_UID, bool $peek = false): Response {
+        return $this->response()->wrap(function($response) use ($uids, $uid, $peek) {
             /** @var Response $response */
 
             $result = [];
             $uids = is_array($uids) ? $uids : [$uids];
+            $fetchOptions = ($uid === IMAP::ST_UID ? IMAP::ST_UID : IMAP::NIL);
+            if ($peek) {
+                $fetchOptions |= IMAP::FT_PEEK;
+            }
             foreach ($uids as $id) {
                 $response->addCommand("imap_fetchbody");
-                $result[$id] = \imap_fetchbody($this->stream, $id, "", $uid === IMAP::ST_UID ? IMAP::ST_UID : IMAP::NIL);
+                $result[$id] = \imap_fetchbody($this->stream, $id, "", $fetchOptions);
             }
 
             return $result;
