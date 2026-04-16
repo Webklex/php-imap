@@ -638,8 +638,9 @@ class Message {
         $this->client->openFolder($this->folder_path);
 
         $sequence_id = $this->getSequenceId();
+        $usePeek = ($this->fetch_options === IMAP::FT_PEEK);
         try {
-            $contents = $this->client->getConnection()->content([$sequence_id], $this->client->rfc, $this->sequence)->validatedData();
+            $contents = $this->client->getConnection()->content([$sequence_id], $this->client->rfc, $this->sequence, $usePeek)->validatedData();
         } catch (Exceptions\RuntimeException $e) {
             throw new MessageContentFetchingException("failed to fetch content", 0, $e);
         }
