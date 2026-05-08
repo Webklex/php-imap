@@ -213,7 +213,7 @@ class Config {
     }
 
     /**
-     * Marge arrays recursively and distinct
+     * Merge arrays recursively and distinct
      *
      * Merges any number of arrays / parameters recursively, replacing
      * entries with string keys with values from latter arrays.
