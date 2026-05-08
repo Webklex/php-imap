@@ -269,6 +269,20 @@ class ImapProtocol extends Protocol {
                 $line = substr($line, $pos + 1);
                 continue;
             }
+            // Section identifiers like BODY[HEADER.FIELDS (Subject)] can
+            // legally contain spaces inside the bracketed section. Extend the token
+            // while it has unbalanced '[' so the entire bracketed section is
+            // captured as a single atom.
+            while (substr_count($token, '[') > substr_count($token, ']')) {
+                $next = strpos($line, ' ', $pos + 1);
+                if ($next === false) {
+                    $token = rtrim($line);
+                    $pos = strlen($line) - 1;
+                    break;
+                }
+                $token = substr($line, 0, $next);
+                $pos = $next;
+            }
             while ($token[0] == '(') {
                 $stack[] = $tokens;
                 $tokens = [];
@@ -779,6 +793,23 @@ class ImapProtocol extends Protocol {
         $items = (array)$items;
         $itemList = $this->escapeList($items);
 
+        // Server responses always use the BODY[<section>] form for the data
+        // identifier, even when the request used BODY.PEEK[<section>].
+        // Per RFC 3501, header names are case-insensitive, so we will convert
+        // to uppercase and check against that.
+        $normalizeItem = function ($item) {
+            if (!is_string($item)) {
+                return $item;
+            }
+            $item = preg_replace('/^BODY\.PEEK\[/i', 'BODY[', $item);
+            return strtoupper($item);
+        };
+
+        // Build a
+        // normalized list for response matching so neither difference
+        // causes the request to silently miss its own response.
+        $itemsForCompare = array_map($normalizeItem, $items);
+
         $response = $this->sendRequest($this->buildUIDCommand("FETCH", $uid), [$set, $itemList], $tag);
         $result = [];
         $tokens = []; // define $tokens variable before first use
@@ -815,9 +846,9 @@ class ImapProtocol extends Protocol {
 
             // if we only want one item we return that one directly
             if (count($items) == 1) {
-                if ($tokens[2][0] == $items[0]) {
+                if (strtoupper((string)$tokens[2][0]) == $itemsForCompare[0]) {
                     $data = $tokens[2][1];
-                } elseif ($uid === IMAP::ST_UID && $tokens[2][2] == $items[0]) {
+                } elseif ($uid === IMAP::ST_UID && strtoupper((string)$tokens[2][2]) == $itemsForCompare[0]) {
                     $data = $tokens[2][3];
                 } else {
                     $expectedResponse = 0;
@@ -825,7 +856,7 @@ class ImapProtocol extends Protocol {
                     $count = count($tokens[2]);
                     // we start with 2, because 0 was already checked
                     for ($i = 2; $i < $count; $i += 2) {
-                        if ($tokens[2][$i] != $items[0]) {
+                        if (strtoupper((string)$tokens[2][$i]) != $itemsForCompare[0]) {
                             continue;
                         }
                         $data = $tokens[2][$i + 1];
