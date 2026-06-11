@@ -763,11 +763,12 @@ class ImapProtocol extends Protocol {
      * @throws RuntimeException
      */
     public function fetch(array|string $items, array|int $from, mixed $to = null, int|string $uid = IMAP::ST_UID): Response {
-        if (is_array($from) && count($from) > 1) {
-            $set = implode(',', $from);
-        } elseif (is_array($from) && count($from) === 1) {
+       
+     if (is_array($from)) {
             $from = array_values($from);
-            $set = $from[0] . ':' . $from[0];
+            $set = count($from) === 1
+                ? sprintf('%s:%s', (string)$from[0], (string)$from[0])
+                : implode(',', $from);
         } elseif ($to === null) {
             $set = $from . ':' . $from;
         } elseif ($to == INF) {
