@@ -453,12 +453,22 @@ class Folder {
                 // This polymorphic call is fine - Protocol::idle() will throw an exception beforehand
                 $line = $idle_client->getConnection()->nextLine(Response::empty());
             } catch (Exceptions\RuntimeException $e) {
-                if(strpos($e->getMessage(), "empty response") >= 0 && $idle_client->getConnection()->connected()) {
-                    continue;
-                }
-                if(!str_contains($e->getMessage(), "connection closed")) {
+                if (!str_contains($e->getMessage(), "empty response") && !str_contains($e->getMessage(), "connection closed")) {
                     throw $e;
                 }
+                $meta = $idle_client->getConnection()->meta();
+                if (($meta["timed_out"] ?? false) && !($meta["eof"] ?? true)) {
+                    // Plain read timeout - the connection is still alive, keep waiting for the next event
+                    continue;
+                }
+                // EOF - the server or an intermediate gateway closed the connection (e.g. after an
+                // inactivity timeout such as the ~30 minutes granted by RFC 2177). Re-establish the
+                // idle session instead of busy-looping on the dead stream.
+                $idle_client->getConnection()->reset();
+                $idle_client->connect();
+                $idle_client->openFolder($this->path, true);
+                $idle_client->getConnection()->idle();
+                continue;
             }
 
             if (($pos = strpos($line, "EXISTS")) !== false) {
