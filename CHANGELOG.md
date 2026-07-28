@@ -7,6 +7,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ## [UNRELEASED]
 ### Fixed
 - Reading whole lines from stream #576 (thanks @wurst-hans)
+- Honor `IMAP::FT_PEEK` at the protocol level: fetch bodies with `BODY.PEEK[TEXT]` (imap_fetchbody `FT_PEEK` for the legacy protocol) instead of fetching with `RFC822.TEXT` (which sets `\Seen`) and reverting the flag with a follow-up `STORE`. Prevents messages from flickering read/unread in other clients, staying marked as read when the revert fails ("flag could not be removed") or the process dies mid-sync, and removes two round-trips per unseen message
 
 ### Added
 - NaN
