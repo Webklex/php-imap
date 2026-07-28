@@ -780,6 +780,13 @@ class ImapProtocol extends Protocol {
         $itemList = $this->escapeList($items);
 
         $response = $this->sendRequest($this->buildUIDCommand("FETCH", $uid), [$set, $itemList], $tag);
+
+        // The server answers a BODY.PEEK[...] request with an untagged BODY[...]
+        // response (rfc3501#section-6.4.5), so response items have to be matched
+        // against the non-PEEK name.
+        $items = array_map(static function(string $item): string {
+            return str_replace("BODY.PEEK[", "BODY[", $item);
+        }, $items);
         $result = [];
         $tokens = []; // define $tokens variable before first use
         while (!$this->readLine($response, $tokens, $tag)) {
@@ -873,9 +880,17 @@ class ImapProtocol extends Protocol {
      * @return Response
      * @throws RuntimeException
      */
-    public function content(int|array $uids, string $rfc = "RFC822", int|string $uid = IMAP::ST_UID): Response {
+    public function content(int|array $uids, string $rfc = "RFC822", int|string $uid = IMAP::ST_UID, bool $peek = false): Response {
         $rfc = $rfc ?? "RFC822";
-        $item = $rfc === "BODY" ? "BODY[TEXT]" : "$rfc.TEXT";
+        if ($peek) {
+            // BODY.PEEK[TEXT] returns the same payload as BODY[TEXT] / RFC822.TEXT
+            // but never sets the \Seen flag (rfc3501#section-6.4.5). There is no
+            // PEEK variant of RFC822.TEXT, so the BODY[] syntax is used for every
+            // $rfc when peeking.
+            $item = "BODY.PEEK[TEXT]";
+        } else {
+            $item = $rfc === "BODY" ? "BODY[TEXT]" : "$rfc.TEXT";
+        }
         return $this->fetch([$item], is_array($uids) ? $uids : [$uids], null, $uid);
     }
 

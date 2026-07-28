@@ -639,7 +639,7 @@ class Message {
 
         $sequence_id = $this->getSequenceId();
         try {
-            $contents = $this->client->getConnection()->content([$sequence_id], $this->client->rfc, $this->sequence)->validatedData();
+            $contents = $this->client->getConnection()->content([$sequence_id], $this->client->rfc, $this->sequence, $this->fetch_options == IMAP::FT_PEEK)->validatedData();
         } catch (Exceptions\RuntimeException $e) {
             throw new MessageContentFetchingException("failed to fetch content", 0, $e);
         }
@@ -688,10 +688,11 @@ class Message {
      */
     public function peek(): void {
         if ($this->fetch_options == IMAP::FT_PEEK) {
-            if ($this->getFlags()->get("seen") == null) {
-                $this->unsetFlag("Seen");
-            }
-        } elseif ($this->getFlags()->get("seen") == null) {
+            // The body was fetched with BODY.PEEK[...], which never sets the
+            // \Seen flag - there is nothing to reconcile.
+            return;
+        }
+        if ($this->getFlags()->get("seen") == null) {
             $this->setFlag("Seen");
         }
     }

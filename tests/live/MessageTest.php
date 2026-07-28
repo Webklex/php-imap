@@ -2407,4 +2407,81 @@ class MessageTest extends LiveMailboxTestCase {
         // Cleanup
         self::assertTrue($message->delete());
     }
+
+    /**
+     * Test that fetching a message body with IMAP::FT_PEEK (the default fetch
+     * option) leaves the \Seen flag unset on the server
+     *
+     * @return void
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws EventNotFoundException
+     * @throws FolderFetchingException
+     * @throws GetMessagesFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws InvalidMessageDateException
+     * @throws MaskNotFoundException
+     * @throws MessageContentFetchingException
+     * @throws MessageFlagException
+     * @throws MessageHeaderFetchingException
+     * @throws MessageNotFoundException
+     * @throws ResponseException
+     * @throws RuntimeException
+     */
+    public function testFetchingBodyLeavesMessageUnseen(): void {
+        $message = $this->getDefaultMessage();
+
+        // getDefaultMessage() has already fetched the body (the fetch option
+        // defaults to IMAP::FT_PEEK): the message must still be unseen.
+        self::assertFalse($message->getFlags()->has("seen"));
+
+        // Fetch the message again - body included - and re-read its flags from
+        // the server: the body must be there and \Seen must still be unset.
+        $folder = $this->getFolder('INBOX');
+        $fresh = $folder->messages()->getMessageByUid($message->getUid());
+        self::assertInstanceOf(Message::class, $fresh);
+        self::assertNotEmpty($fresh->getTextBody());
+        self::assertFalse($fresh->getFlags()->has("seen"));
+
+        // Cleanup
+        self::assertTrue($message->delete());
+    }
+
+    /**
+     * Test that fetching a message body without IMAP::FT_PEEK still marks the
+     * message as seen
+     *
+     * @return void
+     * @throws AuthFailedException
+     * @throws ConnectionFailedException
+     * @throws EventNotFoundException
+     * @throws FolderFetchingException
+     * @throws GetMessagesFailedException
+     * @throws ImapBadRequestException
+     * @throws ImapServerErrorException
+     * @throws InvalidMessageDateException
+     * @throws MaskNotFoundException
+     * @throws MessageContentFetchingException
+     * @throws MessageFlagException
+     * @throws MessageHeaderFetchingException
+     * @throws MessageNotFoundException
+     * @throws ResponseException
+     * @throws RuntimeException
+     */
+    public function testFetchingBodyWithoutPeekMarksMessageSeen(): void {
+        $message = $this->getDefaultMessage();
+        self::assertFalse($message->getFlags()->has("seen"));
+
+        $message->setFetchOption(IMAP::FT_UID);
+        $message->parseBody();
+
+        $folder = $this->getFolder('INBOX');
+        $fresh = $folder->messages()->getMessageByUid($message->getUid());
+        self::assertInstanceOf(Message::class, $fresh);
+        self::assertTrue($fresh->getFlags()->has("seen"));
+
+        // Cleanup
+        self::assertTrue($message->delete());
+    }
 }
