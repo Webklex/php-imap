@@ -55,6 +55,9 @@ class Query {
     /** @var Client $client */
     protected Client $client;
 
+    /** @var string|null $folder_path */
+    protected ?string $folder_path = null;
+
     /** @var ?int $limit */
     protected ?int $limit = null;
 
@@ -89,9 +92,11 @@ class Query {
      * Query constructor.
      * @param Client $client
      * @param string[] $extensions
+     * @param string|null $folder_path
      */
-    public function __construct(Client $client, array $extensions = []) {
+    public function __construct(Client $client, array $extensions = [], ?string $folder_path = null) {
         $this->setClient($client);
+        $this->folder_path = $folder_path;
         $config = $this->client->getConfig();
 
         $this->sequence = $config->get('options.sequence', IMAP::ST_MSGN);
@@ -115,6 +120,19 @@ class Query {
      * Instance boot method for additional functionality
      */
     protected function boot(): void {
+    }
+
+    /**
+     * Re-select the folder on the server after a reconnect so IMAP commands
+     * that require a selected mailbox don't fail.
+     *
+     * TODO: compare and invalidate UIDVALIDITY here once that support lands.
+     */
+    protected function reassertFolder(): void {
+        if ($this->folder_path === null) {
+            return;
+        }
+        $this->client->openFolder($this->folder_path);
     }
 
     /**
@@ -197,6 +215,9 @@ class Query {
         $this->generate_query();
 
         try {
+            if ($this->client->checkConnection()) {
+                $this->reassertFolder();
+            }
             $available_messages = $this->client->getConnection()->search([$this->getRawQuery()], $this->sequence)->validatedData();
             return new Collection($available_messages);
         } catch (RuntimeException|ConnectionFailedException $e) {
@@ -231,6 +252,10 @@ class Query {
      * @throws ResponseException
      */
     protected function fetch(Collection $available_messages): array {
+        if ($this->client->checkConnection()) {
+            $this->reassertFolder();
+        }
+
         if ($this->fetch_order === 'desc') {
             $available_messages = $available_messages->reverse();
         }
@@ -699,7 +724,9 @@ class Query {
      * @throws ResponseException
      */
     public function getClient(): Client {
-        $this->client->checkConnection();
+        if ($this->client->checkConnection()) {
+            $this->reassertFolder();
+        }
         return $this->client;
     }
 
