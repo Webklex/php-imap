@@ -1,10 +1,11 @@
 <?php
 
-namespace Tests;
+namespace Tests\issues;
 
 use PHPUnit\Framework\TestCase;
 use Webklex\PHPIMAP\Client;
 use Webklex\PHPIMAP\Config;
+use Webklex\PHPIMAP\Exceptions\NoFolderSelectedException;
 use Webklex\PHPIMAP\Message;
 use Webklex\PHPIMAP\Connection\Protocols\ImapProtocol;
 
@@ -38,22 +39,22 @@ class PR619Test extends TestCase
         return $client;
     }
 
-    public function testMakeThrowsTypeErrorWhenActiveFolderIsNull(): void
+    public function testMakeThrowsWhenActiveFolderIsNull(): void
     {
-        $this->expectException(\TypeError::class);
+        $this->expectException(NoFolderSelectedException::class);
 
         $client = $this->makeClientWithNullActiveFolder();
         Message::make(1, 0, $client, "Subject: Test\r\n\r\n", '', []);
     }
 
-    public function testMakeSucceedsAfterFix(): void
+    public function testMakeSucceedsWithActiveFolder(): void
     {
         $client = $this->makeClientWithNullActiveFolder();
+        $client->setActiveFolder("INBOX");
 
         $message = Message::make(1, 0, $client, "Subject: Test\r\n\r\n", '', []);
 
         $this->assertInstanceOf(Message::class, $message);
-        $this->assertIsString($message->getFolderPath());
-        $this->assertNotEmpty($message->getFolderPath());
+        $this->assertSame("INBOX", $message->getFolderPath());
     }
 }
