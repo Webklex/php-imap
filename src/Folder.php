@@ -161,7 +161,7 @@ class Folder {
         $this->getClient()->openFolder($this->path);
         $extensions = count($extensions) > 0 ? $extensions : $this->getClient()->extensions;
 
-        return new WhereQuery($this->getClient(), $extensions);
+        return new WhereQuery($this->getClient(), $extensions, $this->path);
     }
 
     /**

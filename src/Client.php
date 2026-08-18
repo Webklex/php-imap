@@ -861,7 +861,10 @@ class Client {
      * @throws ResponseException
      */
     public function expunge(): array {
-        $this->checkConnection();
+        $active = $this->active_folder;
+        if ($this->checkConnection() && $active !== null) {
+            $this->openFolder($active);
+        }
         return $this->connection->expunge()->validatedData();
     }
 
