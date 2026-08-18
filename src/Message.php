@@ -33,6 +33,7 @@ use Webklex\PHPIMAP\Exceptions\MessageFlagException;
 use Webklex\PHPIMAP\Exceptions\MessageHeaderFetchingException;
 use Webklex\PHPIMAP\Exceptions\MessageNotFoundException;
 use Webklex\PHPIMAP\Exceptions\MessageSizeFetchingException;
+use Webklex\PHPIMAP\Exceptions\NoFolderSelectedException;
 use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
 use Webklex\PHPIMAP\Exceptions\ResponseException;
 use Webklex\PHPIMAP\Exceptions\RuntimeException;
@@ -219,6 +220,7 @@ class Message {
      * @throws MessageContentFetchingException
      * @throws MessageFlagException
      * @throws MessageHeaderFetchingException
+     * @throws NoFolderSelectedException
      * @throws RuntimeException
      * @throws ResponseException
      */
@@ -232,7 +234,7 @@ class Message {
         $this->events["message"] = $client->getDefaultEvents("message");
         $this->events["flag"] = $client->getDefaultEvents("flag");
 
-        $this->folder_path = $client->getFolderPath();
+        $this->folder_path = $client->getFolderPath() ?? throw new NoFolderSelectedException("no folder has been selected");
 
         $this->setSequence($sequence);
         $this->setFetchOption($fetch_options);
@@ -269,6 +271,7 @@ class Message {
      * @param array $raw_flags
      * @param null $fetch_options
      * @param null $sequence
+     * @param string|null $folder_path
      *
      * @return Message
      * @throws AuthFailedException
@@ -279,6 +282,7 @@ class Message {
      * @throws InvalidMessageDateException
      * @throws MessageContentFetchingException
      * @throws MessageFlagException
+     * @throws NoFolderSelectedException
      * @throws ReflectionException
      * @throws RuntimeException
      * @throws ResponseException
@@ -297,7 +301,8 @@ class Message {
                                  "message" => $client->getDefaultEvents("message"),
                                  "flag"    => $client->getDefaultEvents("flag"),
                              ]);
-        $instance->setFolderPath($client->getFolderPath());
+        $folder_path = $client->getFolderPath() ?? throw new NoFolderSelectedException("no folder has been selected");
+        $instance->setFolderPath($folder_path);
         $instance->setSequence($sequence);
         $instance->setFetchOption($fetch_options);
 
@@ -338,7 +343,10 @@ class Message {
     }
 
     /**
-     * Create a new message instance by reading and loading a string
+     * Create a new message instance by reading and loading a string.
+     * Note: the resulting Message has no folder association; calling
+     * getFolderPath() will throw NoFolderSelectedException.
+     *
      * @param string $blob
      * @param ?Config $config
      *
@@ -1458,9 +1466,10 @@ class Message {
      * Get the message path aka folder path
      *
      * @return string
+     * @throws NoFolderSelectedException
      */
     public function getFolderPath(): string {
-        return $this->folder_path;
+        return $this->folder_path ?? throw new NoFolderSelectedException("no folder has been selected");
     }
 
     /**
