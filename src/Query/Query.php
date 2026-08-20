@@ -105,6 +105,8 @@ class Query {
 
         $this->date_format = $config->get('date_format', 'd M y');
         $this->soft_fail = $config->get('options.soft_fail', false);
+        $this->fetch_body = $config->get('options.fetch_body', true);
+        $this->fetch_flags = $config->get('options.fetch_flags', true);
 
         $this->setExtensions($extensions);
         $this->query = new Collection();
