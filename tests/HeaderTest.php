@@ -201,4 +201,70 @@ class HeaderTest extends TestCase {
         $this->assertArrayHasKey('attribute_test', $mock->getAttributes());
         $this->assertEquals('attribute_test_value', $mock->get('attribute_test'));
     }
+
+    /**
+     * A localised month abbreviation must not escape parseDate().
+     *
+     * "Seg, 08 Set 2026 ..." (pt-BR) matches one of the regex cases below the
+     * first Carbon::parse(), which then calls Carbon::createFromFormat("d M Y ...")
+     * outside of any try. The resulting InvalidFormatException is neither an
+     * InvalidMessageDateException nor one of the exceptions Query::make() catches
+     * with soft_fail, so it aborts the whole fetched batch instead of this single
+     * message.
+     *
+     * @throws InvalidMessageDateException
+     */
+    public function testUnparsableDateFallsBackToFallbackDate(): void {
+        $config = Config::make(["options" => ["fallback_date" => "1970-01-01 00:00:00 +0000"]]);
+
+        foreach (["Seg, 08 Set 2026 10:00:00 -0300", "Qua, 10 Dez 2026 10:00:00 -0300", "Sex, 06 Fev 2026 10:00:00 -0300"] as $raw) {
+            $header = new Header("Subject: Test\r\nDate: " . $raw, $config);
+
+            /** @var Carbon $date */
+            $date = $header->get("date")->first();
+
+            self::assertSame("1970-01-01T00:00:00+00:00", $date->toIso8601String(), $raw);
+        }
+    }
+
+    /**
+     * Without fallback_date the same headers must fail with the documented
+     * InvalidMessageDateException, not with a raw Carbon exception.
+     */
+    public function testUnparsableDateThrowsInvalidMessageDateException(): void {
+        $this->expectException(InvalidMessageDateException::class);
+
+        new Header("Subject: Test\r\nDate: Seg, 08 Set 2026 10:00:00 -0300", Config::make());
+    }
+
+    /**
+     * The day-of-week is redundant in RFC 2822 and PHP reads an inconsistent one
+     * as a relative weekday: "Mon, 08 Sep 2026" (a Tuesday) used to parse as
+     * 14 Sep 2026, six days off, without any error.
+     *
+     * @throws InvalidMessageDateException
+     */
+    public function testInconsistentDayOfWeekDoesNotShiftTheDate(): void {
+        $header = new Header("Subject: Test\r\nDate: Mon, 08 Sep 2026 10:00:00 -0300", $this->config);
+
+        /** @var Carbon $date */
+        $date = $header->get("date")->first();
+
+        self::assertSame("2026-09-08T10:00:00-03:00", $date->toIso8601String());
+    }
+
+    /**
+     * A date that carries no day-of-week must stay untouched: the leading token of
+     * "Mar 08 2026 10:00:00 -0300" is a month, not a weekday.
+     *
+     * @throws InvalidMessageDateException
+     */
+    public function testDateWithoutDayOfWeekIsNotStripped(): void {
+        $header = new Header("Subject: Test\r\nDate: Mar 08 2026 10:00:00 -0300", $this->config);
+
+        /** @var Carbon $date */
+        $date = $header->get("date")->first();
+
+        self::assertSame("2026-03-08T10:00:00-03:00", $date->toIso8601String());
+    }
 }
