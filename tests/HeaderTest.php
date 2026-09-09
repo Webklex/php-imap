@@ -254,6 +254,22 @@ class HeaderTest extends TestCase {
     }
 
     /**
+     * The same must hold for a header that only reaches a date after the regex
+     * switch: "Mon, 04 Jan 2018 10:12:47 UT" fails the first Carbon::parse() (it
+     * needs the trailing "C" the switch appends) and used to come back as 08 Jan.
+     *
+     * @throws InvalidMessageDateException
+     */
+    public function testInconsistentDayOfWeekDoesNotShiftTheDateAfterTheSwitchEither(): void {
+        $header = new Header("Subject: Test\r\nDate: Mon, 04 Jan 2018 10:12:47 UT", $this->config);
+
+        /** @var Carbon $date */
+        $date = $header->get("date")->first();
+
+        self::assertSame("2018-01-04T10:12:47+00:00", $date->toIso8601String());
+    }
+
+    /**
      * A date that carries no day-of-week must stay untouched: the leading token of
      * "Mar 08 2026 10:00:00 -0300" is a month, not a weekday.
      *
@@ -266,5 +282,26 @@ class HeaderTest extends TestCase {
         $date = $header->get("date")->first();
 
         self::assertSame("2026-03-08T10:00:00-03:00", $date->toIso8601String());
+    }
+
+    /**
+     * A truncated header must not be rescued by the strip: dropping "Seg," from
+     * "Seg, 10:00:00 -0300" leaves a bare time, which PHP happily parses as *today*
+     * at 10:00 -- a plausible, wrong date with no error. It has to reach
+     * fallback_date instead.
+     *
+     * @throws InvalidMessageDateException
+     */
+    public function testTruncatedDateStillReachesFallbackDate(): void {
+        $config = Config::make(["options" => ["fallback_date" => "1970-01-01 00:00:00 +0000"]]);
+
+        foreach (["Seg, 10:00:00 -0300", "Qua,"] as $raw) {
+            $header = new Header("Subject: Test\r\nDate: " . $raw, $config);
+
+            /** @var Carbon $date */
+            $date = $header->get("date")->first();
+
+            self::assertSame("1970-01-01T00:00:00+00:00", $date->toIso8601String(), $raw);
+        }
     }
 }

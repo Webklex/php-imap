@@ -698,12 +698,7 @@ class Header {
                 if (str_contains($date, ' UT ')) {
                     $date = str_replace(' UT ', ' UTC ', $date);
                 }
-                // The day-of-week is redundant in RFC 2822, and PHP's parser reads an
-                // inconsistent one as a *relative* weekday, silently pushing the date
-                // forward ("Mon, 08 Sep 2026" is a Tuesday and parses as 14 Sep 2026).
-                // Drop it for this attempt only: the regex switch below still needs to
-                // see the raw header, because most of its patterns are anchored on it.
-                $parsed_date = Carbon::parse(preg_replace('/^[A-Za-z]{2,3}\.?\s*,\s*/', '', $date) ?? $date);
+                $parsed_date = Carbon::parse(self::stripDayOfWeek($date));
             } catch (\Exception $e) {
                 // Everything that can throw while normalising the date belongs in the
                 // same try as the final Carbon::parse(): the createFromFormat() calls
@@ -765,7 +760,7 @@ class Header {
                             $date = trim(array_pop($array));
                             break;
                     }
-                    $parsed_date = Carbon::parse($date);
+                    $parsed_date = Carbon::parse(is_string($date) ? self::stripDayOfWeek($date) : $date);
                 } catch (\Throwable $_e) {
                     if (!isset($this->options["fallback_date"])) {
                         throw new InvalidMessageDateException("Invalid message date. ID:" . $this->get("message_id") . " Date:" . $header->date . "/" . $date, 1100, $e);
@@ -777,6 +772,25 @@ class Header {
 
             $this->set("date", $parsed_date);
         }
+    }
+
+    /**
+     * Drop the day-of-week token from a Date: header.
+     *
+     * It is redundant in RFC 2822, and PHP's parser reads an inconsistent one as a
+     * *relative* weekday, silently pushing the date forward ("Mon, 08 Sep 2026" is a
+     * Tuesday and parses as 14 Sep 2026).
+     *
+     * Two deliberate narrowings, so this never turns a date the package parses today
+     * into a fallback:
+     *  - the comma is required, otherwise the leading month of "Mar 08 2026 10:00:00
+     *    -0300" would be eaten as well;
+     *  - the tail must still look like a date, otherwise a truncated header such as
+     *    "Seg, 10:00:00 -0300" would parse as *today* at 10:00 instead of reaching
+     *    fallback_date.
+     */
+    private static function stripDayOfWeek(string $date): string {
+        return preg_replace('/^[A-Za-z]{2,3}\.?\s*,\s*(?=[0-9]{1,2}[\s.-]+[A-Za-z]{3})/', '', $date) ?? $date;
     }
 
     /**
