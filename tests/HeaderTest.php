@@ -201,4 +201,16 @@ class HeaderTest extends TestCase {
         $this->assertArrayHasKey('attribute_test', $mock->getAttributes());
         $this->assertEquals('attribute_test_value', $mock->get('attribute_test'));
     }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testLargeHeaderAttributeIsParsedWithinMemory(): void {
+        $value = "list=" . str_repeat("a", 16 * 1024 * 1024) . "; charset=utf-8";
+        ini_set("memory_limit", (string)(memory_get_usage() + 192 * 1024 * 1024));
+
+        $header = new Header("X-Large: " . $value, $this->config);
+
+        self::assertSame("utf-8", (string)$header->get("charset"));
+    }
 }

@@ -599,7 +599,9 @@ class Header {
         $inside_word = false;
         $inside_key = true;
         $escaped = false;
-        foreach (str_split($raw_attribute) as $char) {
+        $length = strlen($raw_attribute);
+        for ($i = 0; $i < $length; $i++) {
+            $char = $raw_attribute[$i];
             if($escaped) {
                 $escaped = false;
                 continue;
