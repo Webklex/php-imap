@@ -442,7 +442,14 @@ class Folder {
         $idle_client = $this->client->clone();
         $idle_client->connect();
         $idle_client->openFolder($this->path, true);
-        $idle_client->getConnection()->idle();
+
+        // Fetch the protocol connection once, before entering IDLE. Client::getConnection() runs
+        // checkConnection(), which verifies the session with a NOOP. Sending a NOOP while the session
+        // is in IDLE violates rfc2177 - servers such as Dovecot answer "BAD Expected DONE" and end the
+        // IDLE, checkConnection() then silently opens a new session without IDLE and no EXISTS ever
+        // arrives. Inside the loop only the protocol connection itself must be used.
+        $connection = $idle_client->getConnection();
+        $connection->idle();
 
         $last_action = Carbon::now()->addSeconds($timeout);
 
@@ -451,9 +458,12 @@ class Folder {
         while (true) {
             try {
                 // This polymorphic call is fine - Protocol::idle() will throw an exception beforehand
-                $line = $idle_client->getConnection()->nextLine(Response::empty());
+                $line = $connection->nextLine(Response::empty());
             } catch (Exceptions\RuntimeException $e) {
-                if(strpos($e->getMessage(), "empty response") >= 0 && $idle_client->getConnection()->connected()) {
+                // Do not use connected() here - it sends a NOOP, which would end the IDLE session.
+                // A stream that is not at EOF is still alive (e.g. a plain read timeout).
+                $meta = $connection->meta();
+                if(strpos($e->getMessage(), "empty response") >= 0 && !($meta["eof"] ?? true)) {
                     continue;
                 }
                 if(!str_contains($e->getMessage(), "connection closed")) {
