@@ -67,6 +67,8 @@ class Attribute implements ArrayAccess {
      * Return the stringified attribute
      *
      * @return string
+     *
+     * @psalm-taint-source input
      */
     public function __toString() {
         return implode(", ", $this->values);
@@ -76,6 +78,8 @@ class Attribute implements ArrayAccess {
      * Return the stringified attribute
      *
      * @return string
+     *
+     * @psalm-taint-source input
      */
     public function toString(): string {
         return $this->__toString();
@@ -85,6 +89,8 @@ class Attribute implements ArrayAccess {
      * Convert instance to array
      *
      * @return array
+     *
+     * @psalm-taint-source input
      */
     public function toArray(): array {
         return $this->__serialize();
@@ -137,6 +143,8 @@ class Attribute implements ArrayAccess {
      *
      * @param int|string $key
      * @return mixed
+     *
+     * @psalm-taint-source input
      */
     public function get(int|string $key = 0): mixed {
         return $this->values[$key] ?? null;
@@ -245,6 +253,8 @@ class Attribute implements ArrayAccess {
      * Get all values
      *
      * @return array
+     *
+     * @psalm-taint-source input
      */
     public function all(): array {
         reset($this->values);
@@ -255,6 +265,8 @@ class Attribute implements ArrayAccess {
      * Get the first value if possible
      *
      * @return mixed|null
+     *
+     * @psalm-taint-source input
      */
     public function first(): mixed {
         return reset($this->values);
@@ -264,6 +276,8 @@ class Attribute implements ArrayAccess {
      * Get the last value if possible
      *
      * @return mixed|null
+     *
+     * @psalm-taint-source input
      */
     public function last(): mixed {
         return end($this->values);

@@ -475,6 +475,8 @@ class Message {
      * @throws RuntimeException
      * @throws ResponseException
      * @throws MessageSizeFetchingException
+     *
+     * @psalm-taint-source input
      */
     public function get($name): mixed {
         if (isset($this->attributes[$name]) && $this->attributes[$name] !== null) {
@@ -511,6 +513,8 @@ class Message {
      * Get the Message text body
      *
      * @return string
+     *
+     * @psalm-taint-source input
      */
     public function getTextBody(): string {
         if (!isset($this->bodies['text'])) {
@@ -533,6 +537,8 @@ class Message {
      * Get the Message html body
      *
      * @return string
+     *
+     * @psalm-taint-source input
      */
     public function getHTMLBody(): string {
         if (!isset($this->bodies['html'])) {
@@ -1288,6 +1294,8 @@ class Message {
      * Get the raw body
      *
      * @return string
+     *
+     * @psalm-taint-source input
      */
     public function getRawBody(): string {
         if ($this->raw_body === "") {
