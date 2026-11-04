@@ -19,6 +19,8 @@ you want to use legacy protocols such as pop3.
 
 Official documentation: [php-imap.com](https://www.php-imap.com/)
 
+Official documentation Markdown Repository (Useful for AI Agents): [php-imap-documentation](https://github.com/Webklex/php-imap-documentation)
+
 Laravel wrapper: [webklex/laravel-imap](https://github.com/Webklex/laravel-imap)
 
 Discord: [discord.gg/rd4cN9h6][link-discord]
@@ -41,7 +43,7 @@ Discord: [discord.gg/rd4cN9h6][link-discord]
 ## Documentations
 - Legacy (< v2.0.0): [legacy documentation](https://github.com/Webklex/php-imap/tree/1.4.5)
 - Core documentation: [php-imap.com](https://www.php-imap.com/)
-
+- Markdown Repository (Useful for AI Agents): [php-imap-documentation](https://github.com/Webklex/php-imap-documentation)
 
 ## Compatibility
 | Version | PHP 5.6 | PHP 7 | PHP 8 |
