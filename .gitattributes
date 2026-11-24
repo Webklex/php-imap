@@ -1,0 +1,6 @@
+/tests              export-ignore
+/examples           export-ignore
+/.github            export-ignore
+/.gitignore         export-ignore
+/_config.yml        export-ignore
+/phpunit.xml.dist   export-ignore
